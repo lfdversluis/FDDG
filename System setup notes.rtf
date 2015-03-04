@@ -1,0 +1,38 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1343\cocoasubrtf140
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\fs24 \cf0 -mirrored architecture\
+-clients connect with one server, random chosen from the n servers available (maybe later geographically based connection)\
+-if server is full, then redirect the client to another server (with a special packet?) -> player starts at the border of the game board if he joins for the first time\
+-the server sends the game state to the client (each connection with a client gets a special identifier, for logging purposes)\
+-when a server receives an update from a client, the server broadcasts to every other server the details of the update\
+\
+-to know whether another server is alive, a heartbeat is being sent every x seconds\
+-\
+\
+Server can send back to client:\
+-full game state\
+-game state update\
+	-dragon dies\
+	-\'85\
+\
+Client interactions:\
+-attack\
+-move (up, down, left, right)\
+-heal\
+\
+Every server has the full game state in memory.\
+\
+CAP model -> drop availability which means that packet transmission can be unreliable.\
+\
+What to do when a server drops?\
+\
+When a server drops, all clients connected to this server, drops their connections. We hardcode the IP addresses of the other servers and the client tries to connect with another server.\
+On restart after drop: connect with other servers, servers send game state to this server.\
+\
+Testing the system:\
+-we can use Thread.sleep to simulate a blackout\
+-}
