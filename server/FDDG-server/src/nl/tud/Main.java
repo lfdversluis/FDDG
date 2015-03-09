@@ -1,5 +1,7 @@
 package nl.tud;
 
+import nl.tud.client.ClientProcess;
+
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -23,11 +25,18 @@ public class Main {
                     new Thread(process).start();
             }
 
+            // create a client after a small delay
+            Thread.sleep(2000);
+            ClientProcess client = new ClientProcess(1234);
+            new Thread(client).start();
+
         } catch (RemoteException e){
             e.printStackTrace();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (AlreadyBoundException e) {
+            e.printStackTrace();
+        } catch(InterruptedException e) {
             e.printStackTrace();
         }
     }

@@ -17,9 +17,7 @@ public interface ServerInterface extends Remote {
 
     public void connect(int playerId) throws java.rmi.RemoteException;
 
-    public void sendField(int remoteId, Field field) throws java.rmi.RemoteException;
-
-    public void sendError(int remoteId, int errorId, String message) throws java.rmi.RemoteException;;
-
     public void heartBeat(int remoteId) throws java.rmi.RemoteException;
+
+    public void pong() throws java.rmi.RemoteException;
 }

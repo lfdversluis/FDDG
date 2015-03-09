@@ -20,13 +20,14 @@ public class Field {
     private int[] dy = { -1, 0, 1, 0 };
     private HashSet<Integer> unitIds;
     private HashMap<Integer, Player> playerMap;
+    private Random random;
 
     public Field() {
         entities = new Unit[BOARD_HEIGHT][BOARD_WIDTH];
         unitIds = new HashSet<Integer>();
         playerMap = new HashMap<Integer, Player>();
 
-        Random random = new Random(System.currentTimeMillis());
+        random = new Random(System.currentTimeMillis());
 
         // fill the field with dragons
         int randX, randY;
@@ -37,18 +38,6 @@ public class Field {
             } while (!isFree(randX, randY));
 
             entities[randY][randX] = new Dragon(randX, randY, getUniqueId());
-        }
-
-        // fill the field with players
-        for(int i = 0; i < INITIAL_DRAGONS; i++) {
-            do {
-                randX = random.nextInt(BOARD_WIDTH);
-                randY = random.nextInt(BOARD_HEIGHT);
-            } while (isFree(randX, randY));
-
-            Player p = new Player(randX, randY, getUniqueId());
-            playerMap.put(p.getUnitId(), p);
-            entities[randY][randX] = p;
         }
     }
 
@@ -62,6 +51,18 @@ public class Field {
         while(unitIds.contains(uniqueId)) { uniqueId = random.nextInt(); }
         unitIds.add(uniqueId);
         return uniqueId;
+    }
+
+    public void addPlayer(int playerId) {
+        int randX, randY;
+        do {
+            randX = random.nextInt(BOARD_WIDTH);
+            randY = random.nextInt(BOARD_HEIGHT);
+        } while (!isFree(randX, randY));
+
+        Player p = new Player(randX, randY, playerId);
+        playerMap.put(p.getUnitId(), p);
+        entities[randY][randX] = p;
     }
 
     public boolean isValidPlayerId(int playerId) {
