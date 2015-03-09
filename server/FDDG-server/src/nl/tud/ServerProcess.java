@@ -1,13 +1,16 @@
 package nl.tud;
 
+import nl.tud.client.ClientInterface;
 import nl.tud.gameobjects.Field;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,14 +22,14 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private final int ID, NUM_SERVERS;
     private Field field;
     private Logger logger;
-    private Set<Integer> connectedPlayers;
+    private Map<Integer, ClientInterface> connectedPlayers;
 
     public ServerProcess(int id, int num_servers) throws RemoteException, AlreadyBoundException, MalformedURLException {
         this.ID = id;
         this.NUM_SERVERS = num_servers;
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
-        this.connectedPlayers = new HashSet<Integer>();
+        this.connectedPlayers = new HashMap<Integer, ClientInterface>();
 
         logger.log(Level.INFO, "Starting server with id " + id);
 
@@ -57,7 +60,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         if(!result) {
             // TODO send error message
         } else {
-            // TODO send updated field
+            connectedPlayers.get(playerId).updateField(field);
         }
     }
 
@@ -73,8 +76,20 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
     @Override
     public void connect(int playerId) throws RemoteException {
-        connectedPlayers.add(playerId);
-        field.addPlayer(playerId);
+
+        logger.log(Level.INFO, "Client with id " + playerId + " connected");
+
+        try {
+            ClientInterface ci = (ClientInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGClient/" + playerId);
+            connectedPlayers.put(playerId, ci);
+            field.addPlayer(playerId);
+            ci.updateField(field);
+
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

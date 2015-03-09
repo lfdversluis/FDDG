@@ -1,9 +1,11 @@
 package nl.tud.entities;
 
+import java.io.Serializable;
+
 /**
  * Created by martijndevos on 3/4/15.
  */
-public class Unit {
+public class Unit implements Serializable {
     protected int maxHitPoints, attackPower, curHitPoints;
     protected int xPos, yPos;
     protected int unitId;

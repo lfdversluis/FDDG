@@ -4,6 +4,7 @@ import nl.tud.entities.Dragon;
 import nl.tud.entities.Player;
 import nl.tud.entities.Unit;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -11,7 +12,7 @@ import java.util.Random;
 /**
  * Created by martijndevos on 3/4/15.
  */
-public class Field {
+public class Field implements Serializable {
     private static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
     private static final int INITIAL_DRAGONS = 20;
     private static final int INITIAL_PLAYERS = 100;
@@ -70,7 +71,7 @@ public class Field {
     }
 
     private boolean canMove(int newX, int newY) {
-        return (isFree(newX, newY) && newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT);
+        return (newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && isFree(newX, newY));
     }
 
     public boolean movePlayer(int playerId, int direction) {

@@ -1,4 +1,4 @@
-package nl.tud;
+package nl.tud.client;
 
 import nl.tud.gameobjects.Field;
 

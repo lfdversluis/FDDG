@@ -1,6 +1,5 @@
 package nl.tud.client;
 
-import nl.tud.ClientInterface;
 import nl.tud.Main;
 import nl.tud.ServerInterface;
 import nl.tud.gameobjects.Field;
@@ -23,6 +22,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     private final int ID;
     private Logger logger;
     private ServerInterface server;
+    private Field field;
 
     public ClientProcess(int id) throws RemoteException, AlreadyBoundException, MalformedURLException {
         this.ID = id;
@@ -34,8 +34,10 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     }
 
     @Override
-    public void updateField(Field field) throws RemoteException {
+    public synchronized void updateField(Field field) throws RemoteException {
         logger.log(Level.INFO, "Client " + this.ID + " received field update");
+
+        this.field = field;
     }
 
     @Override
