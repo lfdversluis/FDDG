@@ -11,7 +11,7 @@ import java.util.*;
  * Created by martijndevos on 3/4/15.
  */
 public class Field implements Serializable {
-    private static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
+    public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
     private static final int INITIAL_DRAGONS = 20;
     private Unit[][] entities;
     private int[] dx = { 0, 1, 0, -1 };
@@ -90,6 +90,10 @@ public class Field implements Serializable {
         p.setxPos(newX); p.setyPos(newY);
 
         return true;
+    }
+
+    public Unit getUnit(int x, int y) {
+        return entities[y][x];
     }
 
     public int manhattanDistance(int x1, int y1, int x2, int y2) {

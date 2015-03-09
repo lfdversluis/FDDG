@@ -1,9 +1,13 @@
 package nl.tud;
 
 import nl.tud.client.ClientInterface;
+import nl.tud.entities.Dragon;
 import nl.tud.entities.Player;
+import nl.tud.entities.Unit;
 import nl.tud.gameobjects.Field;
 
+import javax.swing.*;
+import java.awt.*;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
@@ -26,16 +30,62 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private Logger logger;
     private Map<Integer, ClientInterface> connectedPlayers;
 
+    private JLabel[][] labels;
+
     public ServerProcess(int id, int num_servers) throws RemoteException, AlreadyBoundException, MalformedURLException {
         this.ID = id;
         this.NUM_SERVERS = num_servers;
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
         this.connectedPlayers = new HashMap<Integer, ClientInterface>();
+        this.labels = new JLabel[field.BOARD_HEIGHT][field.BOARD_WIDTH];
 
         logger.log(Level.INFO, "Starting server with id " + id);
 
         java.rmi.Naming.bind("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/" + id, this);
+
+        setupGUI();
+    }
+
+    private void setupGUI() {
+        JFrame frame = new JFrame("FDDG Visualizer");
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(field.BOARD_WIDTH, field.BOARD_HEIGHT));
+
+        // create squares
+        for(int x = 0; x < field.BOARD_WIDTH; x++) {
+            for(int y = 0; y < field.BOARD_HEIGHT; y++) {
+                JLabel b = new JLabel("", SwingConstants.CENTER);
+                b.setOpaque(true);
+                panel.add(b);
+                labels[y][x] = b;
+            }
+        }
+
+        frame.add(panel);
+        frame.setSize(600, 600);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+
+    private void updateLabels() {
+        for(int x = 0; x < field.BOARD_WIDTH; x++) {
+            for (int y = 0; y < field.BOARD_HEIGHT; y++) {
+                Unit unit = field.getUnit(x, y);
+                if(unit == null) {
+                    labels[y][x].setBackground(Color.WHITE);
+                    labels[y][x].setText("");
+                } else if(unit instanceof Dragon) {
+                    labels[y][x].setBackground(Color.RED);
+                    labels[y][x].setText("D");
+                } else if(unit instanceof Player) {
+                    labels[y][x].setBackground(Color.GREEN);
+                    labels[y][x].setText("P");
+                }
+            }
+        }
     }
 
     @Override
@@ -77,6 +127,8 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         } else {
             broadcastFieldToConnectedPlayers();
         }
+
+        updateLabels();
     }
 
     @Override
@@ -90,6 +142,8 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
             field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
             broadcastFieldToConnectedPlayers();
         }
+
+        updateLabels();
     }
 
     @Override
@@ -106,6 +160,8 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
             }
             broadcastFieldToConnectedPlayers();
         }
+
+        updateLabels();
     }
 
     @Override
@@ -124,6 +180,8 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+
+        updateLabels();
     }
 
     @Override
