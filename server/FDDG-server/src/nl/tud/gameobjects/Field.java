@@ -24,6 +24,7 @@ public class Field {
     public Field() {
         entities = new Unit[BOARD_HEIGHT][BOARD_WIDTH];
         unitIds = new HashSet<Integer>();
+        playerMap = new HashMap<Integer, Player>();
 
         Random random = new Random(System.currentTimeMillis());
 
@@ -33,7 +34,7 @@ public class Field {
             do {
                 randX = random.nextInt(BOARD_WIDTH);
                 randY = random.nextInt(BOARD_HEIGHT);
-            } while (isFree(randX, randY));
+            } while (!isFree(randX, randY));
 
             entities[randY][randX] = new Dragon(randX, randY, getUniqueId());
         }
@@ -63,18 +64,28 @@ public class Field {
         return uniqueId;
     }
 
-    /**
-     * This methods moves a player to a new direction.
-     * @param playerId
-     * @param direction 0 = top, 1 = right, 2 = bottom, 3 = left
-     * @return a boolean indicating whether the move action was successful
-     */
-    private boolean movePlayer(int playerId, int direction) {
-        // TODO: check whether new position is not occupied
+    public boolean isValidPlayerId(int playerId) {
+        return playerMap.containsKey(playerId);
+    }
+
+    private boolean canMove(int newX, int newY) {
+        return (isFree(newX, newY) && newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT);
+    }
+
+    public boolean movePlayer(int playerId, int direction) {
         Player p = playerMap.get(playerId);
-        int oldX = p.getxPos(); int oldY = p.getyPos();
-        p.setxPos(oldX + dx[direction]);
-        p.setyPos(oldY + dy[direction]);
+        int newX = p.getxPos() + dx[direction];
+        int newY = p.getyPos() + dy[direction];
+
+        if(!canMove(newX, newY)) {
+            return false;
+        }
+
+        // move the player
+        entities[p.getyPos()][p.getxPos()] = null;
+        entities[newY][newX] = p;
+        p.setxPos(newX); p.setyPos(newY);
+
         return true;
     }
 }
