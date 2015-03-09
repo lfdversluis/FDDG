@@ -13,7 +13,6 @@ import java.util.*;
 public class Field implements Serializable {
     private static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
     private static final int INITIAL_DRAGONS = 20;
-    private static final int INITIAL_PLAYERS = 100;
     private Unit[][] entities;
     private int[] dx = { 0, 1, 0, -1 };
     private int[] dy = { -1, 0, 1, 0 };
@@ -50,8 +49,8 @@ public class Field implements Serializable {
 
     private int getUniqueId() {
         Random random = new Random(System.currentTimeMillis());
-        int uniqueId = random.nextInt();
-        while(unitIds.contains(uniqueId)) { uniqueId = random.nextInt(); }
+        int uniqueId = random.nextInt(Integer.MAX_VALUE);
+        while(unitIds.contains(uniqueId)) { uniqueId = random.nextInt(Integer.MAX_VALUE); }
         unitIds.add(uniqueId);
         return uniqueId;
     }
@@ -64,7 +63,7 @@ public class Field implements Serializable {
         } while (!isFree(randX, randY));
 
         Player p = new Player(randX, randY, playerId);
-        playerMap.put(p.getUnitId(), p);
+        playerMap.put(playerId, p);
         entities[randY][randX] = p;
     }
 
@@ -97,9 +96,19 @@ public class Field implements Serializable {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    public boolean isInRange(int thisPlayerId, int thatPlayerId, int range) {
+    public boolean isInRange(int thisPlayerId, int thatUnitId, int range) {
         Player thisPlayer = playerMap.get(thisPlayerId);
-        Player thatPlayer = playerMap.get(thatPlayerId);
+        Unit thatPlayer;
+        if(playerMap.containsKey(thatUnitId)){
+            thatPlayer = playerMap.get(thatUnitId);
+        } else {
+            thatPlayer = dragonMap.get(thatUnitId);
+        }
+        if(thisPlayer == null){
+            System.out.println("help");
+        } else if(thatPlayer == null){
+            System.out.println("halp " + thatUnitId);
+        }
         int distance = manhattanDistance(thisPlayer.getxPos(), thisPlayer.getyPos(), thatPlayer.getxPos(), thatPlayer.getyPos());
         return (distance <= range);
     }
@@ -165,7 +174,70 @@ public class Field implements Serializable {
         dragonMap.remove(dragonId);
     }
 
-    public Set<Integer> getPath(int startX, int startY, int endX, int endY) {
+    public int getPathToNearestDragon(int startX, int startY) {
+        ArrayList<Integer> set = new ArrayList<Integer>();
+        final int MAX_WIDTH_HEIGHT = Math.max(BOARD_HEIGHT, BOARD_WIDTH) + 5;
+        int curPos = startX + startY * MAX_WIDTH_HEIGHT;
+        set.add(curPos);
+        State s = new State(curPos, set);
 
+        Queue<State> queue = new LinkedList<State>();
+        queue.add(s);
+
+        while(!queue.isEmpty()){
+            State curState = queue.poll();
+            ArrayList<Integer> path = curState.passed;
+            int position = curState.curPos;
+            int curX = position % MAX_WIDTH_HEIGHT;
+            int curY = position / MAX_WIDTH_HEIGHT;
+
+            for(int i=0; i<dx.length; i++){
+                int newX = curX + dx[i];
+                int newY = curY + dy[i];
+
+                if(newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && (entities[newY][newX] instanceof Dragon)){
+                    int firstStep = path.get(0);
+                    int diffX = (firstStep % MAX_WIDTH_HEIGHT) - startX;
+                    int diffY = (firstStep / MAX_WIDTH_HEIGHT) - startY;
+
+                    if(diffX == -1){
+                        return 3;
+                    } else if(diffX == 1){
+                        return 1;
+                    } else if(diffY == -1){
+                        return 0;
+                    } else {
+                        return 2;
+                    }
+                }
+
+                if(canMove(newX, newY)){
+                    int newPos = newX + newY * MAX_WIDTH_HEIGHT;
+                    if(!path.contains(newPos)){
+                        // Make a copy (hard copy, no reference)
+                        ArrayList<Integer> updatedPath = new ArrayList<Integer>(path.size());
+                       for(int pos : path){
+                           updatedPath.add(pos);
+                       }
+                        updatedPath.add(newPos);
+                        queue.add(new State(newPos, updatedPath));
+                    }
+                }
+            }
+        }
+
+        // No path possible, return -1
+        return -1; // nil in swift
+    }
+}
+
+class State{
+
+    int curPos;
+    ArrayList<Integer> passed;
+
+    public State(int i, ArrayList<Integer> set){
+        this.curPos = i;
+        this.passed = set;
     }
 }

@@ -1,6 +1,7 @@
 package nl.tud;
 
 import nl.tud.client.ClientProcess;
+import org.omg.CORBA.INTERNAL;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -33,7 +34,7 @@ public class Main {
             // create a client after a small delay
             Thread.sleep(2000);
             for(int i = 0; i < NUM_CLIENTS; i++) {
-                ClientProcess client = new ClientProcess(Math.abs(random.nextInt()));
+                ClientProcess client = new ClientProcess(random.nextInt(Integer.MAX_VALUE));
                 clientProcesses.add(client);
                 new Thread(client).start();
             }
