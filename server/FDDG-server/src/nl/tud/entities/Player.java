@@ -2,9 +2,6 @@ package nl.tud.entities;
 
 import java.util.Random;
 
-/**
- * Created by martijndevos on 3/4/15.
- */
 public class Player extends Unit {
 
     public Player(int x, int y, int id) {

@@ -5,7 +5,6 @@ import nl.tud.ServerInterface;
 import nl.tud.entities.Dragon;
 import nl.tud.entities.Player;
 import nl.tud.gameobjects.Field;
-import sun.rmi.runtime.Log;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -13,14 +12,10 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Created by Martijn on 09-03-15.
- */
 public class ClientProcess extends UnicastRemoteObject implements ClientInterface, Runnable {
 
     private final int ID;
@@ -78,7 +73,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                     server.attack(this.ID, dragonToAttack.getUnitId());
                 } else {
                     Player p = field.getPlayer(this.ID);
-                    int move = field.getPathToNearestDragon(p.getxPos(), p.getyPos());
+                    int move = field.getDirectionToNearestDragon(p.getxPos(), p.getyPos());
                     if(move == -1 ) {
                         logger.log(Level.INFO, "Player" + this.ID + " couldn't move towards a dragon (blocked?)");
                         continue;

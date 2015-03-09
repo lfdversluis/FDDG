@@ -7,9 +7,6 @@ import nl.tud.entities.Unit;
 import java.io.Serializable;
 import java.util.*;
 
-/**
- * Created by martijndevos on 3/4/15.
- */
 public class Field implements Serializable {
     public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
     private static final int INITIAL_DRAGONS = 20;
@@ -178,15 +175,15 @@ public class Field implements Serializable {
         dragonMap.remove(dragonId);
     }
 
-    public int getPathToNearestDragon(int startX, int startY) {
-        ArrayList<Integer> set = new ArrayList<Integer>();
+    public int getDirectionToNearestDragon(int startX, int startY) {
+        HashMap<Integer, Integer> stepMap = new HashMap<Integer, Integer>();
         final int MAX_WIDTH_HEIGHT = Math.max(BOARD_HEIGHT, BOARD_WIDTH) + 5;
         int curPos = startX + startY * MAX_WIDTH_HEIGHT;
-        set.add(curPos);
-        State s = new State(curPos, set);
+        State s = new State(curPos, new ArrayList<Integer>(), 0);
 
         Queue<State> queue = new LinkedList<State>();
         queue.add(s);
+        stepMap.put(curPos, 0);
 
         while(!queue.isEmpty()){
             State curState = queue.poll();
@@ -194,6 +191,7 @@ public class Field implements Serializable {
             int position = curState.curPos;
             int curX = position % MAX_WIDTH_HEIGHT;
             int curY = position / MAX_WIDTH_HEIGHT;
+            int curSteps = curState.steps;
 
             for(int i=0; i<dx.length; i++){
                 int newX = curX + dx[i];
@@ -217,14 +215,15 @@ public class Field implements Serializable {
 
                 if(canMove(newX, newY)){
                     int newPos = newX + newY * MAX_WIDTH_HEIGHT;
-                    if(!path.contains(newPos)){
+                    if(!stepMap.containsKey(newPos) || (curSteps + 1 ) < stepMap.get(newPos) ){
                         // Make a copy (hard copy, no reference)
                         ArrayList<Integer> updatedPath = new ArrayList<Integer>(path.size());
                        for(int pos : path){
                            updatedPath.add(pos);
                        }
                         updatedPath.add(newPos);
-                        queue.add(new State(newPos, updatedPath));
+                        stepMap.put(newPos, curSteps+1);
+                        queue.add(new State(newPos, updatedPath, curSteps+1));
                     }
                 }
             }
@@ -237,11 +236,12 @@ public class Field implements Serializable {
 
 class State{
 
-    int curPos;
+    int curPos, steps;
     ArrayList<Integer> passed;
 
-    public State(int i, ArrayList<Integer> set){
+    public State(int i, ArrayList<Integer> set, int steps){
         this.curPos = i;
         this.passed = set;
+        this.steps = steps;
     }
 }

@@ -20,9 +20,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Created by Martijn on 09-03-15.
- */
 public class ServerProcess extends UnicastRemoteObject implements ServerInterface, Runnable {
 
     private final int ID, NUM_SERVERS;
