@@ -17,4 +17,8 @@ public class Player extends Unit {
         this.xPos = x; this.yPos = y;
         this.unitId = id;
     }
+
+    public void heal(int healHp) {
+        curHitPoints = Math.min(maxHitPoints, healHp);
+    }
 }

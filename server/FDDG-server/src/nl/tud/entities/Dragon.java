@@ -17,4 +17,8 @@ public class Dragon extends Unit {
         this.xPos = x; this.yPos = y;
         this.unitId = id;
     }
+
+    public void getHit(int ap) {
+        curHitPoints -= ap;
+    }
 }

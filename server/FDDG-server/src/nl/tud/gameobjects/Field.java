@@ -5,9 +5,7 @@ import nl.tud.entities.Player;
 import nl.tud.entities.Unit;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by martijndevos on 3/4/15.
@@ -21,12 +19,14 @@ public class Field implements Serializable {
     private int[] dy = { -1, 0, 1, 0 };
     private HashSet<Integer> unitIds;
     private HashMap<Integer, Player> playerMap;
+    private HashMap<Integer, Dragon> dragonMap;
     private Random random;
 
     public Field() {
         entities = new Unit[BOARD_HEIGHT][BOARD_WIDTH];
         unitIds = new HashSet<Integer>();
         playerMap = new HashMap<Integer, Player>();
+        dragonMap = new HashMap<Integer, Dragon>();
 
         random = new Random(System.currentTimeMillis());
 
@@ -38,7 +38,9 @@ public class Field implements Serializable {
                 randY = random.nextInt(BOARD_HEIGHT);
             } while (!isFree(randX, randY));
 
-            entities[randY][randX] = new Dragon(randX, randY, getUniqueId());
+            Dragon d = new Dragon(randX, randY, getUniqueId());
+            entities[randY][randX] = d;
+            dragonMap.put(d.getUnitId(), d);
         }
     }
 
@@ -89,5 +91,81 @@ public class Field implements Serializable {
         p.setxPos(newX); p.setyPos(newY);
 
         return true;
+    }
+
+    public int manhattanDistance(int x1, int y1, int x2, int y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
+
+    public boolean isInRange(int thisPlayerId, int thatPlayerId, int range) {
+        Player thisPlayer = playerMap.get(thisPlayerId);
+        Player thatPlayer = playerMap.get(thatPlayerId);
+        int distance = manhattanDistance(thisPlayer.getxPos(), thisPlayer.getyPos(), thatPlayer.getxPos(), thatPlayer.getyPos());
+        return (distance <= range);
+    }
+
+    /**
+     * This method returns a random player from a set of players that are eligible to heal.
+     * We return a random player from this set to avoid overhealing of one player.
+     * @param playerId
+     * @return
+     */
+    public Player isInRangeToHeal(int playerId) {
+        ArrayList<Player> eligible = new ArrayList<Player>();
+        Player thisPlayer = playerMap.get(playerId);
+
+        Iterator<Integer> it = playerMap.keySet().iterator();
+        while(it.hasNext()) {
+            Integer id = it.next();
+            Player thatPlayer = playerMap.get(id);
+            if(isInRange(playerId, id, 5) && thatPlayer.getCurHitPoints() < 0.5) { eligible.add(thatPlayer); }
+        }
+
+        if(eligible.size() == 0) { return null; }
+        return eligible.get(new Random().nextInt(eligible.size()));
+    }
+
+    /**
+     * This method returns a random dragon from a set of dragons that can be attacked.
+     * @param playerId
+     * @return
+     */
+    public Dragon dragonIsInRangeToAttack(int playerId) {
+        ArrayList<Dragon> eligible = new ArrayList<Dragon>();
+        Player thisPlayer = playerMap.get(playerId);
+
+        Iterator<Integer> it = dragonMap.keySet().iterator();
+        while(it.hasNext()) {
+            Integer id = it.next();
+            Dragon d = dragonMap.get(id);
+            if(isInRange(playerId, id, 1)) { eligible.add(d); }
+        }
+
+        if(eligible.size() == 0) { return null; }
+        return eligible.get(new Random().nextInt(eligible.size()));
+    }
+
+    public Player getPlayer(int playerId) {
+        return playerMap.get(playerId);
+    }
+
+    public void removePlayer(int playerId) {
+        Player p = playerMap.get(playerId);
+        entities[p.getyPos()][p.getxPos()] = null;
+        playerMap.remove(playerId);
+    }
+
+    public Dragon getDragon(int dragonId) {
+        return dragonMap.get(dragonId);
+    }
+
+    public void removeDragon(int dragonId) {
+        Dragon d = dragonMap.get(dragonId);
+        entities[d.getyPos()][d.getxPos()] = null;
+        dragonMap.remove(dragonId);
+    }
+
+    public Set<Integer> getPath(int startX, int startY, int endX, int endY) {
+
     }
 }

@@ -2,6 +2,8 @@ package nl.tud.client;
 
 import nl.tud.Main;
 import nl.tud.ServerInterface;
+import nl.tud.entities.Dragon;
+import nl.tud.entities.Player;
 import nl.tud.gameobjects.Field;
 
 import java.net.MalformedURLException;
@@ -50,6 +52,8 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
     }
 
+
+
     @Override
     public void run() {
 
@@ -62,7 +66,19 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
             while(true) {
                 Thread.sleep(1000);
-                server.move(this.ID, random.nextInt(4));
+
+                // check if there is a nearby player with hp < 50% to heal
+                Dragon dragonToAttack;
+                Player playerToHeal = field.isInRangeToHeal(this.ID);
+                if(playerToHeal != null) {
+                    server.heal(this.ID, playerToHeal.getUnitId());
+                } else if((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
+                    server.attack(this.ID, dragonToAttack.getUnitId());
+                } else {
+                    // TODO move to nearby dragon
+                }
+
+                // server.move(this.ID, random.nextInt(4));
             }
 
         } catch (NotBoundException e) {

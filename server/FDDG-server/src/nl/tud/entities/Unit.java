@@ -57,4 +57,8 @@ public class Unit implements Serializable {
     public void setUnitId(int unitId) {
         this.unitId = unitId;
     }
+
+    public double getHitPointsPercentage() {
+        return (double)curHitPoints / (double)maxHitPoints;
+    }
 }
