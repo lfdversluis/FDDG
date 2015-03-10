@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0f6cc34a-34c5-4056-9b3f-e349797ce00b" name="Default" comment="Dragons">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="0f6cc34a-34c5-4056-9b3f-e349797ce00b" name="Default" comment="Dragons" />
     <ignored path="FDDG.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -31,20 +28,18 @@
       <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="780">
-              <caret line="36" column="63" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
-              <folding>
-                <element signature="imports" expanded="false" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="780">
+              <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Field.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Field.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/gameobjects/Field.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.45894736" vertical-offset="3547" max-vertical-offset="4080">
-              <caret line="251" column="13" selection-start-line="251" selection-start-column="13" selection-end-line="251" selection-end-column="13" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="270" max-vertical-offset="4080">
+              <caret line="11" column="49" selection-start-line="11" selection-start-column="49" selection-end-line="11" selection-end-column="49" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1380#1381#0" expanded="true" />
@@ -55,13 +50,13 @@
                 <element signature="e#2896#2897#0" expanded="true" />
                 <element signature="e#2964#2965#0" expanded="true" />
                 <element signature="e#3024#3025#0" expanded="true" />
-                <element signature="e#4040#4048#0" expanded="true" />
-                <element signature="e#4781#4789#0" expanded="true" />
-                <element signature="e#5259#5260#0" expanded="true" />
-                <element signature="e#5305#5306#0" expanded="true" />
-                <element signature="e#5533#5534#0" expanded="true" />
-                <element signature="e#5579#5580#0" expanded="true" />
-                <element signature="e#7648#7657#0" expanded="true" />
+                <element signature="e#3866#3874#0" expanded="true" />
+                <element signature="e#4607#4615#0" expanded="true" />
+                <element signature="e#5085#5086#0" expanded="true" />
+                <element signature="e#5131#5132#0" expanded="true" />
+                <element signature="e#5359#5360#0" expanded="true" />
+                <element signature="e#5405#5406#0" expanded="true" />
+                <element signature="e#7474#7483#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -70,8 +65,8 @@
       <file leaf-file-name="ServerProcess.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/ServerProcess.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="735" max-vertical-offset="2685">
-              <caret line="90" column="31" selection-start-line="90" selection-start-column="31" selection-end-line="90" selection-end-column="31" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1020" max-vertical-offset="2760">
+              <caret line="94" column="16" selection-start-line="94" selection-start-column="16" selection-end-line="94" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -90,8 +85,8 @@
       <file leaf-file-name="Unit.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Unit.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="660">
-              <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="660">
+              <caret line="10" column="25" selection-start-line="10" selection-start-column="25" selection-end-line="10" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -110,13 +105,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ClientProcess.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ClientProcess.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/client/ClientProcess.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="1335">
-              <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.28421053" vertical-offset="570" max-vertical-offset="1365">
+              <caret line="61" column="13" selection-start-line="61" selection-start-column="13" selection-end-line="61" selection-end-column="13" />
               <folding>
-                <element signature="imports" expanded="false" />
+                <element signature="e#1553#1554#0" expanded="true" />
+                <element signature="e#1622#1623#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -131,13 +127,13 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/nl/tud/Main.java" />
-        <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/Main.java" />
         <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Dragon.java" />
         <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Player.java" />
-        <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/client/ClientProcess.java" />
-        <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/ServerProcess.java" />
         <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Unit.java" />
+        <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/ServerProcess.java" />
         <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/gameobjects/Field.java" />
+        <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/Main.java" />
+        <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/client/ClientProcess.java" />
       </list>
     </option>
   </component>
@@ -227,6 +223,10 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="gameobjects" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Field.java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -531,9 +531,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="780">
           <caret line="36" column="63" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -551,13 +549,13 @@
             <element signature="e#2896#2897#0" expanded="true" />
             <element signature="e#2964#2965#0" expanded="true" />
             <element signature="e#3024#3025#0" expanded="true" />
-            <element signature="e#4040#4048#0" expanded="true" />
-            <element signature="e#4781#4789#0" expanded="true" />
-            <element signature="e#5259#5260#0" expanded="true" />
-            <element signature="e#5305#5306#0" expanded="true" />
-            <element signature="e#5533#5534#0" expanded="true" />
-            <element signature="e#5579#5580#0" expanded="true" />
-            <element signature="e#7648#7657#0" expanded="true" />
+            <element signature="e#3866#3874#0" expanded="true" />
+            <element signature="e#4607#4615#0" expanded="true" />
+            <element signature="e#5085#5086#0" expanded="true" />
+            <element signature="e#5131#5132#0" expanded="true" />
+            <element signature="e#5359#5360#0" expanded="true" />
+            <element signature="e#5405#5406#0" expanded="true" />
+            <element signature="e#7474#7483#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -594,7 +592,8 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="1335">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="false" />
+            <element signature="e#1553#1554#0" expanded="true" />
+            <element signature="e#1622#1623#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -603,9 +602,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="435" max-vertical-offset="780">
           <caret line="36" column="63" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -623,13 +620,13 @@
             <element signature="e#2896#2897#0" expanded="true" />
             <element signature="e#2964#2965#0" expanded="true" />
             <element signature="e#3024#3025#0" expanded="true" />
-            <element signature="e#4040#4048#0" expanded="true" />
-            <element signature="e#4781#4789#0" expanded="true" />
-            <element signature="e#5259#5260#0" expanded="true" />
-            <element signature="e#5305#5306#0" expanded="true" />
-            <element signature="e#5533#5534#0" expanded="true" />
-            <element signature="e#5579#5580#0" expanded="true" />
-            <element signature="e#7648#7657#0" expanded="true" />
+            <element signature="e#3866#3874#0" expanded="true" />
+            <element signature="e#4607#4615#0" expanded="true" />
+            <element signature="e#5085#5086#0" expanded="true" />
+            <element signature="e#5131#5132#0" expanded="true" />
+            <element signature="e#5359#5360#0" expanded="true" />
+            <element signature="e#5405#5406#0" expanded="true" />
+            <element signature="e#7474#7483#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -666,7 +663,8 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="1335">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="false" />
+            <element signature="e#1553#1554#0" expanded="true" />
+            <element signature="e#1622#1623#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -675,9 +673,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="323" max-vertical-offset="884">
           <caret line="36" column="63" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -695,13 +691,13 @@
             <element signature="e#2896#2897#0" expanded="true" />
             <element signature="e#2964#2965#0" expanded="true" />
             <element signature="e#3024#3025#0" expanded="true" />
-            <element signature="e#4040#4048#0" expanded="true" />
-            <element signature="e#4781#4789#0" expanded="true" />
-            <element signature="e#5259#5260#0" expanded="true" />
-            <element signature="e#5305#5306#0" expanded="true" />
-            <element signature="e#5533#5534#0" expanded="true" />
-            <element signature="e#5579#5580#0" expanded="true" />
-            <element signature="e#7648#7657#0" expanded="true" />
+            <element signature="e#3866#3874#0" expanded="true" />
+            <element signature="e#4607#4615#0" expanded="true" />
+            <element signature="e#5085#5086#0" expanded="true" />
+            <element signature="e#5131#5132#0" expanded="true" />
+            <element signature="e#5359#5360#0" expanded="true" />
+            <element signature="e#5405#5406#0" expanded="true" />
+            <element signature="e#7474#7483#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -738,27 +734,8 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="1564">
           <caret line="82" column="108" selection-start-line="82" selection-start-column="24" selection-end-line="82" selection-end-column="108" />
           <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/client/ClientProcess.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1513">
-          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="884">
-          <caret line="36" column="63" selection-start-line="36" selection-start-column="63" selection-end-line="36" selection-end-column="63" />
-          <folding>
-            <element signature="imports" expanded="false" />
+            <element signature="e#1553#1554#0" expanded="true" />
+            <element signature="e#1622#1623#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -774,34 +751,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Player.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
-          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Unit.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="660">
-          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/ServerProcess.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="735" max-vertical-offset="2685">
-          <caret line="90" column="31" selection-start-line="90" selection-start-column="31" selection-end-line="90" selection-end-column="31" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="660">
+          <caret line="10" column="25" selection-start-line="10" selection-start-column="25" selection-end-line="10" selection-end-column="25" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/gameobjects/Field.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.45894736" vertical-offset="3547" max-vertical-offset="4080">
-          <caret line="251" column="13" selection-start-line="251" selection-start-column="13" selection-end-line="251" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4080">
+          <caret line="11" column="49" selection-start-line="11" selection-start-column="49" selection-end-line="11" selection-end-column="49" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1380#1381#0" expanded="true" />
@@ -812,13 +773,48 @@
             <element signature="e#2896#2897#0" expanded="true" />
             <element signature="e#2964#2965#0" expanded="true" />
             <element signature="e#3024#3025#0" expanded="true" />
-            <element signature="e#4040#4048#0" expanded="true" />
-            <element signature="e#4781#4789#0" expanded="true" />
-            <element signature="e#5259#5260#0" expanded="true" />
-            <element signature="e#5305#5306#0" expanded="true" />
-            <element signature="e#5533#5534#0" expanded="true" />
-            <element signature="e#5579#5580#0" expanded="true" />
-            <element signature="e#7648#7657#0" expanded="true" />
+            <element signature="e#3866#3874#0" expanded="true" />
+            <element signature="e#4607#4615#0" expanded="true" />
+            <element signature="e#5085#5086#0" expanded="true" />
+            <element signature="e#5131#5132#0" expanded="true" />
+            <element signature="e#5359#5360#0" expanded="true" />
+            <element signature="e#5405#5406#0" expanded="true" />
+            <element signature="e#7474#7483#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="780">
+          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Player.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
+          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/ServerProcess.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1020" max-vertical-offset="2760">
+          <caret line="94" column="16" selection-start-line="94" selection-start-column="16" selection-end-line="94" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/client/ClientProcess.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.28421053" vertical-offset="570" max-vertical-offset="1365">
+          <caret line="61" column="13" selection-start-line="61" selection-start-column="13" selection-end-line="61" selection-end-column="13" />
+          <folding>
+            <element signature="e#1553#1554#0" expanded="true" />
+            <element signature="e#1622#1623#0" expanded="true" />
           </folding>
         </state>
       </provider>

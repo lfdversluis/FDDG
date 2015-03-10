@@ -105,11 +105,7 @@ public class Field implements Serializable {
         } else {
             thatPlayer = dragonMap.get(thatUnitId);
         }
-        if(thisPlayer == null){
-            System.out.println("help");
-        } else if(thatPlayer == null){
-            System.out.println("halp " + thatUnitId);
-        }
+
         int distance = manhattanDistance(thisPlayer.getxPos(), thisPlayer.getyPos(), thatPlayer.getxPos(), thatPlayer.getyPos());
         return (distance <= range);
     }
@@ -247,7 +243,11 @@ public class Field implements Serializable {
 
                 if(unitX >= 0 && unitX < BOARD_WIDTH && unitY >= 0 && unitY < BOARD_HEIGHT && entities[unitY][unitX] instanceof Player){
                     Player p = (Player) entities[unitY][unitX];
-                    p.setHitpoints(p.getCurHitPoints() - d.getAttackPower());
+                    p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
+
+                    if(p.getCurHitPoints() <= 0){
+                        entities[p.getyPos()][p.getxPos()] = null;
+                    }
                 }
             }
         }

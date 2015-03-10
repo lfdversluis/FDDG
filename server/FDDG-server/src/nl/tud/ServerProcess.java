@@ -89,6 +89,11 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     public void run() {
         while (true) {
             field.dragonRage();
+            try{
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -96,7 +101,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         return field.isValidPlayerId(playerId);
     }
 
-    public void broadcastFieldToConnectedPlayers() {
+    public synchronized void broadcastFieldToConnectedPlayers() {
         Iterator<Integer> it = connectedPlayers.keySet().iterator();
         while(it.hasNext()) {
             Integer id = it.next();

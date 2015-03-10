@@ -49,7 +49,9 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
     }
 
-
+    public boolean isAlive() {
+        return field.getPlayer(this.ID).getCurHitPoints() > 0;
+    }
 
     @Override
     public void run() {
@@ -61,13 +63,13 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             server = (ServerInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/0");
             server.connect(this.ID);
 
-            while(true) {
+            while(isAlive()) {
                 Thread.sleep(1000);
 
                 // check if there is a nearby player with hp < 50% to heal
                 Dragon dragonToAttack;
                 Player playerToHeal = field.isInRangeToHeal(this.ID);
-                if(playerToHeal != null) {
+                if(playerToHeal != null && playerToHeal.getCurHitPoints() > 0) {
                     server.heal(this.ID, playerToHeal.getUnitId());
                 } else if((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
                     server.attack(this.ID, dragonToAttack.getUnitId());
