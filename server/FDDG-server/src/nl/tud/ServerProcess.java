@@ -87,14 +87,16 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
     @Override
     public void run() {
-        while (!field.gameHasFinished()) {
-            field.dragonRage();
-            try{
+        try {
+            Thread.sleep(5000);
+            while (!field.gameHasFinished()) {
+                field.dragonRage();
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+        } catch(InterruptedException e) {
+            e.printStackTrace();
         }
+
     }
 
     public boolean isValidPlayerId(int playerId) {
