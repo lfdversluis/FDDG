@@ -87,7 +87,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
     @Override
     public void run() {
-        while (true) {
+        while (!field.gameHasFinished()) {
             field.dragonRage();
             try{
                 Thread.sleep(1000);

@@ -63,7 +63,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             server = (ServerInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/0");
             server.connect(this.ID);
 
-            while(isAlive()) {
+            while(isAlive() && !field.gameHasFinished()) {
                 Thread.sleep(1000);
 
                 // check if there is a nearby player with hp < 50% to heal

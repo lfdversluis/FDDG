@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Field implements Serializable {
     public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
-    private static final int INITIAL_DRAGONS = 20;
+    private static final int INITIAL_DRAGONS = 1;
     private Unit[][] entities;
     private int[] dx = { 0, 1, 0, -1 };
     private int[] dy = { -1, 0, 1, 0 };
@@ -155,12 +155,6 @@ public class Field implements Serializable {
         return playerMap.get(playerId);
     }
 
-    public void removePlayer(int playerId) {
-        Player p = playerMap.get(playerId);
-        entities[p.getyPos()][p.getxPos()] = null;
-        playerMap.remove(playerId);
-    }
-
     public Dragon getDragon(int dragonId) {
         return dragonMap.get(dragonId);
     }
@@ -251,6 +245,20 @@ public class Field implements Serializable {
                 }
             }
         }
+    }
+
+    public boolean gameHasFinished() {
+        if(dragonMap.size() == 0) {
+            return true;
+        }
+
+        for(int playerId : playerMap.keySet()) {
+            if(playerMap.get(playerId).getCurHitPoints() > 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 
