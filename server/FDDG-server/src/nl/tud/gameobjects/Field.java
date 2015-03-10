@@ -176,13 +176,14 @@ public class Field implements Serializable {
     }
 
     public int getDirectionToNearestDragon(int startX, int startY) {
-        HashMap<Integer, Integer> stepMap = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> stepMap = new HashMap<>();
         final int MAX_WIDTH_HEIGHT = Math.max(BOARD_HEIGHT, BOARD_WIDTH) + 5;
         int curPos = startX + startY * MAX_WIDTH_HEIGHT;
         State s = new State(curPos, new ArrayList<Integer>(), 0);
 
-        Queue<State> queue = new LinkedList<State>();
+        Queue<State> queue = new LinkedList<>();
         queue.add(s);
+
         stepMap.put(curPos, 0);
 
         while(!queue.isEmpty()){
@@ -230,7 +231,26 @@ public class Field implements Serializable {
         }
 
         // No path possible, return -1
-        return -1; // nil in swift
+        return -1;
+    }
+
+    public void dragonRage() {
+        for(int dragonId : dragonMap.keySet()){
+            Dragon d = dragonMap.get(dragonId);
+
+            int dragonX = d.getxPos();
+            int dragonY = d.getyPos();
+
+            for(int i=0; i<4; i++){
+                int unitX = dragonX + dx[i];
+                int unitY = dragonY + dy[i];
+
+                if(unitX >= 0 && unitX < BOARD_WIDTH && unitY >= 0 && unitY < BOARD_HEIGHT && entities[unitY][unitX] instanceof Player){
+                    Player p = (Player) entities[unitY][unitX];
+                    p.setHitpoints(p.getCurHitPoints() - d.getAttackPower());
+                }
+            }
+        }
     }
 }
 

@@ -88,7 +88,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     @Override
     public void run() {
         while (true) {
-            // TODO implementation here
+            field.dragonRage();
         }
     }
 
