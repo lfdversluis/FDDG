@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Field implements Serializable {
     public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
-    private static final int INITIAL_DRAGONS = 500;
+    private static final int INITIAL_DRAGONS = 50;
     private Unit[][] entities;
     private int[] dx = { 0, 1, 0, -1 };
     private int[] dy = { -1, 0, 1, 0 };
