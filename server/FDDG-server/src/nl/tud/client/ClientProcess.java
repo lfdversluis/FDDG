@@ -56,8 +56,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     @Override
     public void run() {
 
-        Random random = new Random();
-
         // send a connect message to the server
         try {
             server = (ServerInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/0");
@@ -82,8 +80,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                     }
                     server.move(this.ID, move);
                 }
-
-                // server.move(this.ID, random.nextInt(4));
             }
 
         } catch (NotBoundException e) {
