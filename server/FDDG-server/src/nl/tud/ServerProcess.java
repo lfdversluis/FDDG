@@ -1,23 +1,16 @@
 package nl.tud;
 
 import nl.tud.client.ClientInterface;
-import nl.tud.entities.Dragon;
 import nl.tud.entities.Player;
-import nl.tud.entities.Unit;
 import nl.tud.gameobjects.*;
-import nl.tud.gameobjects.Action;
 import nl.tud.gui.VisualizerGUI;
 
-import javax.swing.*;
-import java.awt.*;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;

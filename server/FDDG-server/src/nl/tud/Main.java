@@ -1,7 +1,6 @@
 package nl.tud;
 
 import nl.tud.client.ClientProcess;
-import org.omg.CORBA.INTERNAL;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;

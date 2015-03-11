@@ -7,7 +7,7 @@ public class Player extends Unit {
     public Player(int x, int y, int id) {
         Random random = new Random(System.currentTimeMillis());
         maxHitPoints = random.nextInt(11) + 10;
-        curHitPoints =  maxHitPoints/3;
+        curHitPoints =  maxHitPoints;
 
         attackPower = random.nextInt(10) + 1;
 

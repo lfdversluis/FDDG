@@ -1,7 +1,6 @@
 package nl.tud;
 
 import nl.tud.gameobjects.Action;
-import nl.tud.gameobjects.Field;
 
 import java.rmi.Remote;
 
