@@ -112,7 +112,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                         logger.log(Level.INFO, "Player" + this.ID + " couldn't move towards a dragon (blocked?)");
                         continue;
                     }
-                    final int MAX_WIDTH_HEIGHT = Math.max(field.BOARD_HEIGHT, field.BOARD_WIDTH) + 5;
+                    final int MAX_WIDTH_HEIGHT = Math.max(Field.BOARD_HEIGHT, Field.BOARD_WIDTH) + 5;
                     int newX = move % MAX_WIDTH_HEIGHT;
                     int newY = move / MAX_WIDTH_HEIGHT;
 
