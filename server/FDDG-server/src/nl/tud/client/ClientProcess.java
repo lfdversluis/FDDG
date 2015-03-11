@@ -4,10 +4,7 @@ import nl.tud.Main;
 import nl.tud.ServerInterface;
 import nl.tud.entities.Dragon;
 import nl.tud.entities.Player;
-import nl.tud.gameobjects.AttackAction;
-import nl.tud.gameobjects.Field;
-import nl.tud.gameobjects.HealAction;
-import nl.tud.gameobjects.MoveAction;
+import nl.tud.gameobjects.*;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -35,9 +32,45 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     }
 
     @Override
-    public synchronized void updateField(Field field) throws RemoteException {
-        // logger.log(Level.INFO, "Client " + this.ID + " received field update");
+    public void initializeField(Field field) throws RemoteException {
         this.field = field;
+    }
+
+    @Override
+    public synchronized void ack (Action action) throws RemoteException {
+        // logger.log(Level.INFO, "Received  " + this.ID + " received field update");
+
+        if(action instanceof AddPlayerAction) {
+            AddPlayerAction apa = (AddPlayerAction) action;
+            field.addPlayer(apa.getPlayerId(), apa.getX(), apa.getY());
+        } else if (action instanceof AttackAction) {
+            AttackAction ata = (AttackAction) action;
+            Dragon d = field.getDragon(ata.getDragonId());
+            Player p = field.getPlayer(ata.getSenderId());
+            d.setCurHitPoints(d.getCurHitPoints() - p.getAttackPower());
+        } else if (action instanceof  DeleteUnitAction) {
+            DeleteUnitAction dua = (DeleteUnitAction) action;
+            if(field.getDragon(dua.getUnitId()) == null){
+                Player p = field.getPlayer(dua.getUnitId());
+                field.removePlayer(p.getUnitId());
+            } else {
+                Dragon d = field.getDragon(dua.getUnitId());
+                field.removeDragon(d.getUnitId());
+            }
+        } else if(action instanceof HealAction){
+            HealAction ha = (HealAction) action;
+            int playerId = ha.getSenderId();
+            int targetPlayer = ha.getTargetPlayer();
+            Player thisPlayer = field.getPlayer(playerId);
+            field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
+        } else if (action instanceof MoveAction) {
+            MoveAction ma = (MoveAction) action;
+            int playerId = ma.getSenderId();
+            int x = ma.getX();
+            int y = ma.getY();
+            field.movePlayer(playerId, x, y);
+        }
+
     }
 
     @Override
@@ -88,13 +121,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                 }
             }
 
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (NotBoundException | MalformedURLException | RemoteException | InterruptedException e) {
             e.printStackTrace();
         }
     }

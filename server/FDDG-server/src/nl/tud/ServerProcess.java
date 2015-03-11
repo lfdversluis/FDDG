@@ -12,6 +12,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +43,12 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         try {
             Thread.sleep(5000);
             while (!field.gameHasFinished()) {
-                field.dragonRage();
+                Set<Player> deadPlayerSet = field.dragonRage();
+
+                for(Player p : deadPlayerSet){
+                    DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
+                    broadcastActionToPlayers(dua);
+                }
                 Thread.sleep(1000);
             }
         } catch(InterruptedException e) {
@@ -55,11 +61,11 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         return field.isValidPlayerId(playerId);
     }
 
-    public synchronized void broadcastFieldToConnectedPlayers() {
+    public synchronized void broadcastActionToPlayers(Action action) {
         for(Map.Entry<Integer, ClientInterface> entry : connectedPlayers.entrySet()) {
             try {
                 ClientInterface client = entry.getValue();
-                client.updateField(field);
+                client.ack(action);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -70,17 +76,21 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     public synchronized void performAction(Action action) throws java.rmi.RemoteException  {
         if(action instanceof MoveAction) {
             MoveAction ma = (MoveAction) action;
-            move(action.getSenderId(), ma.getX(), ma.getY());
+            move(ma);
         } else if(action instanceof HealAction) {
             HealAction ha = (HealAction) action;
-            heal(action.getSenderId(), ha.getTargetPlayer());
+            heal(ha);
         } else if(action instanceof AttackAction) {
             AttackAction aa = (AttackAction) action;
-            attack(action.getSenderId(), aa.getDragonId());
+            attack(aa);
         }
     }
 
-    public void move(int playerId, int x, int y) throws RemoteException {
+    public void move(MoveAction ma) throws RemoteException {
+        int playerId = ma.getSenderId();
+        int x = ma.getX();
+        int y = ma.getY();
+
         logger.log(Level.INFO, "Server " + this.ID + " received move to (" + x + ", " + y + ") from player " + playerId);
         if(!isValidPlayerId(playerId)) {
             // TODO send error message
@@ -90,13 +100,16 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         if(!result) {
             // TODO send error message
         } else {
-            broadcastFieldToConnectedPlayers();
+            broadcastActionToPlayers(ma);
         }
 
         visualizerGUI.updateGUI();
     }
 
-    public void heal(int playerId, int targetPlayer) throws RemoteException {
+    public void heal(HealAction ha) throws RemoteException {
+        int playerId = ha.getSenderId();
+        int targetPlayer = ha.getTargetPlayer();
+
         logger.log(Level.INFO, "Server " + this.ID + " received heal to player " + targetPlayer + " from player " + playerId);
 
         if(!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5) {
@@ -104,13 +117,16 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         } else {
             Player thisPlayer = field.getPlayer(playerId);
             field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
-            broadcastFieldToConnectedPlayers();
+            broadcastActionToPlayers(ha);
         }
 
         visualizerGUI.updateGUI();
     }
 
-    public void attack(int playerId, int dragonId) throws RemoteException {
+    public void attack(AttackAction aa) throws RemoteException {
+        int playerId = aa.getSenderId();
+        int dragonId = aa.getDragonId();
+
         logger.log(Level.INFO, "Server " + this.ID + " received attack to dragon " + dragonId + " from player " + playerId);
 
         if(!field.isInRange(playerId, dragonId, 1)) {
@@ -120,8 +136,11 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
             field.getDragon(dragonId).getHit(thisPlayer.getAttackPower());
             if(field.getDragon(dragonId).getCurHitPoints() <= 0) {
                 field.removeDragon(dragonId);
+                DeleteUnitAction dua = new DeleteUnitAction(dragonId);
+                broadcastActionToPlayers(dua);
+            } else {
+                broadcastActionToPlayers(aa);
             }
-            broadcastFieldToConnectedPlayers();
         }
 
         visualizerGUI.updateGUI();
@@ -134,13 +153,16 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
         try {
             ClientInterface ci = (ClientInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGClient/" + playerId);
-            connectedPlayers.put(playerId, ci);
             field.addPlayer(playerId);
-            broadcastFieldToConnectedPlayers();
+            ci.initializeField(field);
 
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
+            AddPlayerAction apa = new AddPlayerAction(playerId, field.getPlayer(playerId).getxPos(), field.getPlayer(playerId).getyPos());
+            broadcastActionToPlayers(apa);
+
+            // Now the broadcast is done, add the player to the player map (so he doesn't add himself again on the field).
+            connectedPlayers.put(playerId, ci);
+
+        } catch (NotBoundException | MalformedURLException e) {
             e.printStackTrace();
         }
 

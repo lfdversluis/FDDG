@@ -65,6 +65,12 @@ public class Field implements Serializable {
         entities[randY][randX] = p;
     }
 
+    public void addPlayer(int playerId, int x, int y){
+        Player p = new Player(x, y, playerId);
+        playerMap.put(playerId, p);
+        entities[y][x] = p;
+    }
+
     public boolean isValidPlayerId(int playerId) {
         return playerMap.containsKey(playerId);
     }
@@ -149,11 +155,11 @@ public class Field implements Serializable {
     }
 
     public Player getPlayer(int playerId) {
-        return playerMap.get(playerId);
+        return playerMap.containsKey(playerId) ? playerMap.get(playerId) : null;
     }
 
     public Dragon getDragon(int dragonId) {
-        return dragonMap.get(dragonId);
+        return dragonMap.containsKey(dragonId) ? dragonMap.get(dragonId) : null;
     }
 
     public void removeDragon(int dragonId) {
@@ -209,7 +215,8 @@ public class Field implements Serializable {
         return -1;
     }
 
-    public void dragonRage() {
+    public Set<Player> dragonRage() {
+        Set<Player> deadPlayerSet = new HashSet<>();
         for(int dragonId : dragonMap.keySet()){
             Dragon d = dragonMap.get(dragonId);
 
@@ -225,11 +232,18 @@ public class Field implements Serializable {
                     p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
 
                     if(p.getCurHitPoints() <= 0){
-                        entities[p.getyPos()][p.getxPos()] = null;
+                        deadPlayerSet.add(p);
+                        removePlayer(p.getUnitId());
                     }
                 }
             }
         }
+        return deadPlayerSet;
+    }
+
+    public void removePlayer(int playerId){
+        Player p = getPlayer(playerId);
+        entities[p.getyPos()][p.getxPos()] = null;
     }
 
     public boolean gameHasFinished() {
