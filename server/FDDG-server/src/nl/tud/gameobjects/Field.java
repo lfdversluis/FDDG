@@ -22,8 +22,8 @@ public class Field implements Serializable {
     public Field() {
         entities = new Unit[BOARD_HEIGHT][BOARD_WIDTH];
         unitIds = new HashSet<Integer>();
-        playerMap = new ConcurrentHashMap<Integer, Player>();
-        dragonMap = new ConcurrentHashMap<Integer, Dragon>();
+        playerMap = new ConcurrentHashMap<>();
+        dragonMap = new ConcurrentHashMap<>();
 
         random = new Random(System.currentTimeMillis());
 
@@ -116,14 +116,13 @@ public class Field implements Serializable {
      * @return
      */
     public Player isInRangeToHeal(int playerId) {
-        ArrayList<Player> eligible = new ArrayList<Player>();
-        Player thisPlayer = playerMap.get(playerId);
+        ArrayList<Player> eligible = new ArrayList<>();
 
         Iterator<Integer> it = playerMap.keySet().iterator();
         while(it.hasNext()) {
             Integer id = it.next();
             Player thatPlayer = playerMap.get(id);
-            if(isInRange(playerId, id, 5) && thatPlayer.getCurHitPoints() < 0.5) { eligible.add(thatPlayer); }
+            if(isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5) { eligible.add(thatPlayer); }
         }
 
         if(eligible.size() == 0) { return null; }
@@ -137,7 +136,6 @@ public class Field implements Serializable {
      */
     public Dragon dragonIsInRangeToAttack(int playerId) {
         ArrayList<Dragon> eligible = new ArrayList<Dragon>();
-        Player thisPlayer = playerMap.get(playerId);
 
         Iterator<Integer> it = dragonMap.keySet().iterator();
         while(it.hasNext()) {
@@ -188,19 +186,7 @@ public class Field implements Serializable {
                 int newY = curY + dy[i];
 
                 if(newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && (entities[newY][newX] instanceof Dragon)){
-                    int firstStep = path.get(0);
-                    int diffX = (firstStep % MAX_WIDTH_HEIGHT) - startX;
-                    int diffY = (firstStep / MAX_WIDTH_HEIGHT) - startY;
-
-                    if(diffX == -1){
-                        return 3;
-                    } else if(diffX == 1){
-                        return 1;
-                    } else if(diffY == -1){
-                        return 0;
-                    } else {
-                        return 2;
-                    }
+                    return path.get(0);
                 }
 
                 if(canMove(newX, newY)){

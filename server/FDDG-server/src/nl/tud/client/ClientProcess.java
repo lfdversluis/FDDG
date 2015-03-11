@@ -7,6 +7,7 @@ import nl.tud.entities.Player;
 import nl.tud.gameobjects.AttackAction;
 import nl.tud.gameobjects.Field;
 import nl.tud.gameobjects.HealAction;
+import nl.tud.gameobjects.MoveAction;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -68,7 +69,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                 // check if there is a nearby player with hp < 50% to heal
                 Dragon dragonToAttack;
                 Player playerToHeal = field.isInRangeToHeal(this.ID);
-                if(playerToHeal != null && playerToHeal.getCurHitPoints() > 0) {
+                if(playerToHeal != null) {
                     server.performAction(new HealAction(this.ID, playerToHeal.getUnitId()));
                 } else if((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
                     server.performAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
@@ -79,7 +80,12 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                         logger.log(Level.INFO, "Player" + this.ID + " couldn't move towards a dragon (blocked?)");
                         continue;
                     }
-                    server.move(this.ID, move);
+                    final int MAX_WIDTH_HEIGHT = Math.max(field.BOARD_HEIGHT, field.BOARD_WIDTH) + 5;
+                    int newX = move % MAX_WIDTH_HEIGHT;
+                    int newY = move / MAX_WIDTH_HEIGHT;
+
+                    MoveAction moveAction = new MoveAction(this.ID, newX, newY);
+                    server.performAction(moveAction);
                 }
             }
 

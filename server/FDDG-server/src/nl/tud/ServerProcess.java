@@ -106,7 +106,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     public void heal(int playerId, int targetPlayer) throws RemoteException {
         logger.log(Level.INFO, "Server " + this.ID + " received heal to player " + targetPlayer + " from player " + playerId);
 
-        if(!field.isInRange(playerId, targetPlayer, 5)) {
+        if(!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5) {
             // TODO send error message
         } else {
             Player thisPlayer = field.getPlayer(playerId);

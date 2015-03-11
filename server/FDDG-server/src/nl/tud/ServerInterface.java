@@ -5,9 +5,6 @@ import nl.tud.gameobjects.Field;
 
 import java.rmi.Remote;
 
-/**
- * Created by Martijn on 09-03-15.
- */
 public interface ServerInterface extends Remote {
 
     public void performAction(Action action) throws java.rmi.RemoteException;
