@@ -1,5 +1,6 @@
 package nl.tud;
 
+import nl.tud.gameobjects.Action;
 import nl.tud.gameobjects.Field;
 
 import java.rmi.Remote;
@@ -9,11 +10,7 @@ import java.rmi.Remote;
  */
 public interface ServerInterface extends Remote {
 
-    public void move(int playerId, int direction) throws java.rmi.RemoteException;
-
-    public void heal(int playerId, int targetPlayer) throws java.rmi.RemoteException;
-
-    public void attack(int playerId, int dragonId) throws java.rmi.RemoteException;
+    public void performAction(Action action) throws java.rmi.RemoteException;
 
     public void connect(int playerId) throws java.rmi.RemoteException;
 

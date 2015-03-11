@@ -4,7 +4,8 @@ import nl.tud.client.ClientInterface;
 import nl.tud.entities.Dragon;
 import nl.tud.entities.Player;
 import nl.tud.entities.Unit;
-import nl.tud.gameobjects.Field;
+import nl.tud.gameobjects.*;
+import nl.tud.gameobjects.Action;
 import nl.tud.gui.VisualizerGUI;
 
 import javax.swing.*;
@@ -73,15 +74,26 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     }
 
     @Override
-    public synchronized void move(int playerId, int direction) throws RemoteException {
-        logger.log(Level.INFO, "Server " + this.ID + " received move with direction " + direction + " from player " + playerId);
+    public synchronized void performAction(Action action) throws java.rmi.RemoteException  {
+        if(action instanceof MoveAction) {
+            MoveAction ma = (MoveAction) action;
+            move(action.getSenderId(), ma.getX(), ma.getY());
+        } else if(action instanceof HealAction) {
+            HealAction ha = (HealAction) action;
+            heal(action.getSenderId(), ha.getTargetPlayer());
+        } else if(action instanceof AttackAction) {
+            AttackAction aa = (AttackAction) action;
+            attack(action.getSenderId(), aa.getDragonId());
+        }
+    }
+
+    public void move(int playerId, int x, int y) throws RemoteException {
+        logger.log(Level.INFO, "Server " + this.ID + " received move to (" + x + ", " + y + ") from player " + playerId);
         if(!isValidPlayerId(playerId)) {
-            // TODO send error message
-        } else if(direction < 0 || direction > 3) {
             // TODO send error message
         }
 
-        boolean result = field.movePlayer(playerId, direction);
+        boolean result = field.movePlayer(playerId, x, y);
         if(!result) {
             // TODO send error message
         } else {
@@ -91,8 +103,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         visualizerGUI.updateGUI();
     }
 
-    @Override
-    public synchronized void heal(int playerId, int targetPlayer) throws RemoteException {
+    public void heal(int playerId, int targetPlayer) throws RemoteException {
         logger.log(Level.INFO, "Server " + this.ID + " received heal to player " + targetPlayer + " from player " + playerId);
 
         if(!field.isInRange(playerId, targetPlayer, 5)) {
@@ -106,7 +117,6 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         visualizerGUI.updateGUI();
     }
 
-    @Override
     public void attack(int playerId, int dragonId) throws RemoteException {
         logger.log(Level.INFO, "Server " + this.ID + " received attack to dragon " + dragonId + " from player " + playerId);
 

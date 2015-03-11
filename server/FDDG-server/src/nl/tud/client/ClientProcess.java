@@ -4,7 +4,9 @@ import nl.tud.Main;
 import nl.tud.ServerInterface;
 import nl.tud.entities.Dragon;
 import nl.tud.entities.Player;
+import nl.tud.gameobjects.AttackAction;
 import nl.tud.gameobjects.Field;
+import nl.tud.gameobjects.HealAction;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -67,13 +69,13 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                 Dragon dragonToAttack;
                 Player playerToHeal = field.isInRangeToHeal(this.ID);
                 if(playerToHeal != null && playerToHeal.getCurHitPoints() > 0) {
-                    server.heal(this.ID, playerToHeal.getUnitId());
+                    server.performAction(new HealAction(this.ID, playerToHeal.getUnitId()));
                 } else if((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
-                    server.attack(this.ID, dragonToAttack.getUnitId());
+                    server.performAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
                 } else {
                     Player p = field.getPlayer(this.ID);
                     int move = field.getDirectionToNearestDragon(p.getxPos(), p.getyPos());
-                    if(move == -1 ) {
+                    if(move == -1) {
                         logger.log(Level.INFO, "Player" + this.ID + " couldn't move towards a dragon (blocked?)");
                         continue;
                     }

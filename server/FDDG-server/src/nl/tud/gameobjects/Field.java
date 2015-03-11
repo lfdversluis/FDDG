@@ -73,19 +73,17 @@ public class Field implements Serializable {
         return (newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && isFree(newX, newY));
     }
 
-    public boolean movePlayer(int playerId, int direction) {
+    public boolean movePlayer(int playerId, int x, int y) {
         Player p = playerMap.get(playerId);
-        int newX = p.getxPos() + dx[direction];
-        int newY = p.getyPos() + dy[direction];
 
-        if(!canMove(newX, newY)) {
+        if(!canMove(x, y)) {
             return false;
         }
 
         // move the player
         entities[p.getyPos()][p.getxPos()] = null;
-        entities[newY][newX] = p;
-        p.setxPos(newX); p.setyPos(newY);
+        entities[y][x] = p;
+        p.setxPos(x); p.setyPos(y);
 
         return true;
     }
