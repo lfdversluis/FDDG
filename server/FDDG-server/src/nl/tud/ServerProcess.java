@@ -18,6 +18,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +27,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private final int ID, NUM_SERVERS;
     private Field field;
     private Logger logger;
-    private Map<Integer, ClientInterface> connectedPlayers;
+    private volatile Map<Integer, ClientInterface> connectedPlayers;
     private VisualizerGUI visualizerGUI;
 
     public ServerProcess(int id, int num_servers) throws RemoteException, AlreadyBoundException, MalformedURLException {
@@ -34,7 +35,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         this.NUM_SERVERS = num_servers;
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
-        this.connectedPlayers = new HashMap<>();
+        this.connectedPlayers = new ConcurrentHashMap<>();
         this.visualizerGUI = new VisualizerGUI(field);
 
         logger.log(Level.INFO, "Starting server with id " + id);
@@ -61,11 +62,9 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     }
 
     public synchronized void broadcastFieldToConnectedPlayers() {
-        Iterator<Integer> it = connectedPlayers.keySet().iterator();
-        while(it.hasNext()) {
-            Integer id = it.next();
-            ClientInterface client = connectedPlayers.get(id);
+        for(Map.Entry<Integer, ClientInterface> entry : connectedPlayers.entrySet()) {
             try {
+                ClientInterface client = entry.getValue();
                 client.updateField(field);
             } catch (RemoteException e) {
                 e.printStackTrace();

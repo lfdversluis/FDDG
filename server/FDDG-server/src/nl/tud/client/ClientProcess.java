@@ -35,7 +35,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     @Override
     public synchronized void updateField(Field field) throws RemoteException {
         // logger.log(Level.INFO, "Client " + this.ID + " received field update");
-
         this.field = field;
     }
 

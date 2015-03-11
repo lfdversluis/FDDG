@@ -6,6 +6,7 @@ import nl.tud.entities.Unit;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Field implements Serializable {
     public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
@@ -14,15 +15,15 @@ public class Field implements Serializable {
     private int[] dx = { 0, 1, 0, -1 };
     private int[] dy = { -1, 0, 1, 0 };
     private HashSet<Integer> unitIds;
-    private HashMap<Integer, Player> playerMap;
-    private HashMap<Integer, Dragon> dragonMap;
+    private ConcurrentHashMap<Integer, Player> playerMap;
+    private ConcurrentHashMap<Integer, Dragon> dragonMap;
     private Random random;
 
     public Field() {
         entities = new Unit[BOARD_HEIGHT][BOARD_WIDTH];
         unitIds = new HashSet<Integer>();
-        playerMap = new HashMap<Integer, Player>();
-        dragonMap = new HashMap<Integer, Dragon>();
+        playerMap = new ConcurrentHashMap<Integer, Player>();
+        dragonMap = new ConcurrentHashMap<Integer, Dragon>();
 
         random = new Random(System.currentTimeMillis());
 
