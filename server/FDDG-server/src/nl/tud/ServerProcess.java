@@ -1,22 +1,18 @@
 package nl.tud;
 
 import nl.tud.client.ClientInterface;
-import nl.tud.entities.Dragon;
 import nl.tud.entities.Player;
-import nl.tud.entities.Unit;
-import nl.tud.gameobjects.Field;
+import nl.tud.gameobjects.*;
+import nl.tud.gui.VisualizerGUI;
 
-import javax.swing.*;
-import java.awt.*;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,64 +21,20 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private final int ID, NUM_SERVERS;
     private Field field;
     private Logger logger;
-    private Map<Integer, ClientInterface> connectedPlayers;
-
-    private JLabel[][] labels;
+    private volatile Map<Integer, ClientInterface> connectedPlayers;
+    private VisualizerGUI visualizerGUI;
 
     public ServerProcess(int id, int num_servers) throws RemoteException, AlreadyBoundException, MalformedURLException {
         this.ID = id;
         this.NUM_SERVERS = num_servers;
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
-        this.connectedPlayers = new HashMap<Integer, ClientInterface>();
-        this.labels = new JLabel[field.BOARD_HEIGHT][field.BOARD_WIDTH];
+        this.connectedPlayers = new ConcurrentHashMap<>();
+        this.visualizerGUI = new VisualizerGUI(field);
 
         logger.log(Level.INFO, "Starting server with id " + id);
 
         java.rmi.Naming.bind("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/" + id, this);
-
-        setupGUI();
-    }
-
-    private void setupGUI() {
-        JFrame frame = new JFrame("FDDG Visualizer");
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(field.BOARD_WIDTH, field.BOARD_HEIGHT));
-
-        // create squares
-        for(int x = 0; x < field.BOARD_WIDTH; x++) {
-            for(int y = 0; y < field.BOARD_HEIGHT; y++) {
-                JLabel b = new JLabel("", SwingConstants.CENTER);
-                b.setOpaque(true);
-                panel.add(b);
-                labels[y][x] = b;
-            }
-        }
-
-        frame.add(panel);
-        frame.setSize(600, 600);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
-
-    private void updateLabels() {
-        for(int x = 0; x < field.BOARD_WIDTH; x++) {
-            for (int y = 0; y < field.BOARD_HEIGHT; y++) {
-                Unit unit = field.getUnit(x, y);
-                if(unit == null) {
-                    labels[y][x].setBackground(Color.WHITE);
-                    labels[y][x].setText("");
-                } else if(unit instanceof Dragon) {
-                    labels[y][x].setBackground(Color.RED);
-                    labels[y][x].setText("D");
-                } else if(unit instanceof Player) {
-                    labels[y][x].setBackground(Color.GREEN);
-                    labels[y][x].setText("P");
-                }
-            }
-        }
     }
 
     @Override
@@ -104,11 +56,9 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     }
 
     public synchronized void broadcastFieldToConnectedPlayers() {
-        Iterator<Integer> it = connectedPlayers.keySet().iterator();
-        while(it.hasNext()) {
-            Integer id = it.next();
-            ClientInterface client = connectedPlayers.get(id);
+        for(Map.Entry<Integer, ClientInterface> entry : connectedPlayers.entrySet()) {
             try {
+                ClientInterface client = entry.getValue();
                 client.updateField(field);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -117,29 +67,39 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     }
 
     @Override
-    public synchronized void move(int playerId, int direction) throws RemoteException {
-        logger.log(Level.INFO, "Server " + this.ID + " received move with direction " + direction + " from player " + playerId);
+    public synchronized void performAction(Action action) throws java.rmi.RemoteException  {
+        if(action instanceof MoveAction) {
+            MoveAction ma = (MoveAction) action;
+            move(action.getSenderId(), ma.getX(), ma.getY());
+        } else if(action instanceof HealAction) {
+            HealAction ha = (HealAction) action;
+            heal(action.getSenderId(), ha.getTargetPlayer());
+        } else if(action instanceof AttackAction) {
+            AttackAction aa = (AttackAction) action;
+            attack(action.getSenderId(), aa.getDragonId());
+        }
+    }
+
+    public void move(int playerId, int x, int y) throws RemoteException {
+        logger.log(Level.INFO, "Server " + this.ID + " received move to (" + x + ", " + y + ") from player " + playerId);
         if(!isValidPlayerId(playerId)) {
-            // TODO send error message
-        } else if(direction < 0 || direction > 3) {
             // TODO send error message
         }
 
-        boolean result = field.movePlayer(playerId, direction);
+        boolean result = field.movePlayer(playerId, x, y);
         if(!result) {
             // TODO send error message
         } else {
             broadcastFieldToConnectedPlayers();
         }
 
-        updateLabels();
+        visualizerGUI.updateGUI();
     }
 
-    @Override
-    public synchronized void heal(int playerId, int targetPlayer) throws RemoteException {
+    public void heal(int playerId, int targetPlayer) throws RemoteException {
         logger.log(Level.INFO, "Server " + this.ID + " received heal to player " + targetPlayer + " from player " + playerId);
 
-        if(!field.isInRange(playerId, targetPlayer, 5)) {
+        if(!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5) {
             // TODO send error message
         } else {
             Player thisPlayer = field.getPlayer(playerId);
@@ -147,10 +107,9 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
             broadcastFieldToConnectedPlayers();
         }
 
-        updateLabels();
+        visualizerGUI.updateGUI();
     }
 
-    @Override
     public void attack(int playerId, int dragonId) throws RemoteException {
         logger.log(Level.INFO, "Server " + this.ID + " received attack to dragon " + dragonId + " from player " + playerId);
 
@@ -165,7 +124,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
             broadcastFieldToConnectedPlayers();
         }
 
-        updateLabels();
+        visualizerGUI.updateGUI();
     }
 
     @Override
@@ -185,7 +144,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
             e.printStackTrace();
         }
 
-        updateLabels();
+        visualizerGUI.updateGUI();
     }
 
     @Override

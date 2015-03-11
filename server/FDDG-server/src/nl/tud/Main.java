@@ -1,7 +1,6 @@
 package nl.tud;
 
 import nl.tud.client.ClientProcess;
-import org.omg.CORBA.INTERNAL;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -12,7 +11,7 @@ import java.util.Random;
 public class Main {
 
     public static final int NUM_SERVERS = 1;
-    public static final int NUM_CLIENTS = 3;
+    public static final int NUM_CLIENTS = 100;
     public static final int SERVER_PORT = 6447;
 
     public static void main(String[] args) {
@@ -34,6 +33,7 @@ public class Main {
             // create a client after a small delay
             Thread.sleep(2000);
             for(int i = 0; i < NUM_CLIENTS; i++) {
+                Thread.sleep(random.nextInt(290) + 10);
                 ClientProcess client = new ClientProcess(random.nextInt(Integer.MAX_VALUE));
                 clientProcesses.add(client);
                 new Thread(client).start();

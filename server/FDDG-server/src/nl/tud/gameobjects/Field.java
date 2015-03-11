@@ -6,23 +6,24 @@ import nl.tud.entities.Unit;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Field implements Serializable {
     public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
-    private static final int INITIAL_DRAGONS = 500;
+    private static final int INITIAL_DRAGONS = 20;
     private Unit[][] entities;
     private int[] dx = { 0, 1, 0, -1 };
     private int[] dy = { -1, 0, 1, 0 };
     private HashSet<Integer> unitIds;
-    private HashMap<Integer, Player> playerMap;
-    private HashMap<Integer, Dragon> dragonMap;
+    private ConcurrentHashMap<Integer, Player> playerMap;
+    private ConcurrentHashMap<Integer, Dragon> dragonMap;
     private Random random;
 
     public Field() {
         entities = new Unit[BOARD_HEIGHT][BOARD_WIDTH];
         unitIds = new HashSet<Integer>();
-        playerMap = new HashMap<Integer, Player>();
-        dragonMap = new HashMap<Integer, Dragon>();
+        playerMap = new ConcurrentHashMap<>();
+        dragonMap = new ConcurrentHashMap<>();
 
         random = new Random(System.currentTimeMillis());
 
@@ -72,19 +73,17 @@ public class Field implements Serializable {
         return (newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && isFree(newX, newY));
     }
 
-    public boolean movePlayer(int playerId, int direction) {
+    public boolean movePlayer(int playerId, int x, int y) {
         Player p = playerMap.get(playerId);
-        int newX = p.getxPos() + dx[direction];
-        int newY = p.getyPos() + dy[direction];
 
-        if(!canMove(newX, newY)) {
+        if(!canMove(x, y)) {
             return false;
         }
 
         // move the player
         entities[p.getyPos()][p.getxPos()] = null;
-        entities[newY][newX] = p;
-        p.setxPos(newX); p.setyPos(newY);
+        entities[y][x] = p;
+        p.setxPos(x); p.setyPos(y);
 
         return true;
     }
@@ -117,14 +116,13 @@ public class Field implements Serializable {
      * @return
      */
     public Player isInRangeToHeal(int playerId) {
-        ArrayList<Player> eligible = new ArrayList<Player>();
-        Player thisPlayer = playerMap.get(playerId);
+        ArrayList<Player> eligible = new ArrayList<>();
 
         Iterator<Integer> it = playerMap.keySet().iterator();
         while(it.hasNext()) {
             Integer id = it.next();
             Player thatPlayer = playerMap.get(id);
-            if(isInRange(playerId, id, 5) && thatPlayer.getCurHitPoints() < 0.5) { eligible.add(thatPlayer); }
+            if(isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5) { eligible.add(thatPlayer); }
         }
 
         if(eligible.size() == 0) { return null; }
@@ -138,7 +136,6 @@ public class Field implements Serializable {
      */
     public Dragon dragonIsInRangeToAttack(int playerId) {
         ArrayList<Dragon> eligible = new ArrayList<Dragon>();
-        Player thisPlayer = playerMap.get(playerId);
 
         Iterator<Integer> it = dragonMap.keySet().iterator();
         while(it.hasNext()) {
@@ -189,19 +186,7 @@ public class Field implements Serializable {
                 int newY = curY + dy[i];
 
                 if(newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && (entities[newY][newX] instanceof Dragon)){
-                    int firstStep = path.get(0);
-                    int diffX = (firstStep % MAX_WIDTH_HEIGHT) - startX;
-                    int diffY = (firstStep / MAX_WIDTH_HEIGHT) - startY;
-
-                    if(diffX == -1){
-                        return 3;
-                    } else if(diffX == 1){
-                        return 1;
-                    } else if(diffY == -1){
-                        return 0;
-                    } else {
-                        return 2;
-                    }
+                    return path.get(0);
                 }
 
                 if(canMove(newX, newY)){

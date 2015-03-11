@@ -4,7 +4,10 @@ import nl.tud.Main;
 import nl.tud.ServerInterface;
 import nl.tud.entities.Dragon;
 import nl.tud.entities.Player;
+import nl.tud.gameobjects.AttackAction;
 import nl.tud.gameobjects.Field;
+import nl.tud.gameobjects.HealAction;
+import nl.tud.gameobjects.MoveAction;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -12,7 +15,6 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +37,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     @Override
     public synchronized void updateField(Field field) throws RemoteException {
         // logger.log(Level.INFO, "Client " + this.ID + " received field update");
-
         this.field = field;
     }
 
@@ -56,8 +57,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     @Override
     public void run() {
 
-        Random random = new Random();
-
         // send a connect message to the server
         try {
             server = (ServerInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/0");
@@ -69,21 +68,24 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                 // check if there is a nearby player with hp < 50% to heal
                 Dragon dragonToAttack;
                 Player playerToHeal = field.isInRangeToHeal(this.ID);
-                if(playerToHeal != null && playerToHeal.getCurHitPoints() > 0) {
-                    server.heal(this.ID, playerToHeal.getUnitId());
+                if(playerToHeal != null) {
+                    server.performAction(new HealAction(this.ID, playerToHeal.getUnitId()));
                 } else if((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
-                    server.attack(this.ID, dragonToAttack.getUnitId());
+                    server.performAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
                 } else {
                     Player p = field.getPlayer(this.ID);
                     int move = field.getDirectionToNearestDragon(p.getxPos(), p.getyPos());
-                    if(move == -1 ) {
+                    if(move == -1) {
                         logger.log(Level.INFO, "Player" + this.ID + " couldn't move towards a dragon (blocked?)");
                         continue;
                     }
-                    server.move(this.ID, move);
-                }
+                    final int MAX_WIDTH_HEIGHT = Math.max(field.BOARD_HEIGHT, field.BOARD_WIDTH) + 5;
+                    int newX = move % MAX_WIDTH_HEIGHT;
+                    int newY = move / MAX_WIDTH_HEIGHT;
 
-                // server.move(this.ID, random.nextInt(4));
+                    MoveAction moveAction = new MoveAction(this.ID, newX, newY);
+                    server.performAction(moveAction);
+                }
             }
 
         } catch (NotBoundException e) {
