@@ -109,7 +109,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                     Player p = field.getPlayer(this.ID);
                     int move = field.getDirectionToNearestDragon(p.getxPos(), p.getyPos());
                     if(move == -1) {
-                        logger.log(Level.INFO, "Player" + this.ID + " couldn't move towards a dragon (blocked?)");
+                        logger.log(Level.INFO, "Player" + this.ID + " can't move towards any dragon)");
                         continue;
                     }
                     final int MAX_WIDTH_HEIGHT = Math.max(Field.BOARD_HEIGHT, Field.BOARD_WIDTH) + 5;

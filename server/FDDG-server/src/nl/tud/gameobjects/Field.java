@@ -104,14 +104,16 @@ public class Field implements Serializable {
 
     public boolean isInRange(int thisPlayerId, int thatUnitId, int range) {
         Player thisPlayer = playerMap.get(thisPlayerId);
-        Unit thatPlayer;
+        Unit thatUnit;
         if(playerMap.containsKey(thatUnitId)){
-            thatPlayer = playerMap.get(thatUnitId);
+            thatUnit = playerMap.get(thatUnitId);
+        } else if (dragonMap.contains(thatUnitId)){
+            thatUnit = dragonMap.get(thatUnitId);
         } else {
-            thatPlayer = dragonMap.get(thatUnitId);
+            return false;
         }
 
-        int distance = manhattanDistance(thisPlayer.getxPos(), thisPlayer.getyPos(), thatPlayer.getxPos(), thatPlayer.getyPos());
+        int distance = manhattanDistance(thisPlayer.getxPos(), thisPlayer.getyPos(), thatUnit.getxPos(), thatUnit.getyPos());
         return (distance <= range);
     }
 
@@ -192,7 +194,7 @@ public class Field implements Serializable {
                 int newY = curY + dy[i];
 
                 if(newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && (entities[newY][newX] instanceof Dragon)){
-                    return path.get(0);
+?                    return path.get(0);
                 }
 
                 if(canMove(newX, newY)){
