@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Field implements Serializable {
     public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
-    private static final int INITIAL_DRAGONS = 20;
+    private static final int INITIAL_DRAGONS = 25;
     private Unit[][] entities;
     private int[] dx = { 0, 1, 0, -1 };
     private int[] dy = { -1, 0, 1, 0 };
@@ -107,7 +107,7 @@ public class Field implements Serializable {
         Unit thatUnit;
         if(playerMap.containsKey(thatUnitId)){
             thatUnit = playerMap.get(thatUnitId);
-        } else if (dragonMap.contains(thatUnitId)){
+        } else if (dragonMap.containsKey(thatUnitId)){
             thatUnit = dragonMap.get(thatUnitId);
         } else {
             return false;
@@ -130,7 +130,7 @@ public class Field implements Serializable {
         while(it.hasNext()) {
             Integer id = it.next();
             Player thatPlayer = playerMap.get(id);
-            if(isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5) { eligible.add(thatPlayer); }
+            if(isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5 && thatPlayer.getHitpoints() > 0) { eligible.add(thatPlayer); }
         }
 
         if(eligible.size() == 0) { return null; }
@@ -194,7 +194,7 @@ public class Field implements Serializable {
                 int newY = curY + dy[i];
 
                 if(newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && (entities[newY][newX] instanceof Dragon)){
-?                    return path.get(0);
+                    return path.get(0);
                 }
 
                 if(canMove(newX, newY)){
@@ -217,8 +217,9 @@ public class Field implements Serializable {
         return -1;
     }
 
-    public Set<Player> dragonRage() {
-        Set<Player> deadPlayerSet = new HashSet<>();
+    public Set<Action> dragonRage() {
+        Set<Action> actionSet = new HashSet<>();
+
         for(int dragonId : dragonMap.keySet()){
             Dragon d = dragonMap.get(dragonId);
 
@@ -234,13 +235,17 @@ public class Field implements Serializable {
                     p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
 
                     if(p.getCurHitPoints() <= 0){
-                        deadPlayerSet.add(p);
+                        DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
+                        actionSet.add(dua);
                         removePlayer(p.getUnitId());
                     }
+
+                    DamageAction da = new DamageAction(p.getUnitId(), d.getAttackPower());
+                    actionSet.add(da);
                 }
             }
         }
-        return deadPlayerSet;
+        return actionSet;
     }
 
     public void removePlayer(int playerId){
@@ -260,6 +265,20 @@ public class Field implements Serializable {
         }
 
         return true;
+    }
+
+    public String toString() {
+        String res = "";
+        for(int y = 0; y < BOARD_HEIGHT; y++) {
+            for(int x = 0; x < BOARD_WIDTH; x++) {
+                Unit u = entities[y][x];
+                if(u == null) { res += " "; }
+                else if(u instanceof Player) { res += "P"; }
+                else if(u instanceof Dragon) { res += "D"; }
+            }
+            res += "\n";
+        }
+        return res;
     }
 }
 

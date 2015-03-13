@@ -18,4 +18,8 @@ public class Dragon extends Unit {
     public void getHit(int ap) {
         curHitPoints -= ap;
     }
+
+    public String toString() {
+        return "{ Dragon: " + this.unitId + " }";
+    }
 }

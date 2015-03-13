@@ -11,7 +11,7 @@ import java.util.Random;
 public class Main {
 
     public static final int NUM_SERVERS = 1;
-    public static final int NUM_CLIENTS = 100;
+    public static final int NUM_CLIENTS = 10;
     public static final int SERVER_PORT = 6447;
 
     public static void main(String[] args) {

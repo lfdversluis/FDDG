@@ -43,11 +43,10 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         try {
             Thread.sleep(5000);
             while (!field.gameHasFinished()) {
-                Set<Player> deadPlayerSet = field.dragonRage();
+                Set<Action> actionSet = field.dragonRage();
 
-                for(Player p : deadPlayerSet){
-                    DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
-                    broadcastActionToPlayers(dua);
+                for(Action a : actionSet){
+                    broadcastActionToPlayers(a);
                 }
                 Thread.sleep(1000);
             }

@@ -21,10 +21,12 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     private Logger logger;
     private ServerInterface server;
     private Field field;
+    private boolean isAlive;
 
     public ClientProcess(int id) throws RemoteException, AlreadyBoundException, MalformedURLException {
         this.ID = id;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
+        this.isAlive = true;
 
         logger.log(Level.INFO, "Starting client with id " + id);
 
@@ -53,6 +55,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             if(field.getDragon(dua.getUnitId()) == null){
                 Player p = field.getPlayer(dua.getUnitId());
                 field.removePlayer(p.getUnitId());
+                if(p.getUnitId() == this.ID) { isAlive = false; }
             } else {
                 Dragon d = field.getDragon(dua.getUnitId());
                 field.removeDragon(d.getUnitId());
@@ -69,6 +72,11 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             int x = ma.getX();
             int y = ma.getY();
             field.movePlayer(playerId, x, y);
+        } else if(action instanceof DamageAction) {
+            DamageAction da = (DamageAction) action;
+            int playerId = da.getPlayerId();
+            int damage = da.getDamage();
+            field.getPlayer(playerId).setCurHitPoints(field.getPlayer(playerId).getCurHitPoints() - damage);
         }
 
     }
@@ -83,10 +91,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
     }
 
-    public boolean isAlive() {
-        return field.getPlayer(this.ID).getCurHitPoints() > 0;
-    }
-
     @Override
     public void run() {
 
@@ -95,7 +99,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             server = (ServerInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/0");
             server.connect(this.ID);
 
-            while(isAlive() && !field.gameHasFinished()) {
+            while(isAlive && !field.gameHasFinished()) {
                 Thread.sleep(1000);
 
                 // check if there is a nearby player with hp < 50% to heal
