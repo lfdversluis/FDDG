@@ -59,6 +59,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             } else {
                 Dragon d = field.getDragon(dua.getUnitId());
                 field.removeDragon(d.getUnitId());
+                System.out.println("REMOVING DRAGON");
             }
         } else if(action instanceof HealAction){
             HealAction ha = (HealAction) action;
@@ -102,10 +103,14 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             while(isAlive && !field.gameHasFinished()) {
                 Thread.sleep(1000);
 
+                //System.out.println("------------ FIELD OF PLAYER " + ID);
+                //System.out.println(field);
+
                 // check if there is a nearby player with hp < 50% to heal
                 Dragon dragonToAttack;
                 Player playerToHeal = field.isInRangeToHeal(this.ID);
                 if(playerToHeal != null) {
+                    System.out.println("health of player to heal: " + playerToHeal.getCurHitPoints());
                     server.performAction(new HealAction(this.ID, playerToHeal.getUnitId()));
                 } else if((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
                     server.performAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));

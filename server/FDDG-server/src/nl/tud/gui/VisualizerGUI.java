@@ -8,9 +8,6 @@ import nl.tud.gameobjects.Field;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Created by Martijn on 10-03-15.
- */
 public class VisualizerGUI {
 
     private JPanel[][] panels;
@@ -33,10 +30,9 @@ public class VisualizerGUI {
         panel.setLayout(new GridLayout(Field.BOARD_WIDTH, Field.BOARD_HEIGHT));
 
         // create squares
-        for(int x = 0; x < Field.BOARD_WIDTH; x++) {
-            for(int y = 0; y < Field.BOARD_HEIGHT; y++) {
+        for(int y = 0; y < Field.BOARD_HEIGHT; y++) {
+            for(int x = 0; x < Field.BOARD_WIDTH; x++) {
                 JPanel p = new JPanel();
-                SpringLayout layout = new SpringLayout();
                 p.setLayout(null);
                 p.setOpaque(true);
                 panels[y][x] = p;
@@ -55,8 +51,8 @@ public class VisualizerGUI {
     }
 
     public void addHealthAndLabels() {
-        for(int x = 0; x < Field.BOARD_WIDTH; x++) {
-            for (int y = 0; y < Field.BOARD_HEIGHT; y++) {
+        for(int y = 0; y < Field.BOARD_HEIGHT; y++) {
+            for(int x = 0; x < Field.BOARD_WIDTH; x++) {
 
                 // add health panel
                 JPanel healthPanel = new JPanel();
@@ -77,8 +73,8 @@ public class VisualizerGUI {
     }
 
     public void updateGUI() {
-        for(int x = 0; x < field.BOARD_WIDTH; x++) {
-            for (int y = 0; y < field.BOARD_HEIGHT; y++) {
+        for(int y = 0; y < field.BOARD_HEIGHT; y++) {
+            for (int x = 0; x < field.BOARD_WIDTH; x++) {
                 JPanel panel = panels[y][x];
                 JLabel label = unitLabels[y][x];
                 JPanel healthPanel = healthPanels[y][x];

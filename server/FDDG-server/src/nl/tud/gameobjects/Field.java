@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Field implements Serializable {
     public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
-    private static final int INITIAL_DRAGONS = 25;
+    private static final int INITIAL_DRAGONS = 1;
     private Unit[][] entities;
     private int[] dx = { 0, 1, 0, -1 };
     private int[] dy = { -1, 0, 1, 0 };
@@ -130,7 +130,7 @@ public class Field implements Serializable {
         while(it.hasNext()) {
             Integer id = it.next();
             Player thatPlayer = playerMap.get(id);
-            if(isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5 && thatPlayer.getHitpoints() > 0) { eligible.add(thatPlayer); }
+            if(isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5 && thatPlayer.getCurHitPoints() > 0) { eligible.add(thatPlayer); }
         }
 
         if(eligible.size() == 0) { return null; }
@@ -272,7 +272,7 @@ public class Field implements Serializable {
         for(int y = 0; y < BOARD_HEIGHT; y++) {
             for(int x = 0; x < BOARD_WIDTH; x++) {
                 Unit u = entities[y][x];
-                if(u == null) { res += " "; }
+                if(u == null) { res += "."; }
                 else if(u instanceof Player) { res += "P"; }
                 else if(u instanceof Dragon) { res += "D"; }
             }
