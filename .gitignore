@@ -1,2 +1,5 @@
-.idea/
 server/FDDG-server/.idea/
+.idea/
+*.iml
+*.iws
+.DS_Store
