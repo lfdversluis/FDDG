@@ -2,6 +2,7 @@ package nl.tud.dcs.fddg;
 
 
 import nl.tud.dcs.fddg.server.ServerProcess;
+import nl.tud.dcs.fddg.util.RMI_Util;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -13,8 +14,6 @@ import java.rmi.registry.Registry;
  * Created by Niels on 16-3-2015.
  */
 public class StartServer {
-
-    private static final int REGISTRY_PORT = 1099;
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -29,18 +28,7 @@ public class StartServer {
             useGUI = true;
 
         // make sure the RMI registry is online
-        Registry registry = null;
-        try {
-            registry = LocateRegistry.getRegistry(REGISTRY_PORT);
-        } catch (RemoteException e) {
-            // registry does not exist yet, so create it
-            System.out.println("RMI registry not online, starting it now");
-            try {
-                registry = LocateRegistry.createRegistry(REGISTRY_PORT);
-            } catch (RemoteException e1) {
-                e1.printStackTrace();
-            }
-        }
+        Registry registry = RMI_Util.getLocalRegistry();
 
         // create the server process, bind it to the registry and start it
         try {
