@@ -25,6 +25,14 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     private ServerInterface server;
     private Field field;
 
+    /**
+     * Constructor: initializes the instance variables, the logger and binds the client to its registry
+     *
+     * @param id The process identifier of this client
+     * @throws RemoteException
+     * @throws AlreadyBoundException
+     * @throws MalformedURLException
+     */
     public ClientProcess(int id) throws RemoteException, AlreadyBoundException, MalformedURLException {
         this.ID = id;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
@@ -50,6 +58,11 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
     }
 
+    /**
+     * Checks whether the player is still alive (hp>0)
+     *
+     * @return true iff the player is still alive
+     */
     public boolean isAlive() {
         return field.getPlayer(this.ID).getCurHitPoints() > 0;
     }
@@ -62,20 +75,20 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             server = (ServerInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/0");
             server.connect(this.ID);
 
-            while(isAlive() && !field.gameHasFinished()) {
+            while (isAlive() && !field.gameHasFinished()) {
                 Thread.sleep(1000);
 
                 // check if there is a nearby player with hp < 50% to heal
                 Dragon dragonToAttack;
                 Player playerToHeal = field.isInRangeToHeal(this.ID);
-                if(playerToHeal != null) {
+                if (playerToHeal != null) {
                     server.performAction(new HealAction(this.ID, playerToHeal.getUnitId()));
-                } else if((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
+                } else if ((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
                     server.performAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
                 } else {
                     Player p = field.getPlayer(this.ID);
                     int move = field.getDirectionToNearestDragon(p.getxPos(), p.getyPos());
-                    if(move == -1) {
+                    if (move == -1) {
                         logger.log(Level.INFO, "Player" + this.ID + " couldn't move towards a dragon (blocked?)");
                         continue;
                     }
