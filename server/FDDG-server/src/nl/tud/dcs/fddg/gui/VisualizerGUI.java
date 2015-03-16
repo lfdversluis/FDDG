@@ -1,9 +1,9 @@
-package nl.tud.gui;
+package nl.tud.dcs.fddg.gui;
 
-import nl.tud.entities.Dragon;
-import nl.tud.entities.Player;
-import nl.tud.entities.Unit;
-import nl.tud.gameobjects.Field;
+import nl.tud.dcs.fddg.game.entities.Dragon;
+import nl.tud.dcs.fddg.game.entities.Player;
+import nl.tud.dcs.fddg.game.entities.Unit;
+import nl.tud.dcs.fddg.game.Field;
 
 import javax.swing.*;
 import java.awt.*;

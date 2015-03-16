@@ -1,6 +1,7 @@
-package nl.tud;
+package nl.tud.dcs.fddg;
 
-import nl.tud.client.ClientProcess;
+import nl.tud.dcs.fddg.client.ClientProcess;
+import nl.tud.dcs.fddg.server.ServerProcess;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;

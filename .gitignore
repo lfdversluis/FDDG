@@ -1,2 +1,7 @@
 .idea/
 server/FDDG-server/.idea/
+
+# Intellij
+.idea/*
+*.iml
+*.iws
