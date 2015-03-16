@@ -30,16 +30,13 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
      *
      * @param id The process identifier of this client
      * @throws RemoteException
-     * @throws AlreadyBoundException
-     * @throws MalformedURLException
      */
-    public ClientProcess(int id) throws RemoteException, AlreadyBoundException, MalformedURLException {
+    public ClientProcess(int id) throws RemoteException {
+        super();
         this.ID = id;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
 
         logger.log(Level.INFO, "Starting client with id " + id);
-
-        java.rmi.Naming.bind("rmi://localhost:" + Main.SERVER_PORT + "/FDDGClient/" + id, this);
     }
 
     @Override
