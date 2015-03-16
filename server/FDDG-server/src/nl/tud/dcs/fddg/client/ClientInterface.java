@@ -1,6 +1,6 @@
-package nl.tud.client;
+package nl.tud.dcs.fddg.client;
 
-import nl.tud.gameobjects.Field;
+import nl.tud.dcs.fddg.game.Field;
 
 import java.rmi.Remote;
 

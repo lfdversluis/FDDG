@@ -1,8 +1,8 @@
-package nl.tud.gameobjects;
+package nl.tud.dcs.fddg.game;
 
-import nl.tud.entities.Dragon;
-import nl.tud.entities.Player;
-import nl.tud.entities.Unit;
+import nl.tud.dcs.fddg.game.entities.Dragon;
+import nl.tud.dcs.fddg.game.entities.Player;
+import nl.tud.dcs.fddg.game.entities.Unit;
 
 import java.io.Serializable;
 import java.util.*;
@@ -193,7 +193,7 @@ public class Field implements Serializable {
                     int newPos = newX + newY * MAX_WIDTH_HEIGHT;
                     if(!stepMap.containsKey(newPos) || (curSteps + 1 ) < stepMap.get(newPos) ){
                         // Make a copy (hard copy, no reference)
-                        ArrayList<Integer> updatedPath = new ArrayList<Integer>(path);
+                        ArrayList<Integer> updatedPath = new ArrayList<>(path);
                         updatedPath.add(newPos);
                         stepMap.put(newPos, curSteps+1);
                         queue.add(new State(newPos, updatedPath, curSteps+1));

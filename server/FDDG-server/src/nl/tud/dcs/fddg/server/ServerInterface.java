@@ -1,6 +1,6 @@
-package nl.tud;
+package nl.tud.dcs.fddg.server;
 
-import nl.tud.gameobjects.Action;
+import nl.tud.dcs.fddg.game.actions.Action;
 
 import java.rmi.Remote;
 

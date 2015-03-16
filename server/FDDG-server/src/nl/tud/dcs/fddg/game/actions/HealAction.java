@@ -1,4 +1,4 @@
-package nl.tud.gameobjects;
+package nl.tud.dcs.fddg.game.actions;
 
 /**
  * Created by martijndevos on 3/11/15.

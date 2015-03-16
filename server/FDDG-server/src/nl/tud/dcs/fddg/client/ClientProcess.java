@@ -1,13 +1,13 @@
-package nl.tud.client;
+package nl.tud.dcs.fddg.client;
 
-import nl.tud.Main;
-import nl.tud.ServerInterface;
-import nl.tud.entities.Dragon;
-import nl.tud.entities.Player;
-import nl.tud.gameobjects.AttackAction;
-import nl.tud.gameobjects.Field;
-import nl.tud.gameobjects.HealAction;
-import nl.tud.gameobjects.MoveAction;
+import nl.tud.dcs.fddg.Main;
+import nl.tud.dcs.fddg.server.ServerInterface;
+import nl.tud.dcs.fddg.game.entities.Dragon;
+import nl.tud.dcs.fddg.game.entities.Player;
+import nl.tud.dcs.fddg.game.actions.AttackAction;
+import nl.tud.dcs.fddg.game.Field;
+import nl.tud.dcs.fddg.game.actions.HealAction;
+import nl.tud.dcs.fddg.game.actions.MoveAction;
 
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
