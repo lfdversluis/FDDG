@@ -69,7 +69,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
         // send a connect message to the server
         try {
-            server = (ServerInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/0");
+            server = (ServerInterface) Naming.lookup("FDDGServer/0");
             server.connect(this.ID);
 
             while (isAlive() && !field.gameHasFinished()) {

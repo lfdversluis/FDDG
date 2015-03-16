@@ -26,7 +26,7 @@ public class Main {
 
             // create the server processes
             for(int i=0; i<NUM_SERVERS; i++) {
-                    ServerProcess process = new ServerProcess(i, NUM_SERVERS);
+                    ServerProcess process = new ServerProcess(i, true);
                     serverProcesses.add(process);
                     new Thread(process).start();
             }
@@ -43,11 +43,7 @@ public class Main {
 
         } catch (RemoteException e){
             e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (AlreadyBoundException e) {
-            e.printStackTrace();
-        } catch(InterruptedException e) {
+        }  catch(InterruptedException e) {
             e.printStackTrace();
         }
     }

@@ -4,8 +4,11 @@ import nl.tud.dcs.fddg.client.ClientProcess;
 import nl.tud.dcs.fddg.server.ServerProcess;
 import nl.tud.dcs.fddg.util.RMI_Util;
 
+import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 /**
@@ -24,18 +27,22 @@ public class StartClient {
         int clientID = Integer.parseInt(args[0]);
 
         // make sure the RMI registry is online
-        Registry registry = RMI_Util.getLocalRegistry();
-
+//        Registry registry = RMI_Util.getLocalRegistry();
+//        try {
+//            LocateRegistry.createRegistry(1099);
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        }
+//        RMI_Util.getLocalRegistry();
         // create the client process, bind it to the registry and start it
         try {
             ClientProcess client = new ClientProcess(clientID);
-            registry.bind("FDDGClient/" + clientID, client);
+            Naming.rebind("FDDGClient/" + clientID, client);
             new Thread(client).start();
         } catch (RemoteException e) {
             e.printStackTrace();
-        } catch (AlreadyBoundException e) {
+        } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
     }
 }
