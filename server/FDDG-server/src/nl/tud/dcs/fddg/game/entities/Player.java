@@ -1,4 +1,4 @@
-package nl.tud.entities;
+package nl.tud.dcs.fddg.game.entities;
 
 import java.util.Random;
 

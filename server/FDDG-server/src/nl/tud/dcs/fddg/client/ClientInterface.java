@@ -1,15 +1,18 @@
-package nl.tud.client;
+package nl.tud.dcs.fddg.client;
 
-import nl.tud.gameobjects.Field;
+import nl.tud.dcs.fddg.game.Field;
 
 import java.rmi.Remote;
 
+/**
+ * Created by Martijn on 09-03-15.
+ */
 public interface ClientInterface extends Remote {
 
     /**
-     * DEPRECATED.
-     * This function can be called by the server to update the field of a player.
-     * @param field The field that the player should update to.
+     * Function to notify a client of an update to the game state.
+     *
+     * @param field The new game field
      * @throws java.rmi.RemoteException
      */
     public void updateField(Field field) throws java.rmi.RemoteException;

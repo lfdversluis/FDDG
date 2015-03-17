@@ -1,4 +1,4 @@
-package nl.tud.gameobjects;
+package nl.tud.dcs.fddg.game.actions;
 
 public class HealAction extends Action {
     private int targetPlayer;
