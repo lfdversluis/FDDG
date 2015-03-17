@@ -9,7 +9,7 @@ public class Player extends Unit {
      * and sets the basic parameters: x, y and id.
      * @param x The initial x coordinate of the player in the grid.
      * @param y The initial y coordinate of the player in the grid.
-     * @param id The unique ID of the player.
+     * @param id The (unique) ID of the player.
      */
     public Player(int x, int y, int id) {
         Random random = new Random(System.currentTimeMillis());
