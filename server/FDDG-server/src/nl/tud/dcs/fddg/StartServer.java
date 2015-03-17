@@ -24,23 +24,11 @@ public class StartServer {
             System.exit(1);
         }
 
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
-
         // parse arguments
         int serverID = Integer.parseInt(args[0]);
         boolean useGUI = false;
         if(args.length > 1 && args[1].equals("GUI"))
             useGUI = true;
-
-        // make sure the RMI registry is online
-//        try {
-//            LocateRegistry.createRegistry(1099);
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//        }
-//        RMI_Util.getLocalRegistry();
 
         // create the server process, bind it to the registry and start it
         try {
