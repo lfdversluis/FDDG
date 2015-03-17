@@ -147,7 +147,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         logger.log(Level.INFO, "Client with id " + playerId + " connected");
 
         try {
-            ClientInterface ci = (ClientInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGClient/" + playerId);
+            ClientInterface ci = (ClientInterface) Naming.lookup("//localhost:1099/FDDGClient/" + playerId);
             connectedPlayers.put(playerId, ci);
             field.addPlayer(playerId);
             broadcastFieldToConnectedPlayers();

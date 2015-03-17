@@ -26,14 +26,6 @@ public class StartClient {
         // parse arguments
         int clientID = Integer.parseInt(args[0]);
 
-        // make sure the RMI registry is online
-//        Registry registry = RMI_Util.getLocalRegistry();
-//        try {
-//            LocateRegistry.createRegistry(1099);
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//        }
-//        RMI_Util.getLocalRegistry();
         // create the client process, bind it to the registry and start it
         try {
             ClientProcess client = new ClientProcess(clientID);
