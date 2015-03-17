@@ -7,8 +7,8 @@ public class Dragon extends Unit {
     /**
      * Constructor of the Dragon class. This initializes a new Dragon object
      * and sets the basic parameters: x, y and id.
-     * @param x The initial x coordinate of the dragon in the grid.
-     * @param y The initial y coordinate of the dragon in the grid.
+     * @param x The initial x coordinate of the dragon on the field.
+     * @param y The initial y coordinate of the dragon on the field.
      * @param id The (unique) ID of the Dragon.
      */
     public Dragon(int x, int y, int id) {

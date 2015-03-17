@@ -7,8 +7,8 @@ public class Player extends Unit {
     /**
      * Constructor of the player class. This initializes a new Player object
      * and sets the basic parameters: x, y and id.
-     * @param x The initial x coordinate of the player in the grid.
-     * @param y The initial y coordinate of the player in the grid.
+     * @param x The initial x coordinate of the player on the field.
+     * @param y The initial y coordinate of the player on the field.
      * @param id The (unique) ID of the player.
      */
     public Player(int x, int y, int id) {
