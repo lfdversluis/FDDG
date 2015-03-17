@@ -51,9 +51,12 @@
       <file leaf-file-name="Player.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Player.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.07522124" vertical-offset="0" max-vertical-offset="904">
-              <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-              <folding />
+            <state vertical-scroll-proportion="0.50774336" vertical-offset="0" max-vertical-offset="904">
+              <caret line="27" column="69" selection-start-line="27" selection-start-column="69" selection-end-line="27" selection-end-column="69" />
+              <folding>
+                <element signature="e#942#943#0" expanded="true" />
+                <element signature="e#1016#1017#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -88,6 +91,7 @@
       <list>
         <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/client/ClientInterface.java" />
         <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/client/ClientProcess.java" />
+        <option value="$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Player.java" />
       </list>
     </option>
   </component>
@@ -492,9 +496,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server/FDDG-server/src/nl/tud/entities/Player.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.07522124" vertical-offset="0" max-vertical-offset="904">
-          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding />
+        <state vertical-scroll-proportion="0.50774336" vertical-offset="0" max-vertical-offset="904">
+          <caret line="27" column="69" selection-start-line="27" selection-start-column="69" selection-end-line="27" selection-end-column="69" />
+          <folding>
+            <element signature="e#942#943#0" expanded="true" />
+            <element signature="e#1016#1017#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
