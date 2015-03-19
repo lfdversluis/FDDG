@@ -14,6 +14,12 @@ public interface ServerInterface extends Remote {
      */
     public void performAction(Action action) throws java.rmi.RemoteException;
 
+    /**
+     * This function is called by clients to tell the server they wish to register.
+     * The server then replies with a Client Connect Action.
+     * @return A ClientConnectAction object that contains the ID of the client.
+     * @throws java.rmi.RemoteException
+     */
     public ClientConnectAction register() throws java.rmi.RemoteException;
 
     /**
