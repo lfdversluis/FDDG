@@ -2,10 +2,7 @@ package nl.tud.dcs.fddg.server;
 
 import nl.tud.dcs.fddg.client.ClientInterface;
 import nl.tud.dcs.fddg.game.Field;
-import nl.tud.dcs.fddg.game.actions.Action;
-import nl.tud.dcs.fddg.game.actions.AttackAction;
-import nl.tud.dcs.fddg.game.actions.HealAction;
-import nl.tud.dcs.fddg.game.actions.MoveAction;
+import nl.tud.dcs.fddg.game.actions.*;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.gui.VisualizerGUI;
 
@@ -15,6 +12,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +24,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private Logger logger;
     private volatile Map<Integer, ClientInterface> connectedPlayers;
     private VisualizerGUI visualizerGUI = null;
+    private boolean gameStarted;
 
     /**
      * The constructor of the ServerProcess class. It requires an ID and a flag indicating whether a GUI should be started or not..
@@ -40,6 +39,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
         this.connectedPlayers = new ConcurrentHashMap<>();
+        this.gameStarted = false;
 
         // start GUI if necessary
         if (useGUI)
@@ -55,14 +55,39 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     @Override
     public void run() {
         try {
+            do {
+                Thread.sleep(1000);
+            } while(!gameStarted);
+
             while (!field.gameHasFinished()) {
-                field.dragonRage();
+                Set<Action> actionSet = field.dragonRage();
+
+                for(Action a : actionSet){
+                    broadcastActionToPlayers(a);
+                }
                 Thread.sleep(1000);
             }
-        } catch (InterruptedException e) {
+
+            logger.log(Level.INFO, "Server " + ID + " finished the game.");
+
+        } catch(InterruptedException e) {
             e.printStackTrace();
         }
+    }
 
+    /**
+     * Broadcast an action to all players
+     * @param action The action to be broadcasted.
+     */
+    public synchronized void broadcastActionToPlayers(Action action) {
+        for(Map.Entry<Integer, ClientInterface> entry : connectedPlayers.entrySet()) {
+            try {
+                ClientInterface client = entry.getValue();
+                client.ack(action);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -84,21 +109,6 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     }
 
     /**
-     * DEPRECATED.
-     * This function broadcasts the field to all clients currently connected to the game.
-     */
-    public synchronized void broadcastFieldToConnectedPlayers() {
-        for (Map.Entry<Integer, ClientInterface> entry : connectedPlayers.entrySet()) {
-            try {
-                ClientInterface client = entry.getValue();
-                client.updateField(field);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
      * This function performs an action, can be one of the following:
      * MoveAction, HealAction, AttackAction.
      *
@@ -106,16 +116,16 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void performAction(Action action) throws java.rmi.RemoteException {
-        if (action instanceof MoveAction) {
+    public synchronized void performAction(Action action) throws java.rmi.RemoteException  {
+        if(action instanceof MoveAction) {
             MoveAction ma = (MoveAction) action;
-            move(action.getSenderId(), ma.getX(), ma.getY());
-        } else if (action instanceof HealAction) {
+            move(ma);
+        } else if(action instanceof HealAction) {
             HealAction ha = (HealAction) action;
-            heal(action.getSenderId(), ha.getTargetPlayer());
-        } else if (action instanceof AttackAction) {
+            heal(ha);
+        } else if(action instanceof AttackAction) {
             AttackAction aa = (AttackAction) action;
-            attack(action.getSenderId(), aa.getDragonId());
+            attack(aa);
         }
     }
 
@@ -123,24 +133,25 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * This function moves a player to a given position. If the move cannot
      * be done or if the player is invalid, it sends an error to the client.
      *
-     * @param playerId The (unique) ID of the player to be moved.
-     * @param x        The x in the grid position to move to.
-     * @param y        The y in the grid position to move to.
+     * @param ma The MoveAction to be performed.
      * @throws RemoteException
      */
-    public void move(int playerId, int x, int y) throws RemoteException {
+    public void move(MoveAction ma) throws RemoteException {
+        int playerId = ma.getSenderId();
+        int x = ma.getX();
+        int y = ma.getY();
+
         logger.log(Level.INFO, "Server " + this.ID + " received move to (" + x + ", " + y + ") from player " + playerId);
-        if (!isValidPlayerId(playerId)) {
+        if(!isValidPlayerId(playerId)) {
             // TODO send error message
         }
 
         boolean result = field.movePlayer(playerId, x, y);
-        if (!result) {
+        if(!result) {
             // TODO send error message
         } else {
-            broadcastFieldToConnectedPlayers();
+            broadcastActionToPlayers(ma);
         }
-
         checkAndUpdateGUI();
     }
 
@@ -150,23 +161,22 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * target player's health percentage is above 50%, or if one or both are invalid players
      * then an error will be send back to the clients.
      *
-     * @param playerId     The player's (unique) ID that wants to heal another player.
-     * @param targetPlayer The player receiving the heal.
+     * @param ha The HealAction to be performed.
      * @throws RemoteException
      */
-    public void heal(int playerId, int targetPlayer) throws RemoteException {
+    public void heal(HealAction ha) throws RemoteException {
+        int playerId = ha.getSenderId();
+        int targetPlayer = ha.getTargetPlayer();
+
         logger.log(Level.INFO, "Server " + this.ID + " received heal to player " + targetPlayer + " from player " + playerId);
 
-        // TODO check if both are valid players.
-
-        if (!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5) {
+        if(!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5 || field.getPlayer(targetPlayer).getCurHitPoints() <= 0) {
             // TODO send error message
         } else {
             Player thisPlayer = field.getPlayer(playerId);
             field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
-            broadcastFieldToConnectedPlayers();
+            broadcastActionToPlayers(ha);
         }
-
         checkAndUpdateGUI();
     }
 
@@ -175,25 +185,28 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * If the dragon is not next to the player or if the dragon or play is invalid,
      * then an error message is send to the client.
      *
-     * @param playerId The player's (unique) ID that wants to attack.
-     * @param dragonId The dragon's (unique) ID that is being attacked.
+     * @param aa The AttackAction to be performed.
      * @throws RemoteException
      */
-    public void attack(int playerId, int dragonId) throws RemoteException {
+    public void attack(AttackAction aa) throws RemoteException {
+        int playerId = aa.getSenderId();
+        int dragonId = aa.getDragonId();
+
         logger.log(Level.INFO, "Server " + this.ID + " received attack to dragon " + dragonId + " from player " + playerId);
 
-        // TODO check if player and dragon are valid.
-        if (!field.isInRange(playerId, dragonId, 1)) {
+        if(!field.isInRange(playerId, dragonId, 1)) {
             // TODO send error message
         } else {
             Player thisPlayer = field.getPlayer(playerId);
             field.getDragon(dragonId).getHit(thisPlayer.getAttackPower());
-            if (field.getDragon(dragonId).getCurHitPoints() <= 0) {
+            if(field.getDragon(dragonId).getCurHitPoints() <= 0) {
                 field.removeDragon(dragonId);
+                DeleteUnitAction dua = new DeleteUnitAction(dragonId);
+                broadcastActionToPlayers(dua);
+            } else {
+                broadcastActionToPlayers(aa);
             }
-            broadcastFieldToConnectedPlayers();
         }
-
         checkAndUpdateGUI();
     }
 
@@ -208,18 +221,25 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
         logger.log(Level.INFO, "Client with id " + playerId + " connected");
 
-        try {
-            ClientInterface ci = (ClientInterface) Naming.lookup("//localhost:1099/FDDGClient/" + playerId);
-            connectedPlayers.put(playerId, ci);
-            field.addPlayer(playerId);
-            broadcastFieldToConnectedPlayers();
-
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        if(!gameStarted) {
+            logger.log(Level.INFO, "Game started on server " + ID);
+            gameStarted = true;
         }
 
+        try {
+            ClientInterface ci = (ClientInterface) Naming.lookup("//localhost:1099/FDDGClient/" + playerId);
+            field.addPlayer(playerId);
+            ci.initializeField(field);
+
+            AddPlayerAction apa = new AddPlayerAction(playerId, field.getPlayer(playerId).getxPos(), field.getPlayer(playerId).getyPos());
+            broadcastActionToPlayers(apa);
+
+            // Now the broadcast is done, add the player to the player map (so he doesn't add himself again on the field).
+            connectedPlayers.put(playerId, ci);
+
+        } catch (NotBoundException | MalformedURLException e) {
+            e.printStackTrace();
+        }
         checkAndUpdateGUI();
     }
 

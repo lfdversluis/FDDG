@@ -1,9 +1,7 @@
 package nl.tud.dcs.fddg.client;
 
 import nl.tud.dcs.fddg.game.Field;
-import nl.tud.dcs.fddg.game.actions.AttackAction;
-import nl.tud.dcs.fddg.game.actions.HealAction;
-import nl.tud.dcs.fddg.game.actions.MoveAction;
+import nl.tud.dcs.fddg.game.actions.*;
 import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ServerInterface;
@@ -22,6 +20,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     private Logger logger;
     private ServerInterface server;
     private Field field;
+    private boolean isAlive;
 
     /**
      * Constructor: initializes the instance variables, the logger and binds the client to its registry
@@ -32,20 +31,66 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     public ClientProcess(int id) throws RemoteException {
         super();
         this.ID = id;
+        this.isAlive = true;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
 
         logger.log(Level.INFO, "Starting client with id " + id);
     }
 
     /**
-     * This method can be called to update the field with another field object.
-     * @param field The field to set for the client.
-     * @throws RemoteException
+     * Function to give the initial field to a new connected client.
+     *
+     * @param field The new game field
+     * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void updateField(Field field) throws RemoteException {
-        // logger.log(Level.INFO, "Client " + this.ID + " received field update");
+    public void initializeField(Field field) throws RemoteException {
         this.field = field;
+    }
+
+    /**
+     * This method is used to send acknowledgements to the clients.
+     * @param action the action to be acknowledged.
+     * @throws java.rmi.RemoteException
+     */
+    @Override
+    public synchronized void ack (Action action) throws RemoteException {
+        if(action instanceof AddPlayerAction) {
+            AddPlayerAction apa = (AddPlayerAction) action;
+            field.addPlayer(apa.getPlayerId(), apa.getX(), apa.getY());
+        } else if (action instanceof AttackAction) {
+            AttackAction ata = (AttackAction) action;
+            Dragon d = field.getDragon(ata.getDragonId());
+            Player p = field.getPlayer(ata.getSenderId());
+            d.setCurHitPoints(d.getCurHitPoints() - p.getAttackPower());
+        } else if (action instanceof  DeleteUnitAction) {
+            DeleteUnitAction dua = (DeleteUnitAction) action;
+            if(field.getDragon(dua.getUnitId()) == null){
+                Player p = field.getPlayer(dua.getUnitId());
+                field.removePlayer(p.getUnitId());
+                if(p.getUnitId() == this.ID) { isAlive = false; }
+            } else {
+                Dragon d = field.getDragon(dua.getUnitId());
+                field.removeDragon(d.getUnitId());
+            }
+        } else if(action instanceof HealAction){
+            HealAction ha = (HealAction) action;
+            int playerId = ha.getSenderId();
+            int targetPlayer = ha.getTargetPlayer();
+            Player thisPlayer = field.getPlayer(playerId);
+            field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
+        } else if (action instanceof MoveAction) {
+            MoveAction ma = (MoveAction) action;
+            int playerId = ma.getSenderId();
+            int x = ma.getX();
+            int y = ma.getY();
+            field.movePlayer(playerId, x, y);
+        } else if(action instanceof DamageAction) {
+            DamageAction da = (DamageAction) action;
+            int playerId = da.getPlayerId();
+            int damage = da.getDamage();
+            field.getPlayer(playerId).setCurHitPoints(field.getPlayer(playerId).getCurHitPoints() - damage);
+        }
     }
 
     /**
@@ -69,16 +114,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     }
 
     /**
-     * This function can be called to check if the character of the client
-     *  is alive, that is its current hp is above zero.
-     *
-     * @return true iff the player is still alive
-     */
-    public boolean isAlive() {
-        return field.getPlayer(this.ID).getCurHitPoints() > 0;
-    }
-
-    /**
      * Main loop of the client process. Here, while the client is alive and the game is still going,
      * executes its strategy to win the game.
      */
@@ -90,7 +125,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             server = (ServerInterface) Naming.lookup("FDDGServer/0");
             server.connect(this.ID);
 
-            while (isAlive() && !field.gameHasFinished()) {
+            while (isAlive && !field.gameHasFinished()) {
                 Thread.sleep(1000);
 
                 // check if there is a nearby player with hp < 50% to heal
@@ -107,7 +142,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                         logger.log(Level.INFO, "Player" + this.ID + " couldn't move towards a dragon (blocked?)");
                         continue;
                     }
-                    final int MAX_WIDTH_HEIGHT = Math.max(field.BOARD_HEIGHT, field.BOARD_WIDTH) + 5;
+                    final int MAX_WIDTH_HEIGHT = Math.max(Field.BOARD_HEIGHT, Field.BOARD_WIDTH) + 5;
                     int newX = move % MAX_WIDTH_HEIGHT;
                     int newY = move / MAX_WIDTH_HEIGHT;
 
@@ -116,13 +151,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                 }
             }
 
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (NotBoundException | MalformedURLException | RemoteException | InterruptedException e) {
             e.printStackTrace();
         }
     }
