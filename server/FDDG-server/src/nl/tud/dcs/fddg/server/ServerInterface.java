@@ -1,6 +1,7 @@
 package nl.tud.dcs.fddg.server;
 
 import nl.tud.dcs.fddg.game.actions.Action;
+import nl.tud.dcs.fddg.game.actions.ClientConnectAction;
 
 import java.rmi.Remote;
 
@@ -12,6 +13,8 @@ public interface ServerInterface extends Remote {
      * @throws java.rmi.RemoteException
      */
     public void performAction(Action action) throws java.rmi.RemoteException;
+
+    public ClientConnectAction register() throws java.rmi.RemoteException;
 
     /**
      * The client calls this function if it wishes to connect to the server and play the game.

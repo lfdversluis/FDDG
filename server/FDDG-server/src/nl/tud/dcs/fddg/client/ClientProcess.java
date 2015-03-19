@@ -1,5 +1,6 @@
 package nl.tud.dcs.fddg.client;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
 import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.*;
 import nl.tud.dcs.fddg.game.entities.Dragon;
@@ -7,6 +8,7 @@ import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ServerInterface;
 
 import java.net.MalformedURLException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -16,7 +18,7 @@ import java.util.logging.Logger;
 
 public class ClientProcess extends UnicastRemoteObject implements ClientInterface, Runnable {
 
-    private final int ID;
+    private int ID;
     private Logger logger;
     private ServerInterface server;
     private Field field;
@@ -25,16 +27,14 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     /**
      * Constructor: initializes the instance variables, the logger and binds the client to its registry
      *
-     * @param id The process identifier of this client
      * @throws RemoteException
      */
-    public ClientProcess(int id) throws RemoteException {
+    public ClientProcess() throws RemoteException {
         super();
-        this.ID = id;
         this.isAlive = true;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
 
-        logger.log(Level.INFO, "Starting client with id " + id);
+        logger.log(Level.INFO, "Starting client");
     }
 
     /**
@@ -123,7 +123,15 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
         // send a connect message to the server
         try {
             server = (ServerInterface) Naming.lookup("FDDGServer/0");
-            server.connect(this.ID);
+            ClientConnectAction cca = server.register();
+            System.out.println(cca);
+            this.ID = cca.getConnectionId();
+
+            Naming.rebind("FDDGClient/" + this.ID, this);
+
+            System.out.println(server);
+
+            server.connect(cca.getConnectionId());
 
             while (isAlive && !field.gameHasFinished()) {
                 Thread.sleep(1000);

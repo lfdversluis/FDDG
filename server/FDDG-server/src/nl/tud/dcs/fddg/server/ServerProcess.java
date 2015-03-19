@@ -25,6 +25,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private volatile Map<Integer, ClientInterface> connectedPlayers;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
+    private int IDCounter;
 
     /**
      * The constructor of the ServerProcess class. It requires an ID and a flag indicating whether a GUI should be started or not..
@@ -40,6 +41,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         this.logger = Logger.getLogger(ServerProcess.class.getName());
         this.connectedPlayers = new ConcurrentHashMap<>();
         this.gameStarted = false;
+        this.IDCounter = 0;
 
         // start GUI if necessary
         if (useGUI)
@@ -211,15 +213,25 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     }
 
     /**
+     * This function gets called by a client to connect to a server.
+     * @throws RemoteException
+     */
+    public synchronized ClientConnectAction register() throws RemoteException {
+        ClientConnectAction cca = new ClientConnectAction(IDCounter);
+        IDCounter++;
+        return cca;
+    }
+
+    /**
      * This function allows a client to connect with a (unique) ID.
      *
-     * @param playerId The ID of the player that wishes to connect.
+     * @param clientId The ID of the player that wishes to connect.
      * @throws RemoteException
      */
     @Override
-    public void connect(int playerId) throws RemoteException {
+    public void connect(int clientId) throws RemoteException {
 
-        logger.log(Level.INFO, "Client with id " + playerId + " connected");
+        logger.log(Level.INFO, "Client with id " + clientId + " connected");
 
         if(!gameStarted) {
             logger.log(Level.INFO, "Game started on server " + ID);
@@ -227,15 +239,15 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         }
 
         try {
-            ClientInterface ci = (ClientInterface) Naming.lookup("//localhost:1099/FDDGClient/" + playerId);
-            field.addPlayer(playerId);
+            ClientInterface ci = (ClientInterface) Naming.lookup("FDDGClient/" + clientId);
+            field.addPlayer(clientId);
             ci.initializeField(field);
 
-            AddPlayerAction apa = new AddPlayerAction(playerId, field.getPlayer(playerId).getxPos(), field.getPlayer(playerId).getyPos());
+            AddPlayerAction apa = new AddPlayerAction(clientId, field.getPlayer(clientId).getxPos(), field.getPlayer(clientId).getyPos());
             broadcastActionToPlayers(apa);
 
             // Now the broadcast is done, add the player to the player map (so he doesn't add himself again on the field).
-            connectedPlayers.put(playerId, ci);
+            connectedPlayers.put(clientId, ci);
 
         } catch (NotBoundException | MalformedURLException e) {
             e.printStackTrace();
