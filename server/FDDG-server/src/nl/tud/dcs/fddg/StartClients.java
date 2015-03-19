@@ -30,10 +30,13 @@ public class StartClients {
                 ClientProcess client = new ClientProcess(id);
                 Naming.rebind("FDDGClient/" + id, client);
                 new Thread(client).start();
+                Thread.sleep(250); // TODO we hardcoded a timeout here between connecting the players
             }
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

@@ -1,6 +1,7 @@
 package nl.tud.dcs.fddg.client;
 
 import nl.tud.dcs.fddg.game.Field;
+import nl.tud.dcs.fddg.game.actions.Action;
 
 import java.rmi.Remote;
 
@@ -10,12 +11,19 @@ import java.rmi.Remote;
 public interface ClientInterface extends Remote {
 
     /**
-     * Function to notify a client of an update to the game state.
+     * Function to give the initial field to a new connected client.
      *
      * @param field The new game field
      * @throws java.rmi.RemoteException
      */
-    public void updateField(Field field) throws java.rmi.RemoteException;
+    public void initializeField(Field field) throws java.rmi.RemoteException;
+
+    /**
+     * This method is used to send acknowledgements to the clients.
+     * @param action the action to be acknowledged.
+     * @throws java.rmi.RemoteException
+     */
+    public void ack(Action action) throws java.rmi.RemoteException;
 
     /**
      * This function can be called by the server to let the client know something went wrong.

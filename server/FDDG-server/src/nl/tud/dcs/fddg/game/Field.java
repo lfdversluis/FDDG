@@ -1,5 +1,8 @@
 package nl.tud.dcs.fddg.game;
 
+import nl.tud.dcs.fddg.game.actions.Action;
+import nl.tud.dcs.fddg.game.actions.DamageAction;
+import nl.tud.dcs.fddg.game.actions.DeleteUnitAction;
 import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.game.entities.Unit;
@@ -85,6 +88,18 @@ public class Field implements Serializable {
     }
 
     /**
+     * This function places a Player on the field at a specific location.
+     * @param playerId The (unique) ID of the player to be placed on the field.
+     * @param x The x-coordinate of the player.
+     * @param y The y-coordinate of the player.
+     */
+    public void addPlayer(int playerId, int x, int y){
+        Player p = new Player(x, y, playerId);
+        playerMap.put(playerId, p);
+        entities[y][x] = p;
+    }
+
+    /**
      * This function checks if a player ID belongs indeed to a player on the field.
      * @param playerId The ID of the player to be checked.
      * @return A boolean indicating if the ID is valid and present on the field.
@@ -144,22 +159,24 @@ public class Field implements Serializable {
 
     public boolean isInRange(int thisPlayerId, int thatUnitId, int range) {
         Player thisPlayer = playerMap.get(thisPlayerId);
-        Unit thatPlayer;
+        Unit thatUnit;
         if(playerMap.containsKey(thatUnitId)){
-            thatPlayer = playerMap.get(thatUnitId);
+            thatUnit = playerMap.get(thatUnitId);
+        } else if (dragonMap.containsKey(thatUnitId)){
+            thatUnit = dragonMap.get(thatUnitId);
         } else {
-            thatPlayer = dragonMap.get(thatUnitId);
+            return false;
         }
 
-        int distance = manhattanDistance(thisPlayer.getxPos(), thisPlayer.getyPos(), thatPlayer.getxPos(), thatPlayer.getyPos());
+        int distance = manhattanDistance(thisPlayer.getxPos(), thisPlayer.getyPos(), thatUnit.getxPos(), thatUnit.getyPos());
         return (distance <= range);
     }
 
     /**
      * This method returns a random player from a set of players that are eligible to heal.
      * We return a random player from this set to avoid overhealing of one player.
-     * @param playerId
-     * @return
+     * @param playerId The ID of the player to heal.
+     * @return The player that is in range to heal (can be null).
      */
     public Player isInRangeToHeal(int playerId) {
         ArrayList<Player> eligible = new ArrayList<>();
@@ -168,7 +185,7 @@ public class Field implements Serializable {
         while(it.hasNext()) {
             Integer id = it.next();
             Player thatPlayer = playerMap.get(id);
-            if(isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5) { eligible.add(thatPlayer); }
+            if(isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5 && thatPlayer.getCurHitPoints() > 0) { eligible.add(thatPlayer); }
         }
 
         if(eligible.size() == 0) { return null; }
@@ -282,7 +299,9 @@ public class Field implements Serializable {
     /**
      * This function lets all dragon alive on the field attack nearby players.
      */
-    public void dragonRage() {
+    public Set<Action> dragonRage() {
+        Set<Action> actionSet = new HashSet<>();
+
         for(int dragonId : dragonMap.keySet()){
             Dragon d = dragonMap.get(dragonId);
 
@@ -298,11 +317,22 @@ public class Field implements Serializable {
                     p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
 
                     if(p.getCurHitPoints() <= 0){
-                        entities[p.getyPos()][p.getxPos()] = null;
+                        DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
+                        actionSet.add(dua);
+                        removePlayer(p.getUnitId());
                     }
+
+                    DamageAction da = new DamageAction(p.getUnitId(), d.getAttackPower());
+                    actionSet.add(da);
                 }
             }
         }
+        return actionSet;
+    }
+
+    public void removePlayer(int playerId){
+        Player p = getPlayer(playerId);
+        entities[p.getyPos()][p.getxPos()] = null;
     }
 
     /**
@@ -319,7 +349,6 @@ public class Field implements Serializable {
                 return false;
             }
         }
-
         return true;
     }
 }
