@@ -216,10 +216,8 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * This function gets called by a client to connect to a server.
      * @throws RemoteException
      */
-    public synchronized ClientConnectAction register() throws RemoteException {
-        ClientConnectAction cca = new ClientConnectAction(IDCounter);
-        IDCounter++;
-        return cca;
+    public synchronized int register() throws RemoteException {
+        return IDCounter++;
     }
 
     /**

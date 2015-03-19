@@ -123,15 +123,14 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
         // send a connect message to the server
         try {
             server = (ServerInterface) Naming.lookup("FDDGServer/0");
-            ClientConnectAction cca = server.register();
-            System.out.println(cca);
-            this.ID = cca.getConnectionId();
+            int newId = server.register();
+            this.ID = newId;
 
             Naming.rebind("FDDGClient/" + this.ID, this);
 
             System.out.println(server);
 
-            server.connect(cca.getConnectionId());
+            server.connect(newId);
 
             while (isAlive && !field.gameHasFinished()) {
                 Thread.sleep(1000);
