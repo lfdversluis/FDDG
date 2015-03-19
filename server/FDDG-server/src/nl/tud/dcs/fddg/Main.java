@@ -15,6 +15,12 @@ public class Main {
     public static final int NUM_CLIENTS = 100;
     public static final int SERVER_PORT = 6447;
 
+    /**
+     * The main function of the simulation.
+     * This function starts {@link Main#NUM_SERVERS} servers and {@link Main#NUM_CLIENTS} processes.
+     *
+     * @param args Required variable, not used in this simulation.
+     */
     public static void main(String[] args) {
         ArrayList<ServerProcess> serverProcesses = new ArrayList<ServerProcess>(NUM_SERVERS);
         ArrayList<ClientProcess> clientProcesses = new ArrayList<ClientProcess>(NUM_CLIENTS);
