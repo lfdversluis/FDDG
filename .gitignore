@@ -5,3 +5,6 @@ server/FDDG-server/.idea/
 .idea/*
 *.iml
 *.iws
+
+# binary files
+out/
