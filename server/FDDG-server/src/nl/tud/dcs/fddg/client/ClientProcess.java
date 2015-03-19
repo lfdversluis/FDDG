@@ -37,24 +37,40 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
         logger.log(Level.INFO, "Starting client with id " + id);
     }
 
+    /**
+     * This method can be called to update the field with another field object.
+     * @param field The field to set for the client.
+     * @throws RemoteException
+     */
     @Override
     public synchronized void updateField(Field field) throws RemoteException {
         // logger.log(Level.INFO, "Client " + this.ID + " received field update");
         this.field = field;
     }
 
+    /**
+     * This function allows the server to send an error to the client.
+     * @param errorId The ID of the error.
+     * @param message The message that goes with the error.
+     * @throws RemoteException
+     */
     @Override
     public void receiveError(int errorId, String message) throws RemoteException {
         logger.log(Level.SEVERE, "Client " + this.ID + " received error: " + message);
     }
 
+    /**
+     * This function serves as a heartbeat to check if the client is still connected.
+     * @throws RemoteException
+     */
     @Override
     public void ping() throws RemoteException {
 
     }
 
     /**
-     * Checks whether the player is still alive (hp>0)
+     * This function can be called to check if the character of the client
+     *  is alive, that is its current hp is above zero.
      *
      * @return true iff the player is still alive
      */
@@ -62,6 +78,10 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
         return field.getPlayer(this.ID).getCurHitPoints() > 0;
     }
 
+    /**
+     * Main loop of the client process. Here, while the client is alive and the game is still going,
+     * executes its strategy to win the game.
+     */
     @Override
     public void run() {
 

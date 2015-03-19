@@ -8,9 +8,6 @@ import nl.tud.dcs.fddg.game.Field;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Created by Martijn on 10-03-15.
- */
 public class VisualizerGUI {
 
     private JPanel[][] panels;
