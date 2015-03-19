@@ -1,16 +1,14 @@
 package nl.tud.dcs.fddg.client;
 
-import nl.tud.dcs.fddg.Main;
-import nl.tud.dcs.fddg.server.ServerInterface;
-import nl.tud.dcs.fddg.game.entities.Dragon;
-import nl.tud.dcs.fddg.game.entities.Player;
-import nl.tud.dcs.fddg.game.actions.AttackAction;
 import nl.tud.dcs.fddg.game.Field;
+import nl.tud.dcs.fddg.game.actions.AttackAction;
 import nl.tud.dcs.fddg.game.actions.HealAction;
 import nl.tud.dcs.fddg.game.actions.MoveAction;
+import nl.tud.dcs.fddg.game.entities.Dragon;
+import nl.tud.dcs.fddg.game.entities.Player;
+import nl.tud.dcs.fddg.server.ServerInterface;
 
 import java.net.MalformedURLException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -30,16 +28,13 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
      *
      * @param id The process identifier of this client
      * @throws RemoteException
-     * @throws AlreadyBoundException
-     * @throws MalformedURLException
      */
-    public ClientProcess(int id) throws RemoteException, AlreadyBoundException, MalformedURLException {
+    public ClientProcess(int id) throws RemoteException {
+        super();
         this.ID = id;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
 
         logger.log(Level.INFO, "Starting client with id " + id);
-
-        java.rmi.Naming.bind("rmi://localhost:" + Main.SERVER_PORT + "/FDDGClient/" + id, this);
     }
 
     /**
@@ -92,7 +87,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
         // send a connect message to the server
         try {
-            server = (ServerInterface) Naming.lookup("rmi://localhost:" + Main.SERVER_PORT + "/FDDGServer/0");
+            server = (ServerInterface) Naming.lookup("FDDGServer/0");
             server.connect(this.ID);
 
             while (isAlive() && !field.gameHasFinished()) {
