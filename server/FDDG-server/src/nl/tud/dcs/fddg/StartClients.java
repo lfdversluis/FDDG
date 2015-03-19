@@ -1,15 +1,10 @@
 package nl.tud.dcs.fddg;
 
 import nl.tud.dcs.fddg.client.ClientProcess;
-import nl.tud.dcs.fddg.server.ServerProcess;
-import nl.tud.dcs.fddg.util.RMI_Util;
 
 import java.net.MalformedURLException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 /**
  * Start one or more clients on the local machine
