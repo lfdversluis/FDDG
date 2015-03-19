@@ -27,21 +27,15 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private volatile Map<Integer, ClientInterface> connectedPlayers;
     private VisualizerGUI visualizerGUI = null;
 
-<<<<<<< HEAD
     /**
-     * The constructor of the ServerProcess class. It requires an ID and the number of servers as parameters.
+     * The constructor of the ServerProcess class. It requires an ID and a flag indicating whether a GUI should be started or not..
      *
-     * @param id The (unique) ID of the server
-     * @param num_servers The total amount of servers used in the simulation.
+     * @param id     The (unique) ID of the server
+     * @param useGUI The flag that tells whether this server should run a GUI or not
      * @throws RemoteException
-     * @throws AlreadyBoundException
-     * @throws MalformedURLException
      */
-    public ServerProcess(int id, int num_servers) throws RemoteException, AlreadyBoundException, MalformedURLException {
-=======
     public ServerProcess(int id, boolean useGUI) throws RemoteException {
         super();
->>>>>>> master
         this.ID = id;
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
@@ -73,12 +67,6 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     }
 
     /**
-<<<<<<< HEAD
-     * Function to check if a player ID is valid.
-     * @param playerId The player ID to check.
-     * @return Returns a boolean indicating if the player is valid.
-     */
-=======
      * Only updates the GUI if there actually is one
      */
     private void checkAndUpdateGUI() {
@@ -86,7 +74,12 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
             visualizerGUI.updateGUI();
     }
 
->>>>>>> master
+    /**
+     * Function to check if a player ID is valid.
+     *
+     * @param playerId The player ID to check.
+     * @return Returns a boolean indicating if the player is valid.
+     */
     public boolean isValidPlayerId(int playerId) {
         return field.isValidPlayerId(playerId);
     }
@@ -109,6 +102,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     /**
      * This function performs an action, can be one of the following:
      * MoveAction, HealAction, AttackAction.
+     *
      * @param action The action to be performed.
      * @throws java.rmi.RemoteException
      */
@@ -129,9 +123,10 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     /**
      * This function moves a player to a given position. If the move cannot
      * be done or if the player is invalid, it sends an error to the client.
+     *
      * @param playerId The (unique) ID of the player to be moved.
-     * @param x The x in the grid position to move to.
-     * @param y The y in the grid position to move to.
+     * @param x        The x in the grid position to move to.
+     * @param y        The y in the grid position to move to.
      * @throws RemoteException
      */
     public void move(int playerId, int x, int y) throws RemoteException {
@@ -155,20 +150,17 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * If the player is not withing a range of 5 of the target player, or if the
      * target player's health percentage is above 50%, or if one or both are invalid players
      * then an error will be send back to the clients.
-     * @param playerId The player's (unique) ID that wants to heal another player.
+     *
+     * @param playerId     The player's (unique) ID that wants to heal another player.
      * @param targetPlayer The player receiving the heal.
      * @throws RemoteException
      */
     public void heal(int playerId, int targetPlayer) throws RemoteException {
         logger.log(Level.INFO, "Server " + this.ID + " received heal to player " + targetPlayer + " from player " + playerId);
 
-<<<<<<< HEAD
         // TODO check if both are valid players.
 
-        if(!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5) {
-=======
         if (!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5) {
->>>>>>> master
             // TODO send error message
         } else {
             Player thisPlayer = field.getPlayer(playerId);
@@ -183,6 +175,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * This function allows a player to attack a dragon.
      * If the dragon is not next to the player or if the dragon or play is invalid,
      * then an error message is send to the client.
+     *
      * @param playerId The player's (unique) ID that wants to attack.
      * @param dragonId The dragon's (unique) ID that is being attacked.
      * @throws RemoteException
@@ -190,13 +183,8 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     public void attack(int playerId, int dragonId) throws RemoteException {
         logger.log(Level.INFO, "Server " + this.ID + " received attack to dragon " + dragonId + " from player " + playerId);
 
-<<<<<<< HEAD
         // TODO check if player and dragon are valid.
-
-        if(!field.isInRange(playerId, dragonId, 1)) {
-=======
         if (!field.isInRange(playerId, dragonId, 1)) {
->>>>>>> master
             // TODO send error message
         } else {
             Player thisPlayer = field.getPlayer(playerId);
@@ -212,6 +200,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
     /**
      * This function allows a client to connect with a (unique) ID.
+     *
      * @param playerId The ID of the player that wishes to connect.
      * @throws RemoteException
      */
@@ -237,6 +226,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
     /**
      * This function sends a heartbeat to a remote machine, identified by its (unique) ID.
+     *
      * @param remoteId The ID of the remote machine.
      * @throws RemoteException
      */
@@ -247,6 +237,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
     /**
      * This function send back a reply whenever a "ping" comes in.
+     *
      * @throws RemoteException
      */
     @Override
