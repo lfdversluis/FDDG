@@ -41,8 +41,8 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         this.ID = id;
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
-        this.connectedPlayers = new HashMap<>();
-        this.clientPings = new ConcurrentHashMap<>();
+        this.connectedPlayers = new ConcurrentHashMap<>();
+        this.clientPings = new HashMap<>();
         this.gameStarted = false;
         this.IDCounter = 0;
 
