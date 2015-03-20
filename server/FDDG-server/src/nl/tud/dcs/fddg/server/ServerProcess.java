@@ -122,6 +122,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void requestAction(Action action) throws RemoteException {
+        logger.fine("Received action request from client " + action.getSenderId());
         if (isValidAction(action)) {
             sendRequestsForAction(action);
         }
@@ -139,9 +140,36 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         return action.isValid(field) && checkPendingRequestsForAction(action);
     }
 
+    /**
+     * Checks whether there are conflicts between the current request and the pending requests.
+     *
+     * @param action The action a client wants to perform
+     * @return true iff there are no conflicts with the pending actions
+     */
     private boolean checkPendingRequestsForAction(Action action) {
-        //TODO: check own pending requests as well
-        return false;
+        if (action instanceof MoveAction) {
+            //check if one of the pending requests also wants to go to the same destination tile
+            MoveAction move = (MoveAction) action;
+            for (ActionRequest request : pendingRequests.values())
+                if (request.getAction() instanceof MoveAction)
+                    if (((MoveAction) request.getAction()).hasSameDestinationAs(move))
+                        return false;
+        } else if (action instanceof AttackAction) {
+            //check if there is another attack request for the same dragon
+            AttackAction attack = (AttackAction) action;
+            for (ActionRequest request : pendingRequests.values())
+                if (request.getAction() instanceof AttackAction)
+                    if (((AttackAction) request.getAction()).getDragonId() == attack.getDragonId())
+                        return false;
+        } else if (action instanceof HealAction) {
+            //check if there is another heal request for the same target player
+            HealAction heal = (HealAction) action;
+            for (ActionRequest request : pendingRequests.values())
+                if (request.getAction() instanceof HealAction)
+                    if (((HealAction) request.getAction()).getTargetPlayer() == heal.getTargetPlayer())
+                        return false;
+        }
+        return true;
     }
 
     /**
@@ -156,7 +184,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         //initialize acknowledgement counter for the request
         pendingRequests.put(request.getRequestID(), request);
         pendingAcknowledgements.put(request.getRequestID(), otherServers.size());
-        //TODO: remove request from these data structures when not all acks are received
+        //TODO: remove request from these data structures when not all acks are received after a certain time
 
         logger.fine("Sending request " + request.getRequestID() + " to all servers...");
 

@@ -39,6 +39,16 @@ public class MoveAction extends Action {
     }
 
     /**
+     * Checks whether two MoveAction have the same destination
+     *
+     * @param other The other MoveAction
+     * @return true iff the destination of the two move actions are equal
+     */
+    public boolean hasSameDestinationAs(MoveAction other) {
+        return (this.x == other.x) && (this.y == other.y);
+    }
+
+    /**
      * Method that all subclasses need to implement.
      * This function moves a player to a given position.
      *
