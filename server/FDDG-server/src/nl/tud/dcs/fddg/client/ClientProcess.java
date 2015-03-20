@@ -53,7 +53,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void ack(Action action) throws RemoteException {
+    public synchronized void performAction(Action action) throws RemoteException {
         if (action instanceof AddPlayerAction) {
             AddPlayerAction apa = (AddPlayerAction) action;
             field.addPlayer(apa.getPlayerId(), apa.getX(), apa.getY());

@@ -19,12 +19,12 @@ public interface ClientInterface extends Remote {
     public void initializeField(Field field) throws java.rmi.RemoteException;
 
     /**
-     * This method is used to send acknowledgements to the clients.
+     * This method is used to send actions to the clients.
      *
-     * @param action the action to be acknowledged.
+     * @param action the action to be performed.
      * @throws java.rmi.RemoteException
      */
-    public void ack(Action action) throws java.rmi.RemoteException;
+    public void performAction(Action action) throws java.rmi.RemoteException;
 
     /**
      * This function can be called by the server to let the client know something went wrong.

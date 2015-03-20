@@ -31,10 +31,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     private int IDCounter;
 
     // server administration
-    private Map<Integer,ServerInterface> otherServers; //(id, RMI object)
+    private Map<Integer, ServerInterface> otherServers; //(id, RMI object)
     private int requestCounter;
-    private List<ActionRequest> pendingRequests;
-    private Map<Integer,Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
+    private Map<Integer, ActionRequest> pendingRequests; //(requestID,request)
+    private Map<Integer, Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
 
     /**
      * The constructor of the ServerProcess class.
@@ -56,7 +56,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         this.requestCounter = 0;
         this.otherServers = new HashMap<>();
-        this.pendingRequests = new ArrayList<>();
+        this.pendingRequests = new HashMap<>();
         this.pendingAcknowledgements = new HashMap<>();
 
         // start GUI if necessary
@@ -102,7 +102,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         for (Map.Entry<Integer, nl.tud.dcs.fddg.client.ClientInterface> entry : connectedPlayers.entrySet()) {
             try {
                 ClientInterface client = entry.getValue();
-                client.ack(action);
+                client.performAction(action);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -146,7 +146,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 //            AttackAction aa = (AttackAction) action;
 //            attack(aa);
 //        }
-        if(isValidAction(action)) {
+        if (isValidAction(action)) {
             sendRequestsForAction(action);
         }
     }
@@ -158,6 +158,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
     /**
      * Creates an ActionRequest for the action and broadcasts this to the other servers
+     *
      * @param action The action that is requested
      */
     private synchronized void sendRequestsForAction(Action action) throws RemoteException {
@@ -165,14 +166,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
 
         //initialize acknowledgement counter for the request
-        pendingRequests.add(request);
+        pendingRequests.put(request.getRequestID(), request);
         pendingAcknowledgements.put(request.getRequestID(), otherServers.size());
         //TODO: remove request from these data structures when not all acks are received
 
-        logger.fine("Sending request "+request.getRequestID()+" to all servers...");
+        logger.fine("Sending request " + request.getRequestID() + " to all servers...");
 
         //broadcast the request to the other servers
-        for(ServerInterface server: otherServers.values())
+        for (ServerInterface server : otherServers.values())
             server.requestAction(request);
     }
 
@@ -343,7 +344,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws MalformedURLException
      */
     private void connectToServer(String serverURL) throws RemoteException, MalformedURLException {
-        int id = Integer.parseInt(serverURL.substring(serverURL.lastIndexOf("/")+1));
+        int id = Integer.parseInt(serverURL.substring(serverURL.lastIndexOf("/") + 1));
         while (true) {
             try {
                 otherServers.put(id, (ServerInterface) Naming.lookup(serverURL));
@@ -369,11 +370,11 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     @Override
     public void requestAction(ActionRequest request) throws RemoteException {
         //TODO: check whether the request can be acknowledged
-        if(true){
+        if (true) {
             int senderID = request.getSenderID();
             int requestID = request.getRequestID();
-            
-            logger.fine("Acknowledging request "+requestID+" to server "+senderID);
+
+            logger.fine("Acknowledging request " + requestID + " to server " + senderID);
             otherServers.get(senderID).acknowledgeRequest(requestID);
         }
     }
@@ -385,8 +386,38 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws java.rmi.RemoteException
      */
     @Override
-    public void acknowledgeRequest(int requestID) throws RemoteException {
+    public synchronized void acknowledgeRequest(int requestID) throws RemoteException {
+        logger.finer("Received acknowledgement for request " + requestID);
 
+        //decrement pending acknowledgement counter
+        int newCount = pendingAcknowledgements.get(requestID) - 1;
+        pendingAcknowledgements.replace(requestID, newCount);
+
+        //if all acknowledgements are received, remove the request and perform the action
+        if (newCount == 0) {
+            logger.fine("All acknowledgements for request " + requestID + " received");
+            Action action = pendingRequests.get(requestID).getAction();
+
+            //perform action on local field + connected clients
+            performAction(action);
+
+            //notify all other servers
+            for (ServerInterface server : otherServers.values())
+                server.performAction(action);
+
+            //cleanup
+            removeRequest(requestID);
+        }
+    }
+
+    /**
+     * Removes the request with requestID from the pending requests (and acknowledgement counter)
+     *
+     * @param requestID The id of the request to be removed
+     */
+    private void removeRequest(int requestID) {
+        pendingAcknowledgements.remove(requestID);
+        pendingRequests.remove(requestID);
     }
 
     /**
@@ -397,7 +428,13 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws java.rmi.RemoteException
      */
     @Override
-    public void performAction(Action action) throws RemoteException {
+    public synchronized void performAction(Action action) throws RemoteException {
+        logger.fine("Performing action from client "+action.getSenderId());
 
+        //TODO: perform the action on the local field
+
+        // send action to the connected clients
+        for (ClientInterface client : connectedPlayers.values())
+            client.performAction(action);
     }
 }
