@@ -1,36 +1,41 @@
 package nl.tud.dcs.fddg.server;
 
+import nl.tud.dcs.fddg.client.ClientInterface;
 import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.*;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.gui.VisualizerGUI;
+import nl.tud.dcs.fddg.server.requests.ActionRequest;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ServerProcess extends UnicastRemoteObject implements ClientServerInterface, Runnable {
+public class ServerProcess extends UnicastRemoteObject implements ClientServerInterface, Runnable, ServerInterface {
 
+    // internal administration
     private final int ID;
     private Field field;
     private Logger logger;
-    private volatile Map<Integer, nl.tud.dcs.fddg.client.ClientInterface> connectedPlayers;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
+
+    // client administration
+    private volatile Map<Integer, ClientInterface> connectedPlayers;
     private int IDCounter;
-    private List<ClientServerInterface> otherServers;
+
+    // server administration
+    private Map<Integer,ServerInterface> otherServers; //(id, RMI object)
 
     /**
-     * The constructor of the ServerProcess class. It requires an ID and a flag indicating whether a GUI should be started or not..
+     * The constructor of the ServerProcess class.
+     * It requires an ID and a flag indicating whether a GUI should be started or not..
      *
      * @param id     The (unique) ID of the server
      * @param useGUI The flag that tells whether this server should run a GUI or not
@@ -44,7 +49,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.connectedPlayers = new ConcurrentHashMap<>();
         this.gameStarted = false;
         this.IDCounter = 0;
-        this.otherServers = new ArrayList<>();
+        this.otherServers = new HashMap<>();
 
         // start GUI if necessary
         if (useGUI)
@@ -88,7 +93,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     public synchronized void broadcastActionToPlayers(Action action) {
         for (Map.Entry<Integer, nl.tud.dcs.fddg.client.ClientInterface> entry : connectedPlayers.entrySet()) {
             try {
-                nl.tud.dcs.fddg.client.ClientInterface client = entry.getValue();
+                ClientInterface client = entry.getValue();
                 client.ack(action);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -243,7 +248,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         }
 
         try {
-            nl.tud.dcs.fddg.client.ClientInterface ci = (nl.tud.dcs.fddg.client.ClientInterface) Naming.lookup("FDDGClient/" + clientId);
+            ClientInterface ci = (ClientInterface) Naming.lookup("FDDGClient/" + clientId);
             field.addPlayer(clientId);
             ci.initializeField(field);
 
@@ -302,10 +307,11 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws MalformedURLException
      */
     private void connectToServer(String serverURL) throws RemoteException, MalformedURLException {
+        int id = Integer.parseInt(serverURL.substring(serverURL.lastIndexOf("/")+1));
         while (true) {
             try {
-                otherServers.add((ClientServerInterface) Naming.lookup(serverURL));
-                logger.info("Connected to server: "+serverURL);
+                otherServers.put(id, (ServerInterface) Naming.lookup(serverURL));
+                logger.info("Connected to server: " + serverURL);
                 break;
             } catch (NotBoundException ignoredException) {
             }
@@ -316,5 +322,39 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Method that one server calls on all other servers to request a certain action.
+     *
+     * @param request A request containing the id and the action the server wants to perform
+     * @throws java.rmi.RemoteException
+     */
+    @Override
+    public void requestAction(ActionRequest request) throws RemoteException {
+
+    }
+
+    /**
+     * Method that is used to acknowledge a request send by another server
+     *
+     * @param requestID The id of the request
+     * @throws java.rmi.RemoteException
+     */
+    @Override
+    public void acknowledgeRequest(int requestID) throws RemoteException {
+
+    }
+
+    /**
+     * Method that indicates that the server should perform a certain action.
+     * This method is only invoked when all other servers have acknowledged the request for the action.
+     *
+     * @param action The action that should be executed
+     * @throws java.rmi.RemoteException
+     */
+    @Override
+    public void performAction(Action action) throws RemoteException {
+
     }
 }
