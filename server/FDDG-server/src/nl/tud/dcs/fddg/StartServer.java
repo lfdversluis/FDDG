@@ -3,11 +3,8 @@ package nl.tud.dcs.fddg;
 
 import nl.tud.dcs.fddg.server.ServerProcess;
 
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.rmi.Naming;
-import java.rmi.RemoteException;
+import java.io.File;
+import java.util.Scanner;
 
 /**
  * Starts a server with or without a GUI on the local machine
@@ -15,7 +12,7 @@ import java.rmi.RemoteException;
  */
 public class StartServer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         if (args.length < 2) {
             System.err.println("Usage: StartServer <servers file> <server ID> [GUI]");
             System.exit(1);
@@ -29,17 +26,17 @@ public class StartServer {
             useGUI = true;
 
         // parse servers file
-        String[] serverURLs = Files.readAllLines(Paths.get(serversFileName)).toArray()
+        Scanner sc = new Scanner(new File(serversFileName));
+        int nrOfServers = sc.nextInt();
+        sc.nextLine(); //skip whitespace
+        String[] serverURLs = new String[nrOfServers];
+        for (int i = 0; i < nrOfServers; i++) {
+            serverURLs[i] = sc.nextLine();
+        }
 
         // create the server process, bind it to the registry and start it
-        try {
-            ServerProcess server = new ServerProcess(serverID, useGUI);
-            Naming.rebind("FDDGServer/" + serverID, server);
-            new Thread(server).start();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        ServerProcess server = new ServerProcess(serverID, useGUI);
+        server.registerAndConnectToAll(serverURLs);
+        new Thread(server).start();
     }
 }

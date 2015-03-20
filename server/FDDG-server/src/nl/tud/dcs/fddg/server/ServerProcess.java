@@ -11,6 +11,8 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +28,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
     private int IDCounter;
+    private List<ServerInterface> otherServers;
 
     /**
      * The constructor of the ServerProcess class. It requires an ID and a flag indicating whether a GUI should be started or not..
@@ -42,6 +45,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         this.connectedPlayers = new ConcurrentHashMap<>();
         this.gameStarted = false;
         this.IDCounter = 0;
+        this.otherServers = new ArrayList<>();
 
         // start GUI if necessary
         if (useGUI)
@@ -275,5 +279,43 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     @Override
     public void pong() throws RemoteException {
 
+    }
+
+    /**
+     * Binds this server to the registry and connects to all other servers.
+     *
+     * @param serverURLs The URLs of all servers
+     * @throws MalformedURLException
+     * @throws RemoteException
+     */
+    public void registerAndConnectToAll(String[] serverURLs) throws MalformedURLException, RemoteException {
+        Naming.rebind(serverURLs[ID], this);
+        for (int i = 0; i < serverURLs.length; i++)
+            if (i != ID)
+                connectToServer(serverURLs[i]);
+    }
+
+    /**
+     * Blocking method that waits until the server (identified by the serverURL) is online.
+     *
+     * @param serverURL The URL of the server we are waiting for
+     * @throws RemoteException
+     * @throws MalformedURLException
+     */
+    private void connectToServer(String serverURL) throws RemoteException, MalformedURLException {
+        while (true) {
+            try {
+                otherServers.add((ServerInterface) Naming.lookup(serverURL));
+                logger.info("Connected to server: "+serverURL);
+                break;
+            } catch (NotBoundException ignoredException) {
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
