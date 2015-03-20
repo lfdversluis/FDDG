@@ -15,8 +15,8 @@ public class Field implements Serializable {
     public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
     private static final int INITIAL_DRAGONS = 20;
     private Unit[][] entities;
-    private int[] dx = { 0, 1, 0, -1 };
-    private int[] dy = { -1, 0, 1, 0 };
+    private int[] dx = {0, 1, 0, -1};
+    private int[] dy = {-1, 0, 1, 0};
     private HashSet<Integer> unitIds;
     private ConcurrentHashMap<Integer, Player> playerMap;
     private ConcurrentHashMap<Integer, Dragon> dragonMap;
@@ -37,7 +37,7 @@ public class Field implements Serializable {
 
         // fill the field with dragons
         int randX, randY;
-        for(int i = 0; i < INITIAL_DRAGONS; i++) {
+        for (int i = 0; i < INITIAL_DRAGONS; i++) {
             do {
                 randX = random.nextInt(BOARD_WIDTH);
                 randY = random.nextInt(BOARD_HEIGHT);
@@ -51,6 +51,7 @@ public class Field implements Serializable {
 
     /**
      * This function checks if a given location is not occupied at the moment.
+     *
      * @param x The x coordinate of the location.
      * @param y The y coordinate of the location.
      * @return Returns a boolean indicating if the location is unoccupied.
@@ -61,18 +62,22 @@ public class Field implements Serializable {
 
     /**
      * This function generates a new ID to be used.
+     *
      * @return A unique ID.
      */
     private int getUniqueId() {
         Random random = new Random(System.currentTimeMillis());
         int uniqueId = random.nextInt(Integer.MAX_VALUE);
-        while(unitIds.contains(uniqueId)) { uniqueId = random.nextInt(Integer.MAX_VALUE); }
+        while (unitIds.contains(uniqueId)) {
+            uniqueId = random.nextInt(Integer.MAX_VALUE);
+        }
         unitIds.add(uniqueId);
         return uniqueId;
     }
 
     /**
      * This function places a Player randomly on the field.
+     *
      * @param playerId The (unique) ID of the player to be placed on the field.
      */
     public void addPlayer(int playerId) {
@@ -89,11 +94,12 @@ public class Field implements Serializable {
 
     /**
      * This function places a Player on the field at a specific location.
+     *
      * @param playerId The (unique) ID of the player to be placed on the field.
-     * @param x The x-coordinate of the player.
-     * @param y The y-coordinate of the player.
+     * @param x        The x-coordinate of the player.
+     * @param y        The y-coordinate of the player.
      */
-    public void addPlayer(int playerId, int x, int y){
+    public void addPlayer(int playerId, int x, int y) {
         Player p = new Player(x, y, playerId);
         playerMap.put(playerId, p);
         entities[y][x] = p;
@@ -101,6 +107,7 @@ public class Field implements Serializable {
 
     /**
      * This function checks if a player ID belongs indeed to a player on the field.
+     *
      * @param playerId The ID of the player to be checked.
      * @return A boolean indicating if the ID is valid and present on the field.
      */
@@ -110,6 +117,7 @@ public class Field implements Serializable {
 
     /**
      * This function checks if a move action to a new location can be done.
+     *
      * @param newX The x coordinate of the new location.
      * @param newY The y coordinate of the new location.
      * @return A boolean indicating if the move can be done.
@@ -120,9 +128,10 @@ public class Field implements Serializable {
 
     /**
      * This function moves a player to a new location.
+     *
      * @param playerId The (unique) ID of the player to be moved.
-     * @param x The x coordinate of the location the player wants to move to.
-     * @param y The y coordinate of the location the player wants to move to.
+     * @param x        The x coordinate of the location the player wants to move to.
+     * @param y        The y coordinate of the location the player wants to move to.
      * @return A boolean indicating if a player can move to the location provided.
      */
     public boolean movePlayer(int playerId, int x, int y) {
@@ -130,14 +139,15 @@ public class Field implements Serializable {
 
         // TODO we forgot something... apparently the player can move anywhere it likes. No distance = 1 check?!
 
-        if(!canMove(x, y)) {
+        if (!canMove(x, y)) {
             return false;
         }
 
         // move the player
         entities[p.getyPos()][p.getxPos()] = null;
         entities[y][x] = p;
-        p.setxPos(x); p.setyPos(y);
+        p.setxPos(x);
+        p.setyPos(y);
 
         return true;
     }
@@ -145,6 +155,7 @@ public class Field implements Serializable {
     /**
      * Simple getter function that returns the unit (might be null) on a position in the field.
      * Null means the location is not occupied by a unit.
+     *
      * @param x The x position on the field.
      * @param y The y position on the field.
      * @return A unit (might be null) that occupies this location on the field.
@@ -160,9 +171,9 @@ public class Field implements Serializable {
     public boolean isInRange(int thisPlayerId, int thatUnitId, int range) {
         Player thisPlayer = playerMap.get(thisPlayerId);
         Unit thatUnit;
-        if(playerMap.containsKey(thatUnitId)){
+        if (playerMap.containsKey(thatUnitId)) {
             thatUnit = playerMap.get(thatUnitId);
-        } else if (dragonMap.containsKey(thatUnitId)){
+        } else if (dragonMap.containsKey(thatUnitId)) {
             thatUnit = dragonMap.get(thatUnitId);
         } else {
             return false;
@@ -175,6 +186,7 @@ public class Field implements Serializable {
     /**
      * This method returns a random player from a set of players that are eligible to heal.
      * We return a random player from this set to avoid overhealing of one player.
+     *
      * @param playerId The ID of the player to heal.
      * @return The player that is in range to heal (can be null).
      */
@@ -182,19 +194,24 @@ public class Field implements Serializable {
         ArrayList<Player> eligible = new ArrayList<>();
 
         Iterator<Integer> it = playerMap.keySet().iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Integer id = it.next();
             Player thatPlayer = playerMap.get(id);
-            if(isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5 && thatPlayer.getCurHitPoints() > 0) { eligible.add(thatPlayer); }
+            if (isInRange(playerId, id, 5) && thatPlayer.getHitPointsPercentage() < 0.5 && thatPlayer.getCurHitPoints() > 0) {
+                eligible.add(thatPlayer);
+            }
         }
 
-        if(eligible.size() == 0) { return null; }
+        if (eligible.size() == 0) {
+            return null;
+        }
         return eligible.get(new Random().nextInt(eligible.size()));
     }
 
     /**
      * This method returns a random dragon from a set of dragons that can be attacked.
      * Null indicates no dragon is in range.
+     *
      * @param playerId The (unique) ID of the player that wishes to attack a dragon.
      * @return A dragon that the player can attack (might be null).
      */
@@ -202,18 +219,23 @@ public class Field implements Serializable {
         ArrayList<Dragon> eligible = new ArrayList<Dragon>();
 
         Iterator<Integer> it = dragonMap.keySet().iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Integer id = it.next();
             Dragon d = dragonMap.get(id);
-            if(isInRange(playerId, id, 1)) { eligible.add(d); }
+            if (isInRange(playerId, id, 1)) {
+                eligible.add(d);
+            }
         }
 
-        if(eligible.size() == 0) { return null; }
+        if (eligible.size() == 0) {
+            return null;
+        }
         return eligible.get(new Random().nextInt(eligible.size()));
     }
 
     /**
      * This function returns a player object on the field based on its ID.
+     *
      * @param playerId The (unique) ID of the player object.
      * @return The player object that belongs to the ID.
      */
@@ -224,6 +246,7 @@ public class Field implements Serializable {
 
     /**
      * This function returns a dragon object on the field based on its ID.
+     *
      * @param dragonId The (unique) ID of the dragon object.
      * @return The dragon object that belongs to the ID.
      */
@@ -235,6 +258,7 @@ public class Field implements Serializable {
     /**
      * This function removes a dragon from the field.
      * Called when it's dead.
+     *
      * @param dragonId The (unique) ID of the dragon to be deleted.
      */
     public void removeDragon(int dragonId) {
@@ -246,6 +270,7 @@ public class Field implements Serializable {
     /**
      * This function computes the location to go to when heading for the next nearest
      * dragon on the field based on a start position (the current place of the player).
+     *
      * @param startX The x coordinate of the start position.
      * @param startY The y coordinate of the start position.
      * @return An integer in which the x and y location of the next location are encoded.
@@ -263,7 +288,7 @@ public class Field implements Serializable {
 
         stepMap.put(curPos, 0);
 
-        while(!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             State curState = queue.poll();
             ArrayList<Integer> path = curState.passed;
             int position = curState.curPos;
@@ -271,22 +296,22 @@ public class Field implements Serializable {
             int curY = position / MAX_WIDTH_HEIGHT;
             int curSteps = curState.steps;
 
-            for(int i=0; i<dx.length; i++){
+            for (int i = 0; i < dx.length; i++) {
                 int newX = curX + dx[i];
                 int newY = curY + dy[i];
 
-                if(newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && (entities[newY][newX] instanceof Dragon)){
+                if (newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && (entities[newY][newX] instanceof Dragon)) {
                     return path.get(0);
                 }
 
-                if(canMove(newX, newY)){
+                if (canMove(newX, newY)) {
                     int newPos = newX + newY * MAX_WIDTH_HEIGHT;
-                    if(!stepMap.containsKey(newPos) || (curSteps + 1 ) < stepMap.get(newPos) ){
+                    if (!stepMap.containsKey(newPos) || (curSteps + 1) < stepMap.get(newPos)) {
                         // Make a copy (hard copy, no reference)
                         ArrayList<Integer> updatedPath = new ArrayList<>(path);
                         updatedPath.add(newPos);
-                        stepMap.put(newPos, curSteps+1);
-                        queue.add(new State(newPos, updatedPath, curSteps+1));
+                        stepMap.put(newPos, curSteps + 1);
+                        queue.add(new State(newPos, updatedPath, curSteps + 1));
                     }
                 }
             }
@@ -302,21 +327,21 @@ public class Field implements Serializable {
     public Set<Action> dragonRage() {
         Set<Action> actionSet = new HashSet<>();
 
-        for(int dragonId : dragonMap.keySet()){
+        for (int dragonId : dragonMap.keySet()) {
             Dragon d = dragonMap.get(dragonId);
 
             int dragonX = d.getxPos();
             int dragonY = d.getyPos();
 
-            for(int i=0; i<4; i++){
+            for (int i = 0; i < 4; i++) {
                 int unitX = dragonX + dx[i];
                 int unitY = dragonY + dy[i];
 
-                if(unitX >= 0 && unitX < BOARD_WIDTH && unitY >= 0 && unitY < BOARD_HEIGHT && entities[unitY][unitX] instanceof Player){
+                if (unitX >= 0 && unitX < BOARD_WIDTH && unitY >= 0 && unitY < BOARD_HEIGHT && entities[unitY][unitX] instanceof Player) {
                     Player p = (Player) entities[unitY][unitX];
                     p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
 
-                    if(p.getCurHitPoints() <= 0){
+                    if (p.getCurHitPoints() <= 0) {
                         DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
                         actionSet.add(dua);
                         removePlayer(p.getUnitId());
@@ -330,22 +355,23 @@ public class Field implements Serializable {
         return actionSet;
     }
 
-    public void removePlayer(int playerId){
+    public void removePlayer(int playerId) {
         Player p = getPlayer(playerId);
         entities[p.getyPos()][p.getxPos()] = null;
     }
 
     /**
      * This function checks if the game has been finished yet.
+     *
      * @return A boolean indicating if the game has finished.
      */
     public boolean gameHasFinished() {
-        if(dragonMap.size() == 0) {
+        if (dragonMap.size() == 0) {
             return true;
         }
 
-        for(int playerId : playerMap.keySet()) {
-            if(playerMap.get(playerId).getCurHitPoints() > 0) {
+        for (int playerId : playerMap.keySet()) {
+            if (playerMap.get(playerId).getCurHitPoints() > 0) {
                 return false;
             }
         }
@@ -356,12 +382,12 @@ public class Field implements Serializable {
 /**
  * An inner class representing a state in the Breadth-first Search algorithm to determine the next location to go to in the {@link Field#getDirectionToNearestDragon(int, int)} function.
  */
-class State{
+class State {
 
     int curPos, steps;
     ArrayList<Integer> passed;
 
-    public State(int i, ArrayList<Integer> set, int steps){
+    public State(int i, ArrayList<Integer> set, int steps) {
         this.curPos = i;
         this.passed = set;
         this.steps = steps;

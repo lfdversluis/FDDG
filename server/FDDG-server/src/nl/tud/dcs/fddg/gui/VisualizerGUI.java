@@ -30,8 +30,8 @@ public class VisualizerGUI {
         panel.setLayout(new GridLayout(Field.BOARD_WIDTH, Field.BOARD_HEIGHT));
 
         // create squares
-        for(int x = 0; x < Field.BOARD_WIDTH; x++) {
-            for(int y = 0; y < Field.BOARD_HEIGHT; y++) {
+        for (int x = 0; x < Field.BOARD_WIDTH; x++) {
+            for (int y = 0; y < Field.BOARD_HEIGHT; y++) {
                 JPanel p = new JPanel();
                 SpringLayout layout = new SpringLayout();
                 p.setLayout(null);
@@ -52,7 +52,7 @@ public class VisualizerGUI {
     }
 
     public void addHealthAndLabels() {
-        for(int x = 0; x < Field.BOARD_WIDTH; x++) {
+        for (int x = 0; x < Field.BOARD_WIDTH; x++) {
             for (int y = 0; y < Field.BOARD_HEIGHT; y++) {
 
                 // add health panel
@@ -74,31 +74,31 @@ public class VisualizerGUI {
     }
 
     public void updateGUI() {
-        for(int x = 0; x < field.BOARD_WIDTH; x++) {
+        for (int x = 0; x < field.BOARD_WIDTH; x++) {
             for (int y = 0; y < field.BOARD_HEIGHT; y++) {
                 JPanel panel = panels[y][x];
                 JLabel label = unitLabels[y][x];
                 JPanel healthPanel = healthPanels[y][x];
                 Unit unit = field.getUnit(x, y);
-                if(unit == null) {
+                if (unit == null) {
                     panel.setBackground(Color.WHITE);
                     label.setText("");
                     healthPanel.setVisible(false);
-                } else if(unit instanceof Dragon) {
+                } else if (unit instanceof Dragon) {
                     panel.setBackground(Color.RED);
                     label.setText("D");
                     healthPanel.setVisible(true);
 
                     double percentage = unit.getHitPointsPercentage();
-                    healthPanel.setBounds(0, 0, (int)(panel.getWidth() * percentage), 6);
+                    healthPanel.setBounds(0, 0, (int) (panel.getWidth() * percentage), 6);
 
-                } else if(unit instanceof Player) {
+                } else if (unit instanceof Player) {
                     panel.setBackground(Color.GREEN);
                     label.setText("P");
                     healthPanel.setVisible(true);
 
                     double percentage = unit.getHitPointsPercentage();
-                    healthPanel.setBounds(0, 0, (int)(panel.getWidth() * percentage), 6);
+                    healthPanel.setBounds(0, 0, (int) (panel.getWidth() * percentage), 6);
                 }
             }
         }

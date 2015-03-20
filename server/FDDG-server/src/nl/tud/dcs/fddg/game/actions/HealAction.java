@@ -5,7 +5,8 @@ public class HealAction extends Action {
 
     /**
      * Constructor of the Heal action.
-     * @param senderId The ID of the unit that created this action.
+     *
+     * @param senderId     The ID of the unit that created this action.
      * @param targetPlayer The id of the player that will receive the heal.
      */
     public HealAction(int senderId, int targetPlayer) {
@@ -15,6 +16,7 @@ public class HealAction extends Action {
 
     /**
      * A simple getter that returns the target player ID.
+     *
      * @return The ID of the player to be healed.
      */
     public int getTargetPlayer() {

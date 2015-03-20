@@ -1,6 +1,5 @@
 package nl.tud.dcs.fddg.client;
 
-import com.sun.org.apache.xpath.internal.SourceTree;
 import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.*;
 import nl.tud.dcs.fddg.game.entities.Dragon;
@@ -8,7 +7,6 @@ import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ServerInterface;
 
 import java.net.MalformedURLException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -50,12 +48,13 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
     /**
      * This method is used to send acknowledgements to the clients.
+     *
      * @param action the action to be acknowledged.
      * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void ack (Action action) throws RemoteException {
-        if(action instanceof AddPlayerAction) {
+    public synchronized void ack(Action action) throws RemoteException {
+        if (action instanceof AddPlayerAction) {
             AddPlayerAction apa = (AddPlayerAction) action;
             field.addPlayer(apa.getPlayerId(), apa.getX(), apa.getY());
         } else if (action instanceof AttackAction) {
@@ -63,17 +62,19 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             Dragon d = field.getDragon(ata.getDragonId());
             Player p = field.getPlayer(ata.getSenderId());
             d.setCurHitPoints(d.getCurHitPoints() - p.getAttackPower());
-        } else if (action instanceof  DeleteUnitAction) {
+        } else if (action instanceof DeleteUnitAction) {
             DeleteUnitAction dua = (DeleteUnitAction) action;
-            if(field.getDragon(dua.getUnitId()) == null){
+            if (field.getDragon(dua.getUnitId()) == null) {
                 Player p = field.getPlayer(dua.getUnitId());
                 field.removePlayer(p.getUnitId());
-                if(p.getUnitId() == this.ID) { isAlive = false; }
+                if (p.getUnitId() == this.ID) {
+                    isAlive = false;
+                }
             } else {
                 Dragon d = field.getDragon(dua.getUnitId());
                 field.removeDragon(d.getUnitId());
             }
-        } else if(action instanceof HealAction){
+        } else if (action instanceof HealAction) {
             HealAction ha = (HealAction) action;
             int playerId = ha.getSenderId();
             int targetPlayer = ha.getTargetPlayer();
@@ -85,7 +86,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
             int x = ma.getX();
             int y = ma.getY();
             field.movePlayer(playerId, x, y);
-        } else if(action instanceof DamageAction) {
+        } else if (action instanceof DamageAction) {
             DamageAction da = (DamageAction) action;
             int playerId = da.getPlayerId();
             int damage = da.getDamage();
@@ -95,6 +96,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
     /**
      * This function allows the server to send an error to the client.
+     *
      * @param errorId The ID of the error.
      * @param message The message that goes with the error.
      * @throws RemoteException
@@ -106,6 +108,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
     /**
      * This function serves as a heartbeat to check if the client is still connected.
+     *
      * @throws RemoteException
      */
     @Override

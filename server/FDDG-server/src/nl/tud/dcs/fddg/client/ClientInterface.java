@@ -20,6 +20,7 @@ public interface ClientInterface extends Remote {
 
     /**
      * This method is used to send acknowledgements to the clients.
+     *
      * @param action the action to be acknowledged.
      * @throws java.rmi.RemoteException
      */
@@ -27,6 +28,7 @@ public interface ClientInterface extends Remote {
 
     /**
      * This function can be called by the server to let the client know something went wrong.
+     *
      * @param errorId The ID of the error that occurred.
      * @param message The message that comes with the error.
      * @throws java.rmi.RemoteException
@@ -36,6 +38,7 @@ public interface ClientInterface extends Remote {
     /**
      * The server can call this function to check if the client is still connected to the server.
      * The client will have to call the {@Link ServerProcess@pong} message to acknowledge this heartbeat.
+     *
      * @throws java.rmi.RemoteException
      */
     public void ping() throws java.rmi.RemoteException;
