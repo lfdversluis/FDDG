@@ -11,6 +11,8 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +33,11 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         super();
         this.isAlive = true;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
+        Handler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.ALL);
+        logger.addHandler(consoleHandler);
 
         logger.log(Level.INFO, "Starting client");
     }
@@ -110,8 +117,10 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 Player playerToHeal = field.isInRangeToHeal(this.ID);
                 if (playerToHeal != null) {
                     server.requestAction(new HealAction(this.ID, playerToHeal.getUnitId()));
+                    logger.fine("Client " + this.ID + " send request for a HealAction");
                 } else if ((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
                     server.requestAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
+                    logger.fine("Client " + this.ID + " send request for a AttackAction");
                 } else {
                     Player p = field.getPlayer(this.ID);
                     int move = field.getDirectionToNearestDragon(p.getxPos(), p.getyPos());
@@ -125,6 +134,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
 
                     MoveAction moveAction = new MoveAction(this.ID, newX, newY);
                     server.requestAction(moveAction);
+                    logger.fine("Client " + this.ID + " send request for a MoveAction");
                 }
             }
 
@@ -141,6 +151,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     // TODO: randomly select one of the server instead of the first one
     public void selectServer(String[] serverURLs) {
         try {
+            logger.info("Client "+ID+" trying to connect to "+serverURLs[0]);
             server = (ClientServerInterface) Naming.lookup(serverURLs[0]);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             logger.severe("Could not connect to server: " + serverURLs[0]);

@@ -14,6 +14,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,6 +51,11 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.ID = id;
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
+        Handler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.ALL);
+        logger.addHandler(consoleHandler);
         this.gameStarted = false;
 
         this.connectedPlayers = new ConcurrentHashMap<>();
@@ -213,11 +220,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     public void connect(int clientId) throws RemoteException {
         logger.log(Level.INFO, "Client with id " + clientId + " connected");
 
-        if (!gameStarted) {
-            logger.log(Level.INFO, "Game started on server " + ID);
-            gameStarted = true;
-        }
-
         try {
             ClientInterface ci = (ClientInterface) Naming.lookup("FDDGClient/" + clientId);
             field.addPlayer(clientId);
@@ -231,6 +233,11 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         } catch (NotBoundException | MalformedURLException e) {
             e.printStackTrace();
+        }
+
+        if (!gameStarted) {
+            logger.log(Level.INFO, "Game started on server " + ID);
+            gameStarted = true;
         }
         checkAndUpdateGUI();
     }
