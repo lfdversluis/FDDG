@@ -32,6 +32,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
     // server administration
     private Map<Integer,ServerInterface> otherServers; //(id, RMI object)
+    private int requestCounter;
+    private List<ActionRequest> pendingRequests;
+    private Map<Integer,Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
 
     /**
      * The constructor of the ServerProcess class.
@@ -46,10 +49,15 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.ID = id;
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
-        this.connectedPlayers = new ConcurrentHashMap<>();
         this.gameStarted = false;
+
+        this.connectedPlayers = new ConcurrentHashMap<>();
         this.IDCounter = 0;
+
+        this.requestCounter = 0;
         this.otherServers = new HashMap<>();
+        this.pendingRequests = new ArrayList<>();
+        this.pendingAcknowledgements = new HashMap<>();
 
         // start GUI if necessary
         if (useGUI)
@@ -120,24 +128,51 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     }
 
     /**
-     * This function performs an action, can be one of the following:
+     * A client calls this function if it wants to perform one of the following actions:
      * MoveAction, HealAction, AttackAction.
      *
-     * @param action The action to be performed.
-     * @throws java.rmi.RemoteException
+     * @param action The action the client wants to be performed.
+     * @throws RemoteException
      */
     @Override
-    public synchronized void requestAction(Action action) throws java.rmi.RemoteException {
-        if (action instanceof MoveAction) {
-            MoveAction ma = (MoveAction) action;
-            move(ma);
-        } else if (action instanceof HealAction) {
-            HealAction ha = (HealAction) action;
-            heal(ha);
-        } else if (action instanceof AttackAction) {
-            AttackAction aa = (AttackAction) action;
-            attack(aa);
+    public void requestAction(Action action) throws RemoteException {
+//        if (action instanceof MoveAction) {
+//            MoveAction ma = (MoveAction) action;
+//            move(ma);
+//        } else if (action instanceof HealAction) {
+//            HealAction ha = (HealAction) action;
+//            heal(ha);
+//        } else if (action instanceof AttackAction) {
+//            AttackAction aa = (AttackAction) action;
+//            attack(aa);
+//        }
+        if(isValidAction(action)) {
+            //request action on other servers
+            sendRequestsForAction(action);
         }
+    }
+
+    private synchronized boolean isValidAction(Action action) {
+        //TODO: implement action validation: check in field+own pending requests
+        return false;
+    }
+
+    /**
+     * Creates an ActionRequest for the action and broadcasts this to the other servers
+     * @param action The action that is requested
+     */
+    private synchronized void sendRequestsForAction(Action action) throws RemoteException {
+        //create request
+        ActionRequest request = new ActionRequest(requestCounter++, action);
+
+        //initialize acknowledgement counter for the request
+        pendingRequests.add(request);
+        pendingAcknowledgements.put(request.getRequestID(), otherServers.size());
+        //TODO: remove request from these data structures when not all acks are received
+
+        //broadcast the request to the other servers
+        for(ServerInterface server: otherServers.values())
+            server.requestAction(request);
     }
 
     /**

@@ -2,10 +2,12 @@ package nl.tud.dcs.fddg.server.requests;
 
 import nl.tud.dcs.fddg.game.actions.Action;
 
+import java.io.Serializable;
+
 /**
  * Class that represents the request for an Action that is sent from one server to the others.
  */
-public class ActionRequest {
+public class ActionRequest implements Serializable{
 
     private int requestID;
     private Action theAction;
@@ -33,5 +35,14 @@ public class ActionRequest {
      */
     public Action getAction() {
         return theAction;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof ActionRequest){
+            ActionRequest that = (ActionRequest) obj;
+            return this.requestID == that.getRequestID();
+        }
+        return false;
     }
 }
