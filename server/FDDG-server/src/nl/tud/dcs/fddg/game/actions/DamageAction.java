@@ -1,5 +1,7 @@
 package nl.tud.dcs.fddg.game.actions;
 
+import nl.tud.dcs.fddg.game.Field;
+
 public class DamageAction extends Action {
     private int playerId;
     private int damage;
@@ -23,5 +25,16 @@ public class DamageAction extends Action {
 
     public void setDamage(int damage) {
         this.damage = damage;
+    }
+
+    /**
+     * Method that all subclasses need to implement.
+     * It performs the action on the field that is passed as parameter.
+     *
+     * @param field The field on which the action needs to be performed
+     */
+    @Override
+    public void perform(Field field) {
+        field.getPlayer(playerId).setCurHitPoints(field.getPlayer(playerId).getCurHitPoints() - damage);
     }
 }

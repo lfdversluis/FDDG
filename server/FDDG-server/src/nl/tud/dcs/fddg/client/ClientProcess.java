@@ -54,44 +54,16 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     @Override
     public synchronized void performAction(Action action) throws RemoteException {
-        if (action instanceof AddPlayerAction) {
-            AddPlayerAction apa = (AddPlayerAction) action;
-            field.addPlayer(apa.getPlayerId(), apa.getX(), apa.getY());
-        } else if (action instanceof AttackAction) {
-            AttackAction ata = (AttackAction) action;
-            Dragon d = field.getDragon(ata.getDragonId());
-            Player p = field.getPlayer(ata.getSenderId());
-            d.setCurHitPoints(d.getCurHitPoints() - p.getAttackPower());
-        } else if (action instanceof DeleteUnitAction) {
+        // do additional work if the action is a delete unit action (as it requires access to this class' instance variables)
+        if (action instanceof DeleteUnitAction) {
             DeleteUnitAction dua = (DeleteUnitAction) action;
-            if (field.getDragon(dua.getUnitId()) == null) {
-                Player p = field.getPlayer(dua.getUnitId());
-                field.removePlayer(p.getUnitId());
-                if (p.getUnitId() == this.ID) {
-                    isAlive = false;
-                }
-            } else {
-                Dragon d = field.getDragon(dua.getUnitId());
-                field.removeDragon(d.getUnitId());
+            int unitID = dua.getUnitId();
+            if ((field.getDragon(unitID) == null) && (unitID == this.ID)) {
+                isAlive = false;
             }
-        } else if (action instanceof HealAction) {
-            HealAction ha = (HealAction) action;
-            int playerId = ha.getSenderId();
-            int targetPlayer = ha.getTargetPlayer();
-            Player thisPlayer = field.getPlayer(playerId);
-            field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
-        } else if (action instanceof MoveAction) {
-            MoveAction ma = (MoveAction) action;
-            int playerId = ma.getSenderId();
-            int x = ma.getX();
-            int y = ma.getY();
-            field.movePlayer(playerId, x, y);
-        } else if (action instanceof DamageAction) {
-            DamageAction da = (DamageAction) action;
-            int playerId = da.getPlayerId();
-            int damage = da.getDamage();
-            field.getPlayer(playerId).setCurHitPoints(field.getPlayer(playerId).getCurHitPoints() - damage);
         }
+
+        action.perform(field);
     }
 
     /**

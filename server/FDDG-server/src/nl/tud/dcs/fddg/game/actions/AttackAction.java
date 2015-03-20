@@ -1,5 +1,9 @@
 package nl.tud.dcs.fddg.game.actions;
 
+import nl.tud.dcs.fddg.game.Field;
+import nl.tud.dcs.fddg.game.entities.Dragon;
+import nl.tud.dcs.fddg.game.entities.Player;
+
 public class AttackAction extends Action {
     private int dragonId;
 
@@ -21,5 +25,18 @@ public class AttackAction extends Action {
      */
     public int getDragonId() {
         return dragonId;
+    }
+
+    /**
+     * Method that all subclasses need to implement.
+     * It performs the action on the field that is passed as parameter.
+     *
+     * @param field The field on which the action needs to be performed
+     */
+    @Override
+    public void perform(Field field) {
+        Dragon dragon = field.getDragon(dragonId);
+        Player player = field.getPlayer(senderId);
+        dragon.setCurHitPoints(dragon.getCurHitPoints() - player.getAttackPower());
     }
 }
