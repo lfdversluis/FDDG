@@ -125,7 +125,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
         // send a connect message to the server
         try {
-            server = (ServerInterface) Naming.lookup("FDDGServer/0");
             this.ID = server.register();
 
             Naming.rebind("FDDGClient/" + this.ID, this);
@@ -157,8 +156,24 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                 }
             }
 
-        } catch (NotBoundException | MalformedURLException | RemoteException | InterruptedException e) {
+        } catch (MalformedURLException | RemoteException | InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Function that selects one of the servers as its server.
+     *
+     * @param serverURLs The URLs of the servers
+     */
+    // TODO: randomly select one of the server instead of the first one
+    public void selectServer(String[] serverURLs) {
+        try {
+            server = (ServerInterface) Naming.lookup(serverURLs[0]);
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            logger.severe("Could not connect to server: " + serverURLs[0]);
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 }
