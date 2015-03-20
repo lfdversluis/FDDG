@@ -11,6 +11,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +24,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private Field field;
     private Logger logger;
     private volatile Map<Integer, ClientInterface> connectedPlayers;
-    private volatile Map<Integer, Boolean> clientPings;
+    private Map<Integer, Boolean> clientPings;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
     private int IDCounter;
@@ -40,7 +41,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         this.ID = id;
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
-        this.connectedPlayers = new ConcurrentHashMap<>();
+        this.connectedPlayers = new HashMap<>();
         this.clientPings = new ConcurrentHashMap<>();
         this.gameStarted = false;
         this.IDCounter = 0;
