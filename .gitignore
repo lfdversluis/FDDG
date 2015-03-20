@@ -12,4 +12,4 @@ server/FDDG-server/.idea/
 out/
 
 # config files
-setup/servers
+ # setup/servers

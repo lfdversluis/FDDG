@@ -4,6 +4,8 @@ package nl.tud.dcs.fddg;
 import nl.tud.dcs.fddg.server.ServerProcess;
 
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 
@@ -14,16 +16,20 @@ import java.rmi.RemoteException;
 public class StartServer {
 
     public static void main(String[] args) {
-        if (args.length < 1) {
-            System.err.println("Usage: StartServer <server ID> [GUI]");
+        if (args.length < 2) {
+            System.err.println("Usage: StartServer <servers file> <server ID> [GUI]");
             System.exit(1);
         }
 
         // parse arguments
-        int serverID = Integer.parseInt(args[0]);
+        String serversFileName = args[0];
+        int serverID = Integer.parseInt(args[1]);
         boolean useGUI = false;
-        if (args.length > 1 && args[1].equals("GUI"))
+        if (args.length > 2 && args[2].equals("GUI"))
             useGUI = true;
+
+        // parse servers file
+        String[] serverURLs = Files.readAllLines(Paths.get(serversFileName)).toArray()
 
         // create the server process, bind it to the registry and start it
         try {
