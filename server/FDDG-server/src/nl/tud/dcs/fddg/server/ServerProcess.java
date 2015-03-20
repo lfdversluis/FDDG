@@ -147,7 +147,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 //            attack(aa);
 //        }
         if(isValidAction(action)) {
-            //request action on other servers
             sendRequestsForAction(action);
         }
     }
@@ -163,12 +162,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     private synchronized void sendRequestsForAction(Action action) throws RemoteException {
         //create request
-        ActionRequest request = new ActionRequest(requestCounter++, action);
+        ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
 
         //initialize acknowledgement counter for the request
         pendingRequests.add(request);
         pendingAcknowledgements.put(request.getRequestID(), otherServers.size());
         //TODO: remove request from these data structures when not all acks are received
+
+        logger.fine("Sending request "+request.getRequestID()+" to all servers...");
 
         //broadcast the request to the other servers
         for(ServerInterface server: otherServers.values())
@@ -367,7 +368,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void requestAction(ActionRequest request) throws RemoteException {
-
+        //TODO: check whether the request can be acknowledged
+        if(true){
+            int senderID = request.getSenderID();
+            int requestID = request.getRequestID();
+            
+            logger.fine("Acknowledging request "+requestID+" to server "+senderID);
+            otherServers.get(senderID).acknowledgeRequest(requestID);
+        }
     }
 
     /**
