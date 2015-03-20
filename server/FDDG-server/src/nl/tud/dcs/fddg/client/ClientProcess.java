@@ -113,8 +113,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
      * @throws RemoteException
      */
     @Override
-    public boolean ping() throws RemoteException {
-        return true;
+    public void ping() throws RemoteException {
     }
 
     /**

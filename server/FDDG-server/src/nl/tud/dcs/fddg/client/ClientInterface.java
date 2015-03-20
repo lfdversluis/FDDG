@@ -39,8 +39,7 @@ public interface ClientInterface extends Remote {
      * The server can call this function to check if the client is still connected to the server.
      * The client will have to call the {@Link ServerProcess@pong} message to acknowledge this heartbeat.
      *
-     * @return Boolean indicating everything is fine.
      * @throws java.rmi.RemoteException
      */
-    public boolean ping() throws java.rmi.RemoteException;
+    public void ping() throws java.rmi.RemoteException;
 }

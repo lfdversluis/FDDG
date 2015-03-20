@@ -293,8 +293,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * @throws RemoteException
      */
     @Override
-    public boolean pong() throws RemoteException {
-        return true;
+    public void pong() throws RemoteException {
     }
 
     /**
