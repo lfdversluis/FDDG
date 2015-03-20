@@ -28,7 +28,7 @@ public class HealAction extends Action {
 
     /**
      * Method that all subclasses need to implement.
-     * It performs the action on the field that is passed as parameter.
+     * In this case the targetPlayer will be healed
      *
      * @param field The field on which the action needs to be performed
      */
@@ -36,5 +36,20 @@ public class HealAction extends Action {
     public void perform(Field field) {
         Player thisPlayer = field.getPlayer(senderId);
         field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
+    }
+
+    /**
+     * Checks whether this action is valid in the current field.
+     * Here, it checks whether the player is within a range of 5 of the target player.
+     * Also it checks whether the target player actually needs to be healed.
+     *
+     * @param field The current field
+     * @return true iff the action is valid
+     */
+    @Override
+    public boolean isValid(Field field) {
+        return field.isInRange(senderId, targetPlayer, 5) &&
+                field.getPlayer(targetPlayer).getHitPointsPercentage() < 0.5 &&
+                field.getPlayer(targetPlayer).getCurHitPoints() > 0;
     }
 }

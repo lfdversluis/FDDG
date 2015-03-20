@@ -23,4 +23,14 @@ public abstract class Action implements Serializable {
      * @param field The field on which the action needs to be performed
      */
     public abstract void perform(Field field);
+
+    /**
+     * Checks whether this action is valid in the current field
+     *
+     * @param field The current field
+     * @return true iff the action is valid
+     */
+    public boolean isValid(Field field) {
+        return false;
+    }
 }

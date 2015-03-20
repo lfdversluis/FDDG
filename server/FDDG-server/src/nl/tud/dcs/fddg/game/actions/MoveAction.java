@@ -40,12 +40,24 @@ public class MoveAction extends Action {
 
     /**
      * Method that all subclasses need to implement.
-     * It performs the action on the field that is passed as parameter.
+     * This function moves a player to a given position.
      *
      * @param field The field on which the action needs to be performed
      */
     @Override
     public void perform(Field field) {
         field.movePlayer(senderId, x, y);
+    }
+
+    /**
+     * Checks whether this action is valid in the current field.
+     * Here it checks whether the player is valid and can be moved.
+     *
+     * @param field The current field
+     * @return true iff the action is valid
+     */
+    @Override
+    public boolean isValid(Field field) {
+        return field.isValidPlayerId(senderId) && field.canMove(x, y);
     }
 }

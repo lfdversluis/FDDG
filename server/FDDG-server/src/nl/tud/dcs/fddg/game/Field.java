@@ -122,7 +122,7 @@ public class Field implements Serializable {
      * @param newY The y coordinate of the new location.
      * @return A boolean indicating if the move can be done.
      */
-    private boolean canMove(int newX, int newY) {
+    public boolean canMove(int newX, int newY) {
         return (newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && isFree(newX, newY));
     }
 

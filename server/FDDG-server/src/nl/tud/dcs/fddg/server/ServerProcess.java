@@ -112,16 +112,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     }
 
     /**
-     * Function to check if a player ID is valid.
-     *
-     * @param playerId The player ID to check.
-     * @return Returns a boolean indicating if the player is valid.
-     */
-    public boolean isValidPlayerId(int playerId) {
-        return field.isValidPlayerId(playerId);
-    }
-
-    /**
      * A client calls this function if it wants to perform one of the following actions:
      * MoveAction, HealAction, AttackAction.
      *
@@ -130,25 +120,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void requestAction(Action action) throws RemoteException {
-//        if (action instanceof MoveAction) {
-//            MoveAction ma = (MoveAction) action;
-//            move(ma);
-//        } else if (action instanceof HealAction) {
-//            HealAction ha = (HealAction) action;
-//            heal(ha);
-//        } else if (action instanceof AttackAction) {
-//            AttackAction aa = (AttackAction) action;
-//            attack(aa);
-//        }
         if (isValidAction(action)) {
             sendRequestsForAction(action);
         }
     }
 
     private synchronized boolean isValidAction(Action action) {
-        //TODO: implement action validation: check in field+own pending requests
-        //use checks from move, heal and attack
-        return false;
+        //TODO: check own pending requests as well?
+        return action.isValid(field);
     }
 
     /**
@@ -173,87 +152,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     }
 
     /**
-     * This function moves a player to a given position. If the move cannot
-     * be done or if the player is invalid, it sends an error to the client.
-     *
-     * @param ma The MoveAction to be performed.
-     * @throws RemoteException
-     */
-    public void move(MoveAction ma) throws RemoteException {
-        int playerId = ma.getSenderId();
-        int x = ma.getX();
-        int y = ma.getY();
-
-        logger.log(Level.INFO, "Server " + this.ID + " received move to (" + x + ", " + y + ") from player " + playerId);
-        if (!isValidPlayerId(playerId)) {
-            // TODO send error message
-        }
-
-        boolean result = field.movePlayer(playerId, x, y);
-        if (!result) {
-            // TODO send error message
-        } else {
-            broadcastActionToClients(ma);
-        }
-        checkAndUpdateGUI();
-    }
-
-    /**
-     * This functions handles a player healing another player.
-     * If the player is not withing a range of 5 of the target player, or if the
-     * target player's health percentage is above 50%, or if one or both are invalid players
-     * then an error will be send back to the clients.
-     *
-     * @param ha The HealAction to be performed.
-     * @throws RemoteException
-     */
-    public void heal(HealAction ha) throws RemoteException {
-        int playerId = ha.getSenderId();
-        int targetPlayer = ha.getTargetPlayer();
-
-        logger.log(Level.INFO, "Server " + this.ID + " received heal to player " + targetPlayer + " from player " + playerId);
-
-        if (!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5 || field.getPlayer(targetPlayer).getCurHitPoints() <= 0) {
-            // TODO send error message
-        } else {
-            Player thisPlayer = field.getPlayer(playerId);
-            field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
-            broadcastActionToClients(ha);
-        }
-        checkAndUpdateGUI();
-    }
-
-    /**
-     * This function allows a player to attack a dragon.
-     * If the dragon is not next to the player or if the dragon or play is invalid,
-     * then an error message is send to the client.
-     *
-     * @param aa The AttackAction to be performed.
-     * @throws RemoteException
-     */
-    public void attack(AttackAction aa) throws RemoteException {
-        int playerId = aa.getSenderId();
-        int dragonId = aa.getDragonId();
-
-        logger.log(Level.INFO, "Server " + this.ID + " received attack to dragon " + dragonId + " from player " + playerId);
-
-        if (!field.isInRange(playerId, dragonId, 1)) {
-            // TODO send error message
-        } else {
-            Player thisPlayer = field.getPlayer(playerId);
-            field.getDragon(dragonId).getHit(thisPlayer.getAttackPower());
-            if (field.getDragon(dragonId).getCurHitPoints() <= 0) {
-                field.removeDragon(dragonId);
-                DeleteUnitAction dua = new DeleteUnitAction(dragonId);
-                broadcastActionToClients(dua);
-            } else {
-                broadcastActionToClients(aa);
-            }
-        }
-        checkAndUpdateGUI();
-    }
-
-    /**
      * This function gets called by a client to connect to a server.
      *
      * @throws RemoteException
@@ -271,7 +169,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void connect(int clientId) throws RemoteException {
-
         logger.log(Level.INFO, "Client with id " + clientId + " connected");
 
         if (!gameStarted) {
@@ -396,13 +293,21 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             //perform action on local field + connected clients
             performAction(action);
 
-            //notify all other servers
-            for (ServerInterface server : otherServers.values())
-                server.performAction(action);
+            broadcastActionToServers(action);
 
             //cleanup
             removeRequest(requestID);
         }
+    }
+
+    /**
+     * Broadcast an action to all other servers
+     *
+     * @param action The action to be broadcasted.
+     */
+    private void broadcastActionToServers(Action action) throws RemoteException {
+        for (ServerInterface server : otherServers.values())
+            server.performAction(action);
     }
 
     /**
