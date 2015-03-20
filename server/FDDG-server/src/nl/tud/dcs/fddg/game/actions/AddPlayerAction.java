@@ -34,4 +34,16 @@ public class AddPlayerAction extends Action {
     public void perform(Field field) {
         field.addPlayer(playerId, x, y);
     }
+
+    /**
+     * Checks whether this action is valid in the current field.
+     * Here, it checks whether the location is free.
+     *
+     * @param field The current field
+     * @return true iff the action is valid
+     */
+    @Override
+    public boolean isValid(Field field) {
+        return field.isFree(x, y);
+    }
 }

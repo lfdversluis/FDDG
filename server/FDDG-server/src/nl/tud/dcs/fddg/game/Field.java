@@ -56,7 +56,7 @@ public class Field implements Serializable {
      * @param y The y coordinate of the location.
      * @return Returns a boolean indicating if the location is unoccupied.
      */
-    private boolean isFree(int x, int y) {
+    public boolean isFree(int x, int y) {
         return entities[y][x] == null;
     }
 
@@ -123,7 +123,7 @@ public class Field implements Serializable {
      * @return A boolean indicating if the move can be done.
      */
     public boolean canMove(int newX, int newY) {
-        return (newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && isFree(newX, newY));
+        return isInBoard(newX, newY) && isFree(newX, newY);
     }
 
     /**
@@ -300,7 +300,7 @@ public class Field implements Serializable {
                 int newX = curX + dx[i];
                 int newY = curY + dy[i];
 
-                if (newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && (entities[newY][newX] instanceof Dragon)) {
+                if (isInBoard(newX, newY) && (entities[newY][newX] instanceof Dragon)) {
                     return path.get(0);
                 }
 
@@ -322,9 +322,20 @@ public class Field implements Serializable {
     }
 
     /**
-     * This function lets all dragon alive on the field attack nearby players.
+     * Checks whether (x,y) is a valid location in the board
+     *
+     * @param x
+     * @param y
+     * @return
      */
-    public Set<Action> dragonRage() {
+    private boolean isInBoard(int x, int y) {
+        return x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT;
+    }
+
+    /**
+     * This function lets all dragon alive on the field attack nearby players (that are connected to this server).
+     */
+    public Set<Action> dragonRage(Set<Integer> connectedPlayers) {
         Set<Action> actionSet = new HashSet<>();
 
         for (int dragonId : dragonMap.keySet()) {
@@ -337,7 +348,7 @@ public class Field implements Serializable {
                 int unitX = dragonX + dx[i];
                 int unitY = dragonY + dy[i];
 
-                if (unitX >= 0 && unitX < BOARD_WIDTH && unitY >= 0 && unitY < BOARD_HEIGHT && entities[unitY][unitX] instanceof Player) {
+                if (isInBoard(unitX, unitY) && entities[unitY][unitX] instanceof Player && connectedPlayers.contains(entities[unitY][unitX].getUnitId())) {
                     Player p = (Player) entities[unitY][unitX];
                     p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
 

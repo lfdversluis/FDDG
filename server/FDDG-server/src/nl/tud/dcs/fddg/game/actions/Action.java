@@ -30,7 +30,5 @@ public abstract class Action implements Serializable {
      * @param field The current field
      * @return true iff the action is valid
      */
-    public boolean isValid(Field field) {
-        return false;
-    }
+    public abstract boolean isValid(Field field);
 }

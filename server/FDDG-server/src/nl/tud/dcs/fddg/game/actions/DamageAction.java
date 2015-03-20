@@ -37,4 +37,16 @@ public class DamageAction extends Action {
     public void perform(Field field) {
         field.getPlayer(playerId).setCurHitPoints(field.getPlayer(playerId).getCurHitPoints() - damage);
     }
+
+    /**
+     * Checks whether this action is valid in the current field.
+     * In this case, the action is valid if the player exists.
+     *
+     * @param field The current field
+     * @return true iff the action is valid
+     */
+    @Override
+    public boolean isValid(Field field) {
+        return field.isValidPlayerId(playerId);
+    }
 }

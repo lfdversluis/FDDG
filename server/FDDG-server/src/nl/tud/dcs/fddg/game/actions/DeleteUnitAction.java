@@ -32,4 +32,16 @@ public class DeleteUnitAction extends Action {
             field.removeDragon(d.getUnitId());
         }
     }
+
+    /**
+     * Checks whether this action is valid in the current field.
+     * Here, it checks whether the unit is actually in the game
+     *
+     * @param field The current field
+     * @return true iff the action is valid
+     */
+    @Override
+    public boolean isValid(Field field) {
+        return field.isValidPlayerId(unitId) || (field.getDragon(unitId) != null);
+    }
 }

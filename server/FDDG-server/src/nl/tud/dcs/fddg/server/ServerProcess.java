@@ -78,10 +78,12 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             } while (!gameStarted);
 
             while (!field.gameHasFinished()) {
-                Set<Action> actionSet = field.dragonRage();
+                //only attack the servers own players (not the others!!!!). Then, no acks are required
+                Set<Action> actionSet = field.dragonRage(connectedPlayers.keySet());
 
                 for (Action a : actionSet) {
                     broadcastActionToClients(a);
+                    broadcastActionToServers(a);
                 }
                 Thread.sleep(1000);
             }
@@ -125,9 +127,21 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         }
     }
 
+    /**
+     * Checks whether the action is valid for this server.
+     * This is done by checking the validity of the action in the field of this server
+     * and by checking whether is does not conflict with this server's pending requests.
+     *
+     * @param action The action of which the validity needs to be checked
+     * @return true iff the action can safely be performed on this server
+     */
     private synchronized boolean isValidAction(Action action) {
-        //TODO: check own pending requests as well?
-        return action.isValid(field);
+        return action.isValid(field) && checkPendingRequestsForAction(action);
+    }
+
+    private boolean checkPendingRequestsForAction(Action action) {
+        //TODO: check own pending requests as well
+        return false;
     }
 
     /**
@@ -261,8 +275,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void requestAction(ActionRequest request) throws RemoteException {
-        //TODO: check whether the request can be acknowledged
-        if (true) {
+        if (isValidAction(request.getAction())) {
             int senderID = request.getSenderID();
             int requestID = request.getRequestID();
 
@@ -335,10 +348,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         action.perform(field);
 
         //if a dragon is killed, the action is changed to a DeleteUnitAction
-        if(action instanceof AttackAction){
+        if (action instanceof AttackAction) {
             AttackAction aa = (AttackAction) action;
             int dragonID = aa.getDragonId();
-            if(field.getDragon(dragonID).getCurHitPoints() <= 0){
+            if (field.getDragon(dragonID).getCurHitPoints() <= 0) {
                 field.removeDragon(dragonID);
                 action = new DeleteUnitAction(dragonID);
             }
