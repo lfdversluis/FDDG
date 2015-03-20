@@ -27,14 +27,11 @@ public class StartClients {
         // create the client processes, bind them to the registry and start them
         try {
             for (int id = firstID; id <= lastID; id++) {
-                ClientProcess client = new ClientProcess(id);
-                Naming.rebind("FDDGClient/" + id, client);
+                ClientProcess client = new ClientProcess();
                 new Thread(client).start();
                 Thread.sleep(250); // TODO we hardcoded a timeout here between connecting the players
             }
         } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();

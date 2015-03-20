@@ -5,6 +5,7 @@ public class AttackAction extends Action {
 
     /**
      * Constructor of the Attack action.
+     *
      * @param senderId The ID of the unit that created this action.
      * @param dragonId The id of the dragon that is being attacked.
      */
@@ -15,6 +16,7 @@ public class AttackAction extends Action {
 
     /**
      * Simple getter for the dragon ID.
+     *
      * @return The dragon ID of the dragon being attacked.
      */
     public int getDragonId() {

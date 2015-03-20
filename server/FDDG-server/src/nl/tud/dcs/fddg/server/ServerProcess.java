@@ -25,6 +25,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private volatile Map<Integer, ClientInterface> connectedPlayers;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
+    private int IDCounter;
 
     /**
      * The constructor of the ServerProcess class. It requires an ID and a flag indicating whether a GUI should be started or not..
@@ -40,6 +41,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         this.logger = Logger.getLogger(ServerProcess.class.getName());
         this.connectedPlayers = new ConcurrentHashMap<>();
         this.gameStarted = false;
+        this.IDCounter = 0;
 
         // start GUI if necessary
         if (useGUI)
@@ -57,12 +59,12 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         try {
             do {
                 Thread.sleep(1000);
-            } while(!gameStarted);
+            } while (!gameStarted);
 
             while (!field.gameHasFinished()) {
                 Set<Action> actionSet = field.dragonRage();
 
-                for(Action a : actionSet){
+                for (Action a : actionSet) {
                     broadcastActionToPlayers(a);
                 }
                 Thread.sleep(1000);
@@ -70,17 +72,18 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
             logger.log(Level.INFO, "Server " + ID + " finished the game.");
 
-        } catch(InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     /**
      * Broadcast an action to all players
+     *
      * @param action The action to be broadcasted.
      */
     public synchronized void broadcastActionToPlayers(Action action) {
-        for(Map.Entry<Integer, ClientInterface> entry : connectedPlayers.entrySet()) {
+        for (Map.Entry<Integer, ClientInterface> entry : connectedPlayers.entrySet()) {
             try {
                 ClientInterface client = entry.getValue();
                 client.ack(action);
@@ -116,14 +119,14 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void performAction(Action action) throws java.rmi.RemoteException  {
-        if(action instanceof MoveAction) {
+    public synchronized void performAction(Action action) throws java.rmi.RemoteException {
+        if (action instanceof MoveAction) {
             MoveAction ma = (MoveAction) action;
             move(ma);
-        } else if(action instanceof HealAction) {
+        } else if (action instanceof HealAction) {
             HealAction ha = (HealAction) action;
             heal(ha);
-        } else if(action instanceof AttackAction) {
+        } else if (action instanceof AttackAction) {
             AttackAction aa = (AttackAction) action;
             attack(aa);
         }
@@ -142,12 +145,12 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         int y = ma.getY();
 
         logger.log(Level.INFO, "Server " + this.ID + " received move to (" + x + ", " + y + ") from player " + playerId);
-        if(!isValidPlayerId(playerId)) {
+        if (!isValidPlayerId(playerId)) {
             // TODO send error message
         }
 
         boolean result = field.movePlayer(playerId, x, y);
-        if(!result) {
+        if (!result) {
             // TODO send error message
         } else {
             broadcastActionToPlayers(ma);
@@ -170,7 +173,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
         logger.log(Level.INFO, "Server " + this.ID + " received heal to player " + targetPlayer + " from player " + playerId);
 
-        if(!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5 || field.getPlayer(targetPlayer).getCurHitPoints() <= 0) {
+        if (!field.isInRange(playerId, targetPlayer, 5) || field.getPlayer(targetPlayer).getHitPointsPercentage() >= 0.5 || field.getPlayer(targetPlayer).getCurHitPoints() <= 0) {
             // TODO send error message
         } else {
             Player thisPlayer = field.getPlayer(playerId);
@@ -194,12 +197,12 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
 
         logger.log(Level.INFO, "Server " + this.ID + " received attack to dragon " + dragonId + " from player " + playerId);
 
-        if(!field.isInRange(playerId, dragonId, 1)) {
+        if (!field.isInRange(playerId, dragonId, 1)) {
             // TODO send error message
         } else {
             Player thisPlayer = field.getPlayer(playerId);
             field.getDragon(dragonId).getHit(thisPlayer.getAttackPower());
-            if(field.getDragon(dragonId).getCurHitPoints() <= 0) {
+            if (field.getDragon(dragonId).getCurHitPoints() <= 0) {
                 field.removeDragon(dragonId);
                 DeleteUnitAction dua = new DeleteUnitAction(dragonId);
                 broadcastActionToPlayers(dua);
@@ -211,31 +214,41 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     }
 
     /**
-     * This function allows a client to connect with a (unique) ID.
+     * This function gets called by a client to connect to a server.
      *
-     * @param playerId The ID of the player that wishes to connect.
      * @throws RemoteException
      */
     @Override
-    public void connect(int playerId) throws RemoteException {
+    public int register() throws RemoteException {
+        return IDCounter++;
+    }
 
-        logger.log(Level.INFO, "Client with id " + playerId + " connected");
+    /**
+     * This function allows a client to connect with a (unique) ID.
+     *
+     * @param clientId The ID of the player that wishes to connect.
+     * @throws RemoteException
+     */
+    @Override
+    public void connect(int clientId) throws RemoteException {
 
-        if(!gameStarted) {
+        logger.log(Level.INFO, "Client with id " + clientId + " connected");
+
+        if (!gameStarted) {
             logger.log(Level.INFO, "Game started on server " + ID);
             gameStarted = true;
         }
 
         try {
-            ClientInterface ci = (ClientInterface) Naming.lookup("//localhost:1099/FDDGClient/" + playerId);
-            field.addPlayer(playerId);
+            ClientInterface ci = (ClientInterface) Naming.lookup("FDDGClient/" + clientId);
+            field.addPlayer(clientId);
             ci.initializeField(field);
 
-            AddPlayerAction apa = new AddPlayerAction(playerId, field.getPlayer(playerId).getxPos(), field.getPlayer(playerId).getyPos());
+            AddPlayerAction apa = new AddPlayerAction(clientId, field.getPlayer(clientId).getxPos(), field.getPlayer(clientId).getyPos());
             broadcastActionToPlayers(apa);
 
             // Now the broadcast is done, add the player to the player map (so he doesn't add himself again on the field).
-            connectedPlayers.put(playerId, ci);
+            connectedPlayers.put(clientId, ci);
 
         } catch (NotBoundException | MalformedURLException e) {
             e.printStackTrace();

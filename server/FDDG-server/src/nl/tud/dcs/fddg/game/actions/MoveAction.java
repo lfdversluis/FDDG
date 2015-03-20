@@ -7,9 +7,10 @@ public class MoveAction extends Action {
 
     /**
      * Constructor of the Move action.
+     *
      * @param senderId The ID of the unit that created this action.
-     * @param x The x coordinate of the location to move to.
-     * @param y The y coordinate of the location to move to.
+     * @param x        The x coordinate of the location to move to.
+     * @param y        The y coordinate of the location to move to.
      */
     public MoveAction(int senderId, int x, int y) {
         this.senderId = senderId;
@@ -19,6 +20,7 @@ public class MoveAction extends Action {
 
     /**
      * A simple getter that returns the x coordinate of the move action.
+     *
      * @return The x coordinate of the new location.
      */
     public int getX() {
@@ -27,6 +29,7 @@ public class MoveAction extends Action {
 
     /**
      * A simple getter that returns the y coordinate of the move action.
+     *
      * @return The y coordinate of the new location.
      */
     public int getY() {

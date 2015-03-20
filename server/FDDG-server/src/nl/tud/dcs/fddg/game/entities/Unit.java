@@ -56,6 +56,6 @@ public class Unit implements Serializable {
     }
 
     public double getHitPointsPercentage() {
-        return (double)curHitPoints / (double)maxHitPoints;
+        return (double) curHitPoints / (double) maxHitPoints;
     }
 }
