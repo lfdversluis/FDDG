@@ -81,32 +81,26 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 Set<Action> actionSet = field.dragonRage();
 
                 for (Action a : actionSet) {
-                    broadcastActionToPlayers(a);
+                    broadcastActionToClients(a);
                 }
                 Thread.sleep(1000);
             }
 
             logger.log(Level.INFO, "Server " + ID + " finished the game.");
 
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | RemoteException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * Broadcast an action to all players
+     * Broadcast an action to all connected clients
      *
      * @param action The action to be broadcasted.
      */
-    public synchronized void broadcastActionToPlayers(Action action) {
-        for (Map.Entry<Integer, nl.tud.dcs.fddg.client.ClientInterface> entry : connectedPlayers.entrySet()) {
-            try {
-                ClientInterface client = entry.getValue();
-                client.performAction(action);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
+    public synchronized void broadcastActionToClients(Action action) throws RemoteException {
+        for (ClientInterface client : connectedPlayers.values())
+            client.performAction(action);
     }
 
     /**
@@ -153,6 +147,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
     private synchronized boolean isValidAction(Action action) {
         //TODO: implement action validation: check in field+own pending requests
+        //use checks from move, heal and attack
         return false;
     }
 
@@ -198,7 +193,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         if (!result) {
             // TODO send error message
         } else {
-            broadcastActionToPlayers(ma);
+            broadcastActionToClients(ma);
         }
         checkAndUpdateGUI();
     }
@@ -223,7 +218,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         } else {
             Player thisPlayer = field.getPlayer(playerId);
             field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
-            broadcastActionToPlayers(ha);
+            broadcastActionToClients(ha);
         }
         checkAndUpdateGUI();
     }
@@ -250,9 +245,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             if (field.getDragon(dragonId).getCurHitPoints() <= 0) {
                 field.removeDragon(dragonId);
                 DeleteUnitAction dua = new DeleteUnitAction(dragonId);
-                broadcastActionToPlayers(dua);
+                broadcastActionToClients(dua);
             } else {
-                broadcastActionToPlayers(aa);
+                broadcastActionToClients(aa);
             }
         }
         checkAndUpdateGUI();
@@ -290,7 +285,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             ci.initializeField(field);
 
             AddPlayerAction apa = new AddPlayerAction(clientId, field.getPlayer(clientId).getxPos(), field.getPlayer(clientId).getyPos());
-            broadcastActionToPlayers(apa);
+            broadcastActionToClients(apa);
 
             // Now the broadcast is done, add the player to the player map (so he doesn't add himself again on the field).
             connectedPlayers.put(clientId, ci);
@@ -429,12 +424,22 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public synchronized void performAction(Action action) throws RemoteException {
-        logger.fine("Performing action from client "+action.getSenderId());
+        logger.fine("Performing action from " + action.getSenderId());
 
-        //TODO: perform the action on the local field
+        //perform the action on the local field
+        action.perform(field);
 
-        // send action to the connected clients
-        for (ClientInterface client : connectedPlayers.values())
-            client.performAction(action);
+        //if a dragon is killed, the action is changed to a DeleteUnitAction
+        if(action instanceof AttackAction){
+            AttackAction aa = (AttackAction) action;
+            int dragonID = aa.getDragonId();
+            if(field.getDragon(dragonID).getCurHitPoints() <= 0){
+                field.removeDragon(dragonID);
+                action = new DeleteUnitAction(dragonID);
+            }
+        }
+
+        checkAndUpdateGUI();
+        broadcastActionToClients(action);
     }
 }

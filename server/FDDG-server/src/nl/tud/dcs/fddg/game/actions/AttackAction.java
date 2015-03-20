@@ -37,6 +37,6 @@ public class AttackAction extends Action {
     public void perform(Field field) {
         Dragon dragon = field.getDragon(dragonId);
         Player player = field.getPlayer(senderId);
-        dragon.setCurHitPoints(dragon.getCurHitPoints() - player.getAttackPower());
+        dragon.getHit(player.getAttackPower());
     }
 }
