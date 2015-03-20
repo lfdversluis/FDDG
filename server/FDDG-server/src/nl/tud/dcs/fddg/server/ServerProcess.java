@@ -1,6 +1,5 @@
 package nl.tud.dcs.fddg.server;
 
-import nl.tud.dcs.fddg.client.ClientInterface;
 import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.*;
 import nl.tud.dcs.fddg.game.entities.Player;
@@ -19,16 +18,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ServerProcess extends UnicastRemoteObject implements ServerInterface, Runnable {
+public class ServerProcess extends UnicastRemoteObject implements ClientServerInterface, Runnable {
 
     private final int ID;
     private Field field;
     private Logger logger;
-    private volatile Map<Integer, ClientInterface> connectedPlayers;
+    private volatile Map<Integer, nl.tud.dcs.fddg.client.ClientInterface> connectedPlayers;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
     private int IDCounter;
-    private List<ServerInterface> otherServers;
+    private List<ClientServerInterface> otherServers;
 
     /**
      * The constructor of the ServerProcess class. It requires an ID and a flag indicating whether a GUI should be started or not..
@@ -87,9 +86,9 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * @param action The action to be broadcasted.
      */
     public synchronized void broadcastActionToPlayers(Action action) {
-        for (Map.Entry<Integer, ClientInterface> entry : connectedPlayers.entrySet()) {
+        for (Map.Entry<Integer, nl.tud.dcs.fddg.client.ClientInterface> entry : connectedPlayers.entrySet()) {
             try {
-                ClientInterface client = entry.getValue();
+                nl.tud.dcs.fddg.client.ClientInterface client = entry.getValue();
                 client.ack(action);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -123,7 +122,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void performAction(Action action) throws java.rmi.RemoteException {
+    public synchronized void requestAction(Action action) throws java.rmi.RemoteException {
         if (action instanceof MoveAction) {
             MoveAction ma = (MoveAction) action;
             move(ma);
@@ -244,7 +243,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         }
 
         try {
-            ClientInterface ci = (ClientInterface) Naming.lookup("FDDGClient/" + clientId);
+            nl.tud.dcs.fddg.client.ClientInterface ci = (nl.tud.dcs.fddg.client.ClientInterface) Naming.lookup("FDDGClient/" + clientId);
             field.addPlayer(clientId);
             ci.initializeField(field);
 
@@ -305,7 +304,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private void connectToServer(String serverURL) throws RemoteException, MalformedURLException {
         while (true) {
             try {
-                otherServers.add((ServerInterface) Naming.lookup(serverURL));
+                otherServers.add((ClientServerInterface) Naming.lookup(serverURL));
                 logger.info("Connected to server: "+serverURL);
                 break;
             } catch (NotBoundException ignoredException) {

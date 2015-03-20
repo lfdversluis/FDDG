@@ -4,7 +4,7 @@ import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.*;
 import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
-import nl.tud.dcs.fddg.server.ServerInterface;
+import nl.tud.dcs.fddg.server.ClientServerInterface;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -14,11 +14,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ClientProcess extends UnicastRemoteObject implements ClientInterface, Runnable {
+public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fddg.client.ClientInterface, Runnable {
 
     private int ID;
     private Logger logger;
-    private ServerInterface server;
+    private ClientServerInterface server;
     private Field field;
     private boolean isAlive;
 
@@ -137,9 +137,9 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                 Dragon dragonToAttack;
                 Player playerToHeal = field.isInRangeToHeal(this.ID);
                 if (playerToHeal != null) {
-                    server.performAction(new HealAction(this.ID, playerToHeal.getUnitId()));
+                    server.requestAction(new HealAction(this.ID, playerToHeal.getUnitId()));
                 } else if ((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
-                    server.performAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
+                    server.requestAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
                 } else {
                     Player p = field.getPlayer(this.ID);
                     int move = field.getDirectionToNearestDragon(p.getxPos(), p.getyPos());
@@ -152,7 +152,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                     int newY = move / MAX_WIDTH_HEIGHT;
 
                     MoveAction moveAction = new MoveAction(this.ID, newX, newY);
-                    server.performAction(moveAction);
+                    server.requestAction(moveAction);
                 }
             }
 
@@ -169,7 +169,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     // TODO: randomly select one of the server instead of the first one
     public void selectServer(String[] serverURLs) {
         try {
-            server = (ServerInterface) Naming.lookup(serverURLs[0]);
+            server = (ClientServerInterface) Naming.lookup(serverURLs[0]);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             logger.severe("Could not connect to server: " + serverURLs[0]);
             e.printStackTrace();

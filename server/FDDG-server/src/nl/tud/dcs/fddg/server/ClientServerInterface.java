@@ -4,15 +4,19 @@ import nl.tud.dcs.fddg.game.actions.Action;
 
 import java.rmi.Remote;
 
-public interface ServerInterface extends Remote {
+/**
+ * The RMI interface between the clients and the server.
+ * It contains all methods that the clients can call on the server.
+ */
+public interface ClientServerInterface extends Remote {
 
     /**
      * A client can call this function to let the server know it wishes to perform a certain action.
      *
-     * @param action
+     * @param action The action the clients wants to perform
      * @throws java.rmi.RemoteException
      */
-    public void performAction(Action action) throws java.rmi.RemoteException;
+    public void requestAction(Action action) throws java.rmi.RemoteException;
 
     /**
      * This function is called by clients to tell the server they wish to register.
