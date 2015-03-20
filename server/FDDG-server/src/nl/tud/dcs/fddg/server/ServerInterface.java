@@ -43,7 +43,8 @@ public interface ServerInterface extends Remote {
     /**
      * This message can be called by a client to let the server know it is still connected.
      *
+     * @return Boolean indicating everything is fine on return.
      * @throws java.rmi.RemoteException
      */
-    public void pong() throws java.rmi.RemoteException;
+    public boolean pong() throws java.rmi.RemoteException;
 }

@@ -23,6 +23,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
     private Field field;
     private Logger logger;
     private volatile Map<Integer, ClientInterface> connectedPlayers;
+    private volatile Map<Integer, Boolean> clientPings;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
     private int IDCounter;
@@ -40,6 +41,7 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
         this.field = new Field();
         this.logger = Logger.getLogger(ServerProcess.class.getName());
         this.connectedPlayers = new ConcurrentHashMap<>();
+        this.clientPings = new ConcurrentHashMap<>();
         this.gameStarted = false;
         this.IDCounter = 0;
 
@@ -62,6 +64,23 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
             } while (!gameStarted);
 
             while (!field.gameHasFinished()) {
+
+                // Ping all clients
+                for (int clientId : connectedPlayers.keySet()) {
+                    ClientInterface ci = connectedPlayers.get(clientId);
+
+                    try {
+                        ci.ping();
+                        clientPings.put(clientId, true);
+                    } catch (RemoteException e) {
+                        if (clientPings.containsKey(clientId) && !clientPings.get(clientId)) {
+                            clientCrashed(clientId);
+                        } else {
+                            clientPings.put(clientId, false);
+                        }
+                    }
+                }
+
                 Set<Action> actionSet = field.dragonRage();
 
                 for (Action a : actionSet) {
@@ -273,7 +292,16 @@ public class ServerProcess extends UnicastRemoteObject implements ServerInterfac
      * @throws RemoteException
      */
     @Override
-    public void pong() throws RemoteException {
+    public boolean pong() throws RemoteException {
+        return true;
+    }
 
+    /**
+     * This server gets called when a client hasn't responded to two consecutive heartbeats.
+     *
+     * @param clientId The ID of the client that probably has crashed.
+     */
+    public void clientCrashed(int clientId) {
+        // TODO implement what to do when a client with a certain ID crashed
     }
 }
