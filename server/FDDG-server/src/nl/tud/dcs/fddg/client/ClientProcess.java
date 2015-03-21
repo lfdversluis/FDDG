@@ -30,7 +30,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     public ClientProcess() throws RemoteException {
         super();
         this.isAlive = true;
-        this.serverAlive = true;
+        this.serverAlive = false;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
 
         logger.log(Level.INFO, "Starting client");
