@@ -20,7 +20,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     private Logger logger;
     private ServerInterface server;
     private Field field;
-    private boolean isAlive;
+    private boolean isAlive, serverAlive;
 
     /**
      * Constructor: initializes the instance variables, the logger and binds the client to its registry
@@ -30,6 +30,7 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
     public ClientProcess() throws RemoteException {
         super();
         this.isAlive = true;
+        this.serverAlive = false;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
 
         logger.log(Level.INFO, "Starting client");
@@ -113,7 +114,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
      */
     @Override
     public void ping() throws RemoteException {
-
     }
 
     /**
@@ -133,6 +133,18 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
             while (isAlive && !field.gameHasFinished()) {
                 Thread.sleep(1000);
+
+                // Check if the server is still alive
+                try {
+                    server.pong();
+                    serverAlive = true;
+                } catch (RemoteException e) {
+                    if (serverAlive) {
+                        serverAlive = false;
+                    } else {
+                        serverCrashed();
+                    }
+                }
 
                 // check if there is a nearby player with hp < 50% to heal
                 Dragon dragonToAttack;
@@ -160,5 +172,12 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
         } catch (NotBoundException | MalformedURLException | RemoteException | InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * This function gets called when two consecutive server heartbeats were missed.
+     */
+    public void serverCrashed() {
+        // TODO implement what to do when server has crashed.
     }
 }
