@@ -107,7 +107,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      *
      * @param action The action to be broadcasted.
      */
-    public synchronized void broadcastActionToClients(Action action) throws RemoteException {
+    public void broadcastActionToClients(Action action) throws RemoteException {
         for (ClientInterface client : connectedPlayers.values())
             client.performAction(action);
     }
@@ -131,7 +131,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     public void requestAction(Action action) throws RemoteException {
         logger.fine("Received action request from client " + action.getSenderId());
         if (isValidAction(action)) {
-            sendRequestsForAction(action);
+            if (!otherServers.isEmpty())
+                sendRequestsForAction(action);
+            else
+                performAction(action);
         }
     }
 
@@ -227,6 +230,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
             AddPlayerAction apa = new AddPlayerAction(clientId, field.getPlayer(clientId).getxPos(), field.getPlayer(clientId).getyPos());
             broadcastActionToClients(apa);
+            broadcastActionToServers(apa); //inform other servers
 
             // Now the broadcast is done, add the player to the player map (so he doesn't add himself again on the field).
             connectedPlayers.put(clientId, ci);
@@ -326,7 +330,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void acknowledgeRequest(int requestID) throws RemoteException {
+    public void acknowledgeRequest(int requestID) throws RemoteException {
         logger.finer("Received acknowledgement for request " + requestID);
 
         //decrement pending acknowledgement counter
@@ -376,7 +380,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void performAction(Action action) throws RemoteException {
+    public void performAction(Action action) throws RemoteException {
         logger.fine("Performing action from " + action.getSenderId());
 
         //perform the action on the local field

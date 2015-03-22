@@ -60,7 +60,8 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void performAction(Action action) throws RemoteException {
+    public void performAction(Action action) throws RemoteException {
+        logger.fine("Client "+this.ID+ "is performing a "+action);
         // do additional work if the action is a delete unit action (as it requires access to this class' instance variables)
         if (action instanceof DeleteUnitAction) {
             DeleteUnitAction dua = (DeleteUnitAction) action;
@@ -100,7 +101,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      * executes its strategy to win the game.
      */
     @Override
-    public void run() {
+    public synchronized void run() {
 
         // send a connect message to the server
         try {
