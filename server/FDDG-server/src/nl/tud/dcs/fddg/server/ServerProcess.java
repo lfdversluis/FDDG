@@ -61,14 +61,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         logger.addHandler(consoleHandler);
 
         this.gameStarted = false;
-        this.connectedPlayers = new ConcurrentHashMap<>();
-        this.clientPings = new HashMap<>();
+        this.connectedPlayers = new ConcurrentHashMap<Integer, ClientInterface>();
+        this.clientPings = new HashMap<Integer, Boolean>();
         this.IDCounter = 0;
 
         this.requestCounter = 0;
-        this.otherServers = new HashMap<>();
-        this.pendingRequests = new HashMap<>();
-        this.pendingAcknowledgements = new HashMap<>();
+        this.otherServers = new HashMap<Integer, ServerInterface>();
+        this.pendingRequests = new HashMap<Integer, ActionRequest>();
+        this.pendingAcknowledgements = new HashMap<Integer, Integer>();
 
         // start GUI if necessary
         if (useGUI)
@@ -116,7 +116,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
             logger.log(Level.INFO, "Server " + ID + " finished the game.");
 
-        } catch (InterruptedException | RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -254,7 +254,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             // Now the broadcast is done, add the player to the player map (so he doesn't add himself again on the field).
             connectedPlayers.put(clientId, ci);
 
-        } catch (NotBoundException | MalformedURLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
