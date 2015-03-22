@@ -7,6 +7,8 @@ import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.game.entities.Unit;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +29,7 @@ public class Field implements Serializable {
      * Sets up the field and creates maps to keep track of the players and dragon
      * in the game.
      */
-    public Field() {
+    public Field(String filename) throws FileNotFoundException {
         entities = new Unit[BOARD_HEIGHT][BOARD_WIDTH];
         unitIds = new HashSet<Integer>();
         playerMap = new ConcurrentHashMap<>();
@@ -36,18 +38,36 @@ public class Field implements Serializable {
         random = new Random(System.currentTimeMillis());
 
         // fill the field with dragons
-        int randX, randY;
-        for (int i = 0; i < INITIAL_DRAGONS; i++) {
-            do {
-                randX = random.nextInt(BOARD_WIDTH);
-                randY = random.nextInt(BOARD_HEIGHT);
-            } while (!isFree(randX, randY));
+//        int randX, randY;
+//        for (int i = 0; i < INITIAL_DRAGONS; i++) {
+//            do {
+//                randX = random.nextInt(BOARD_WIDTH);
+//                randY = random.nextInt(BOARD_HEIGHT);
+//            } while (!isFree(randX, randY));
+//
+//            Dragon d = new Dragon(randX, randY, getUniqueId());
+//            entities[randY][randX] = d;
+//            dragonMap.put(d.getUnitId(), d);
+//        }
 
-            Dragon d = new Dragon(randX, randY, getUniqueId());
-            entities[randY][randX] = d;
-            dragonMap.put(d.getUnitId(), d);
-        }
+        readFromFile(filename);
     }
+
+    private void readFromFile(String filename) throws FileNotFoundException {
+        Scanner sc = new Scanner(new File(filename));
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                String next = sc.next();
+                if (next.equals("D")) {
+                    Dragon dragon = new Dragon(x, y, getUniqueId());
+                    entities[y][x] = dragon;
+                    dragonMap.put(dragon.getUnitId(), dragon);
+                }
+            }
+        }
+
+    }
+
 
     /**
      * This function checks if a given location is not occupied at the moment.

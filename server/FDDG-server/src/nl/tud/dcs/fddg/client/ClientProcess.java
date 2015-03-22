@@ -67,6 +67,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             DeleteUnitAction dua = (DeleteUnitAction) action;
             int unitID = dua.getUnitId();
             if ((field.getDragon(unitID) == null) && (unitID == this.ID)) {
+                logger.info("I have been killed (player "+ID+")");
                 isAlive = false;
             }
         }

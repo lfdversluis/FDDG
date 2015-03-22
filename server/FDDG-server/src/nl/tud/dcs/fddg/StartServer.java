@@ -13,16 +13,17 @@ import java.util.Scanner;
 public class StartServer {
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
-            System.err.println("Usage: StartServer <servers file> <server ID> [GUI]");
+        if (args.length < 3) {
+            System.err.println("Usage: StartServer <servers file> <field file> <server ID> [GUI]");
             System.exit(1);
         }
 
         // parse arguments
         String serversFileName = args[0];
-        int serverID = Integer.parseInt(args[1]);
+        String fieldFile = args[1];
+        int serverID = Integer.parseInt(args[2]);
         boolean useGUI = false;
-        if (args.length > 2 && args[2].equals("GUI"))
+        if (args.length > 3 && args[3].equals("GUI"))
             useGUI = true;
 
         // parse servers file
@@ -35,7 +36,7 @@ public class StartServer {
         }
 
         // create the server process, bind it to the registry and start it
-        ServerProcess server = new ServerProcess(serverID, useGUI);
+        ServerProcess server = new ServerProcess(serverID, useGUI, fieldFile);
         server.registerAndConnectToAll(serverURLs);
         new Thread(server).start();
     }

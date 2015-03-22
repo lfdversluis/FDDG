@@ -7,6 +7,7 @@ import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.gui.VisualizerGUI;
 import nl.tud.dcs.fddg.server.requests.ActionRequest;
 
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -46,10 +47,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @param useGUI The flag that tells whether this server should run a GUI or not
      * @throws RemoteException
      */
-    public ServerProcess(int id, boolean useGUI) throws RemoteException {
+    public ServerProcess(int id, boolean useGUI, String fieldFile) throws RemoteException, FileNotFoundException {
         super();
         this.ID = id;
-        this.field = new Field();
+        this.field = new Field(fieldFile);
         this.logger = Logger.getLogger(ServerProcess.class.getName());
         logger.setLevel(Level.ALL);
         logger.setUseParentHandlers(false);
