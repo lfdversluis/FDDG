@@ -29,16 +29,18 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     private Logger logger;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
+    private String[] serverURLs;
 
     // client administration
     private volatile Map<Integer, ClientInterface> connectedPlayers;
     private Map<Integer, Boolean> clientPings;
+    private Map<Integer, Integer> serverPings;
     private int IDCounter;
 
     // server administration
     private Map<Integer, ServerInterface> otherServers; //(id, RMI object)
     private int requestCounter;
-    private Map<Integer, ActionRequest> pendingRequests; //(requestID,request)
+    private Map<Integer, ActionRequest> pendingRequests; //(requestID, request)
     private Map<Integer, Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
 
     /**
@@ -63,6 +65,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.gameStarted = false;
         this.connectedPlayers = new ConcurrentHashMap<>();
         this.clientPings = new HashMap<>();
+        this.serverPings = new HashMap<>();
         this.IDCounter = 0;
 
         this.requestCounter = 0;
@@ -102,6 +105,41 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                         } else {
                             clientPings.put(clientId, false);
                         }
+                    }
+                }
+
+                // Ping all servers
+                if (!otherServers.isEmpty()) {
+                    for (int serverId : otherServers.keySet()) {
+                        try {
+                            otherServers.get(serverId).heartBeat(serverId);
+                            serverPings.put(serverId, 0);
+                        } catch (RemoteException e) {
+                            serverPings.put(serverId, serverPings.get(serverId) + 1);
+                        }
+                    }
+
+                    boolean crashed = true;
+                    for (int amountOfFailedHartbeats : serverPings.keySet()) {
+                        if (amountOfFailedHartbeats < 2) {
+                            crashed = false;
+                            break;
+                        }
+                    }
+
+                    if (crashed) {
+                        // Keep trying until you connect
+                        while (true) {
+                            try {
+                                registerAndConnectToAll(serverURLs);
+                                break;
+                            } catch (Exception ignored) {
+
+                            }
+                        }
+
+                        Map.Entry<Integer, ServerInterface> entry = otherServers.entrySet().iterator().next();
+                        this.field = entry.getValue().sendField();
                     }
                 }
 
@@ -276,6 +314,11 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
     }
 
+    @Override
+    public Field sendField() throws RemoteException {
+        return field;
+    }
+
     /**
      * This function send back a reply whenever a "ping" comes in.
      *
@@ -302,6 +345,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws RemoteException
      */
     public void registerAndConnectToAll(String[] serverURLs) throws MalformedURLException, RemoteException {
+        if (this.serverURLs == null) {
+            this.serverURLs = serverURLs;
+        }
+
+        if (!otherServers.isEmpty()) {
+            otherServers.clear();
+        }
+
         Naming.rebind(serverURLs[ID], this);
         for (int i = 0; i < serverURLs.length; i++)
             if (i != ID)
@@ -362,7 +413,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         //decrement pending acknowledgement counter
         int newCount = pendingAcknowledgements.get(requestID) - 1;
-        if(pendingAcknowledgements.containsKey(requestID)) {
+        if (pendingAcknowledgements.containsKey(requestID)) {
             pendingAcknowledgements.put(requestID, newCount);
         }
 

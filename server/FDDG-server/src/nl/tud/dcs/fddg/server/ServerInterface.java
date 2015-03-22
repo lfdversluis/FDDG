@@ -1,5 +1,6 @@
 package nl.tud.dcs.fddg.server;
 
+import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.Action;
 import nl.tud.dcs.fddg.server.requests.ActionRequest;
 
@@ -35,4 +36,21 @@ public interface ServerInterface extends Remote {
      * @throws RemoteException
      */
     public void performAction(Action action) throws RemoteException;
+
+    /**
+     * This function sends a heartbeat to a remote machine, identified by its (unique) ID.
+     *
+     * @param remoteId The ID of the remote machine.
+     * @throws RemoteException
+     */
+    public void heartBeat(int remoteId) throws RemoteException;
+
+    /**
+     * Sends the entire field upon request to a peer. This function is called by
+     * a crashed server that is recovering.
+     *
+     * @return The current Field (state) of the game.
+     * @throws RemoteException
+     */
+    public Field sendField() throws RemoteException;
 }
