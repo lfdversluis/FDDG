@@ -1,14 +1,23 @@
+# This script can be used to parse a WowAH directory with .txt files. The output will be a file with players connecting/disconnecting which can be simulated.
+# The first argument of the script should be the name of the directory where the .txt files are located, i.e.
+# python parse.py 2007-07-14
+# Note: the directory with .txt files should live next to the parse.py script.
+
+# Each .txt file contains information about the sample at a particular time (the time is indecated in the name of the file). The samples are taken every 10 minutes. This scripts finds out how many players there are online at a particular sample and how many connected/disconnected during the time between this sample and the last sample. Then, a connecting/disconnecting event is created at a random timestamp between these two samples.
+
 import glob
 import os
+import sys
 from random import randint
 
-onlinePlayers = []
 connectedPlayers = []
 disconnectedPlayers = []
 firstParsed = False
 onlinePlayerIds = []
 events = {}
 lastFile = ""
+directoryName = sys.argv[1]
+initialOnline = []
 
 def getTimestamp(file):
     parts = file.split(".")
@@ -47,13 +56,12 @@ def parseFile(file):
             break
         dataLines.append(line)
 
-
-    onlinePlayers.append(len(dataLines))
     if firstParsed == False:
         
         # put the online players in a set
         for line in dataLines:
             onlinePlayerIds.append(getAvatarId(line))
+            initialOnline.append(getAvatarId(line))
         
         firstParsed = True
     else:
@@ -87,14 +95,20 @@ def parseFile(file):
     disconnectedPlayers.append(disconnected)
     lastFile = file
 
-os.chdir("2007-07-14")
+os.chdir(directoryName)
 for file in glob.glob("*.txt"):
     parseFile(file)
 
 # write the file out
-outfile = open('../2007-07-14-sim.txt', 'w')
+outfile = open('../' + directoryName + '.sim', 'w')
 
-outfile.write(str(max(onlinePlayers)) + "\n")
+outfile.write(str(len(initialOnline)) + "\n")
+
+for playerId in initialOnline:
+    outfile.write(playerId + " ")
+
+outfile.write("\n")
+
 #print connectedPlayers
 #print disconnectedPlayers
 for key in sorted(events):
@@ -102,4 +116,4 @@ for key in sorted(events):
     arr = events[key]
     for event in arr:
         l = str(l) + " " + str(event)
-        outfile.write(l + "\n")
+    outfile.write(l + "\n")
