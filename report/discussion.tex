@@ -18,9 +18,8 @@
 	The drawbacks of this approach is the loss of performance due to an increased amount of messages being sent. 
 	This is because of actions being broadcast to all servers and clients in order to maintain a mirrored game state. 
 	Also, network issues are not covered by this design. 
-	If two servers A and B are unable to communicate with each other, but are able to connect and communicate with the remaining servers, they will get out of synchronization. 
+	If two servers \emph{A} and \emph{B} are unable to communicate with each other, but are able to connect and communicate with the remaining servers, they no longer will be synchronized. 
 	Both \emph{A} and \emph{B} will still broadcast to the remaining servers (which then will still check if the actions can be performed), but not to the server they assume has crashed. 
-	As a result, players who are connected to \emph{A} will appear to stand still for server \emph{B} and vice versa. 
-	Since the remaining servers still perform checks, it can never lead to a conflicting state.
+	As a result, players who are connected to \emph{A} will appear to stand still for server \emph{B} and vice versa. This means that the consistency between the servers is lost. However, since the remaining servers still perform checks for both \emph{A} and \emph{B} and process their changes, it can never lead to a conflicting state.
 	
 	TODO results from 6b. (experiments).
