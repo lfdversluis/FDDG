@@ -9,7 +9,7 @@
 % libraries you have used to implement and deploy your system, other tools and
 % libraries used to conduct your experiments.
 
-	Since FDDG is a lightweight game, we could easily simulate it on our desktop computers with 5 servers, 100 clients and 20 dragons. 
+	Since FDDG is a lightweight game, we can easily simulate it on our desktop computers with 5 servers, 100 clients and 20 dragons. 
 	We decided to simulate the game on an iMac (late 2013 edition), with 8 Intel core i7 3.5 GHz processors and 16 GB (1600 MHz DDR3) RAM memory. 
 	This gave us easier access and allowed better monitoring of performance.
 	We haven't used the DAS cluster nor Amazon's EC2 platform service to run experiments on. 
@@ -18,10 +18,11 @@
 	FDDG makes use of Java's Remote Method Invocation (RMI) to call methods on objects running on remote machines with locally specified parameters. 
 	Furthermore, we've developed our own message system that makes use of \emph{actions} to implement updates and acknowledgments.
 	
-	A simulation starts as soon as a client joins the server. The game is then considered active and will run until either all players are dead or all dragons are slain.
+	A simulation starts as soon as the first client joins the server. The game is then considered active and will run until either all players are dead or all dragons are slain.
 
 
 \subsection{Experiments}
+\label{subsec:experiments}
 % Describe the experiments you have conducted to analyze each
 % system feature, such as consistency, scalability, fault-tolerance, and
 % performance. Analyze the results obtained for each system feature. Use one
@@ -29,21 +30,24 @@
 % i. Service metrics of the experiment, such as runtime and response time of
 % the service, etc.
 % ii. (optional) Usage metrics and costs of the experiment.
-	We ran experiments concerning the consistency, fault-tolerance and scalability of the game. Below are the results of the experiments conducted for each of these factors.
+	We ran experiments concerning the consistency, fault-tolerance and scalability of the game. Below are the results of the experiments conducted for each of these features.
 
 	\subsubsection{Consistency}
+	\label{subsubsec:consistency}
 		In order to test consistency, we ran the simulation with exactly the same setup multiple times.
-		We checked if the end result was consistent, that is the same at the end of each simulation. 
+		We checked if the result was consistent, that is the same field state at the end of each simulation. 
 		
 	\subsubsection{Fault-tolerant}
+	\label{subsubsec:fault-tolerant}
 		To test fault-tolerance, we ran the following scenarios:
 		\begin{enumerate}
 			\item During simulation we killed some client nodes. The servers should then remove the players from the field and continue the game.
 			\item During the simulation we killed one server and let it recover. It then should connect to the other servers, receive the current field and start participating again.
-			\item We simulated the lose of move actions with a small percentage server side. We then checked if in the next update, the field became consistent again when the next movement was received.
+			\item We simulated the loss of move actions with a small percentage server side. We then checked if in the next update, the field became consistent again when the next movement was received.
 		\end{enumerate}
 		
 		The results are as follows... 
 		
 	\subsubsection{Scalability}
+	\label{subsubsec:scalability}
 		The minimum requirements of 5 servers, 100 clients and 20 dragons were easily fulfilled. We therefore decided to try 10 dragons, 200 clients and 40 dragons (twice as much for every parameter). The results were ...
