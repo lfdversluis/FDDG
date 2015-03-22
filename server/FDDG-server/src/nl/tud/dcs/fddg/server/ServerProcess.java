@@ -3,7 +3,6 @@ package nl.tud.dcs.fddg.server;
 import nl.tud.dcs.fddg.client.ClientInterface;
 import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.*;
-import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.gui.VisualizerGUI;
 import nl.tud.dcs.fddg.server.requests.ActionRequest;
 
@@ -13,7 +12,9 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 public class ServerProcess extends UnicastRemoteObject implements ClientServerInterface, Runnable, ServerInterface {
 
     // internal administration
-    private final int ID;
+    private int ID;
     private Field field;
     private Logger logger;
     private VisualizerGUI visualizerGUI = null;
@@ -31,6 +32,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
     // client administration
     private volatile Map<Integer, ClientInterface> connectedPlayers;
+    private Map<Integer, Boolean> clientPings;
     private int IDCounter;
 
     // server administration
@@ -57,9 +59,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);
         logger.addHandler(consoleHandler);
-        this.gameStarted = false;
 
+        this.gameStarted = false;
         this.connectedPlayers = new ConcurrentHashMap<>();
+        this.clientPings = new HashMap<>();
         this.IDCounter = 0;
 
         this.requestCounter = 0;
@@ -86,9 +89,24 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             } while (!gameStarted);
 
             while (!field.gameHasFinished()) {
+                // Ping all clients
+                for (int clientId : connectedPlayers.keySet()) {
+                    ClientInterface ci = connectedPlayers.get(clientId);
+
+                    try {
+                        ci.ping();
+                        clientPings.put(clientId, true);
+                    } catch (RemoteException e) {
+                        if (clientPings.containsKey(clientId) && !clientPings.get(clientId)) {
+                            clientCrashed(clientId);
+                        } else {
+                            clientPings.put(clientId, false);
+                        }
+                    }
+                }
+
                 //only attack the servers own players (not the others!!!!). Then, no acks are required
                 Set<Action> actionSet = field.dragonRage(connectedPlayers.keySet());
-
                 for (Action a : actionSet) {
                     broadcastActionToClients(a);
                     broadcastActionToServers(a);
@@ -265,7 +283,15 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void pong() throws RemoteException {
+    }
 
+    /**
+     * This server gets called when a client hasn't responded to two consecutive heartbeats.
+     *
+     * @param clientId The ID of the client that probably has crashed.
+     */
+    public void clientCrashed(int clientId) {
+        // TODO implement what to do when a client with a certain ID crashed
     }
 
     /**

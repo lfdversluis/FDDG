@@ -22,7 +22,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     private Logger logger;
     private ClientServerInterface server;
     private Field field;
-    private boolean isAlive;
+    private boolean isAlive, serverAlive;
 
     /**
      * Constructor: initializes the instance variables, the logger and binds the client to its registry
@@ -32,6 +32,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     public ClientProcess() throws RemoteException {
         super();
         this.isAlive = true;
+        this.serverAlive = false;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
         logger.setLevel(Level.ALL);
         logger.setUseParentHandlers(false);
@@ -94,7 +95,6 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     @Override
     public void ping() throws RemoteException {
-
     }
 
     /**
@@ -113,6 +113,18 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
 
             while (isAlive && !field.gameHasFinished()) {
                 Thread.sleep(1000);
+
+                // Check if the server is still alive
+                try {
+                    server.pong();
+                    serverAlive = true;
+                } catch (RemoteException e) {
+                    if (serverAlive) {
+                        serverAlive = false;
+                    } else {
+                        serverCrashed();
+                    }
+                }
 
                 // check if there is a nearby player with hp < 50% to heal
                 Dragon dragonToAttack;
@@ -160,5 +172,12 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    /**
+     * This function gets called when two consecutive server heartbeats were missed.
+     */
+    public void serverCrashed() {
+        // TODO implement what to do when server has crashed.
     }
 }
