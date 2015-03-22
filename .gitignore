@@ -10,3 +10,6 @@ server/FDDG-server/.idea/
 
 # binary files
 out/
+
+# config files
+setup/servers.txt

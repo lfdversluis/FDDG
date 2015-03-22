@@ -1,49 +1,38 @@
 package nl.tud.dcs.fddg.server;
 
 import nl.tud.dcs.fddg.game.actions.Action;
+import nl.tud.dcs.fddg.server.requests.ActionRequest;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
+/**
+ * The RMI interface between the different servers.
+ */
 public interface ServerInterface extends Remote {
 
     /**
-     * A client can call this function to let the server know it wishes to perform a certain action.
+     * Method that one server calls on all other servers to request a certain action.
      *
-     * @param action
-     * @throws java.rmi.RemoteException
+     * @param request A request containing the id and the action the server wants to perform
+     * @throws RemoteException
      */
-    public void performAction(Action action) throws java.rmi.RemoteException;
+    public void requestAction(ActionRequest request) throws RemoteException;
 
     /**
-     * This function is called by clients to tell the server they wish to register.
-     * The server then replies with sending an identifier that the client should use.
+     * Method that is used to acknowledge a request send by another server
      *
-     * @return The ID of the client.
-     * @throws java.rmi.RemoteException
+     * @param requestID The id of the request
+     * @throws RemoteException
      */
-    public int register() throws java.rmi.RemoteException;
+    public void acknowledgeRequest(int requestID) throws RemoteException;
 
     /**
-     * The client calls this function if it wishes to connect to the server and play the game.
+     * Method that indicates that the server should perform a certain action.
+     * This method is only invoked when all other servers have acknowledged the request for the action.
      *
-     * @param clientId The ID of the client that wants to connect
-     * @throws java.rmi.RemoteException
+     * @param action The action that should be executed
+     * @throws RemoteException
      */
-    public void connect(int clientId) throws java.rmi.RemoteException;
-
-    /**
-     * This function can be called by other servers to check if this server is still functional.
-     * This server will send a heartbeat back to acknowledge it is still alive.
-     *
-     * @param remoteId The (unique) id of the machine that issues the heartbeat.
-     * @throws java.rmi.RemoteException
-     */
-    public void heartBeat(int remoteId) throws java.rmi.RemoteException;
-
-    /**
-     * This message can be called by a client to let the server know it is still connected.
-     *
-     * @throws java.rmi.RemoteException
-     */
-    public void pong() throws java.rmi.RemoteException;
+    public void performAction(Action action) throws RemoteException;
 }

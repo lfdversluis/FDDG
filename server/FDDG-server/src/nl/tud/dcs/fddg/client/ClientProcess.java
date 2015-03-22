@@ -4,21 +4,23 @@ import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.*;
 import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
-import nl.tud.dcs.fddg.server.ServerInterface;
+import nl.tud.dcs.fddg.server.ClientServerInterface;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ClientProcess extends UnicastRemoteObject implements ClientInterface, Runnable {
+public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fddg.client.ClientInterface, Runnable {
 
     private int ID;
     private Logger logger;
-    private ServerInterface server;
+    private ClientServerInterface server;
     private Field field;
     private boolean isAlive, serverAlive;
 
@@ -32,6 +34,11 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
         this.isAlive = true;
         this.serverAlive = false;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
+        Handler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.ALL);
+        logger.addHandler(consoleHandler);
 
         logger.log(Level.INFO, "Starting client");
     }
@@ -54,45 +61,19 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
      * @throws java.rmi.RemoteException
      */
     @Override
-    public synchronized void ack(Action action) throws RemoteException {
-        if (action instanceof AddPlayerAction) {
-            AddPlayerAction apa = (AddPlayerAction) action;
-            field.addPlayer(apa.getPlayerId(), apa.getX(), apa.getY());
-        } else if (action instanceof AttackAction) {
-            AttackAction ata = (AttackAction) action;
-            Dragon d = field.getDragon(ata.getDragonId());
-            Player p = field.getPlayer(ata.getSenderId());
-            d.setCurHitPoints(d.getCurHitPoints() - p.getAttackPower());
-        } else if (action instanceof DeleteUnitAction) {
+    public void performAction(Action action) throws RemoteException {
+        logger.fine("Client "+this.ID+ " is performing a "+action.getClass().getName());
+        // do additional work if the action is a delete unit action (as it requires access to this class' instance variables)
+        if (action instanceof DeleteUnitAction) {
             DeleteUnitAction dua = (DeleteUnitAction) action;
-            if (field.getDragon(dua.getUnitId()) == null) {
-                Player p = field.getPlayer(dua.getUnitId());
-                field.removePlayer(p.getUnitId());
-                if (p.getUnitId() == this.ID) {
-                    isAlive = false;
-                }
-            } else {
-                Dragon d = field.getDragon(dua.getUnitId());
-                field.removeDragon(d.getUnitId());
+            int unitID = dua.getUnitId();
+            if ((field.getDragon(unitID) == null) && (unitID == this.ID)) {
+                logger.info("I have been killed (player "+ID+")");
+                isAlive = false;
             }
-        } else if (action instanceof HealAction) {
-            HealAction ha = (HealAction) action;
-            int playerId = ha.getSenderId();
-            int targetPlayer = ha.getTargetPlayer();
-            Player thisPlayer = field.getPlayer(playerId);
-            field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
-        } else if (action instanceof MoveAction) {
-            MoveAction ma = (MoveAction) action;
-            int playerId = ma.getSenderId();
-            int x = ma.getX();
-            int y = ma.getY();
-            field.movePlayer(playerId, x, y);
-        } else if (action instanceof DamageAction) {
-            DamageAction da = (DamageAction) action;
-            int playerId = da.getPlayerId();
-            int damage = da.getDamage();
-            field.getPlayer(playerId).setCurHitPoints(field.getPlayer(playerId).getCurHitPoints() - damage);
         }
+
+        action.perform(field);
     }
 
     /**
@@ -125,7 +106,6 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
 
         // send a connect message to the server
         try {
-            server = (ServerInterface) Naming.lookup("FDDGServer/0");
             this.ID = server.register();
 
             Naming.rebind("FDDGClient/" + this.ID, this);
@@ -150,9 +130,11 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                 Dragon dragonToAttack;
                 Player playerToHeal = field.isInRangeToHeal(this.ID);
                 if (playerToHeal != null) {
-                    server.performAction(new HealAction(this.ID, playerToHeal.getUnitId()));
+                    server.requestAction(new HealAction(this.ID, playerToHeal.getUnitId()));
+                    logger.fine("Client " + this.ID + " send request for a HealAction");
                 } else if ((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
-                    server.performAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
+                    server.requestAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
+                    logger.fine("Client " + this.ID + " send request for a AttackAction");
                 } else {
                     Player p = field.getPlayer(this.ID);
                     int move = field.getDirectionToNearestDragon(p.getxPos(), p.getyPos());
@@ -165,12 +147,30 @@ public class ClientProcess extends UnicastRemoteObject implements ClientInterfac
                     int newY = move / MAX_WIDTH_HEIGHT;
 
                     MoveAction moveAction = new MoveAction(this.ID, newX, newY);
-                    server.performAction(moveAction);
+                    server.requestAction(moveAction);
+                    logger.fine("Client " + this.ID + " send request for a MoveAction");
                 }
             }
 
-        } catch (NotBoundException | MalformedURLException | RemoteException | InterruptedException e) {
+        } catch (MalformedURLException | RemoteException | InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Function that selects one of the servers as its server.
+     *
+     * @param serverURLs The URLs of the servers
+     */
+    // TODO: randomly select one of the server instead of the first one
+    public void selectServer(String[] serverURLs) {
+        try {
+            logger.info("Client "+ID+" trying to connect to "+serverURLs[0]);
+            server = (ClientServerInterface) Naming.lookup(serverURLs[0]);
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            logger.severe("Could not connect to server: " + serverURLs[0]);
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 

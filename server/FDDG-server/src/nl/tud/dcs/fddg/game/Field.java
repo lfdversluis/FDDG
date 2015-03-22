@@ -7,6 +7,8 @@ import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.game.entities.Unit;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +29,7 @@ public class Field implements Serializable {
      * Sets up the field and creates maps to keep track of the players and dragon
      * in the game.
      */
-    public Field() {
+    public Field(String filename) throws FileNotFoundException {
         entities = new Unit[BOARD_HEIGHT][BOARD_WIDTH];
         unitIds = new HashSet<Integer>();
         playerMap = new ConcurrentHashMap<>();
@@ -36,18 +38,36 @@ public class Field implements Serializable {
         random = new Random(System.currentTimeMillis());
 
         // fill the field with dragons
-        int randX, randY;
-        for (int i = 0; i < INITIAL_DRAGONS; i++) {
-            do {
-                randX = random.nextInt(BOARD_WIDTH);
-                randY = random.nextInt(BOARD_HEIGHT);
-            } while (!isFree(randX, randY));
+//        int randX, randY;
+//        for (int i = 0; i < INITIAL_DRAGONS; i++) {
+//            do {
+//                randX = random.nextInt(BOARD_WIDTH);
+//                randY = random.nextInt(BOARD_HEIGHT);
+//            } while (!isFree(randX, randY));
+//
+//            Dragon d = new Dragon(randX, randY, getUniqueId());
+//            entities[randY][randX] = d;
+//            dragonMap.put(d.getUnitId(), d);
+//        }
 
-            Dragon d = new Dragon(randX, randY, getUniqueId());
-            entities[randY][randX] = d;
-            dragonMap.put(d.getUnitId(), d);
-        }
+        readFromFile(filename);
     }
+
+    private void readFromFile(String filename) throws FileNotFoundException {
+        Scanner sc = new Scanner(new File(filename));
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                String next = sc.next();
+                if (next.equals("D")) {
+                    Dragon dragon = new Dragon(x, y, getUniqueId());
+                    entities[y][x] = dragon;
+                    dragonMap.put(dragon.getUnitId(), dragon);
+                }
+            }
+        }
+
+    }
+
 
     /**
      * This function checks if a given location is not occupied at the moment.
@@ -56,7 +76,7 @@ public class Field implements Serializable {
      * @param y The y coordinate of the location.
      * @return Returns a boolean indicating if the location is unoccupied.
      */
-    private boolean isFree(int x, int y) {
+    public boolean isFree(int x, int y) {
         return entities[y][x] == null;
     }
 
@@ -122,8 +142,8 @@ public class Field implements Serializable {
      * @param newY The y coordinate of the new location.
      * @return A boolean indicating if the move can be done.
      */
-    private boolean canMove(int newX, int newY) {
-        return (newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && isFree(newX, newY));
+    public boolean canMove(int newX, int newY) {
+        return isInBoard(newX, newY) && isFree(newX, newY);
     }
 
     /**
@@ -300,7 +320,7 @@ public class Field implements Serializable {
                 int newX = curX + dx[i];
                 int newY = curY + dy[i];
 
-                if (newX >= 0 && newX < BOARD_WIDTH && newY >= 0 && newY < BOARD_HEIGHT && (entities[newY][newX] instanceof Dragon)) {
+                if (isInBoard(newX, newY) && (entities[newY][newX] instanceof Dragon)) {
                     return path.get(0);
                 }
 
@@ -322,9 +342,20 @@ public class Field implements Serializable {
     }
 
     /**
-     * This function lets all dragon alive on the field attack nearby players.
+     * Checks whether (x,y) is a valid location in the board
+     *
+     * @param x
+     * @param y
+     * @return
      */
-    public Set<Action> dragonRage() {
+    private boolean isInBoard(int x, int y) {
+        return x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_HEIGHT;
+    }
+
+    /**
+     * This function lets all dragon alive on the field attack nearby players (that are connected to this server).
+     */
+    public Set<Action> dragonRage(Set<Integer> connectedPlayers) {
         Set<Action> actionSet = new HashSet<>();
 
         for (int dragonId : dragonMap.keySet()) {
@@ -337,7 +368,7 @@ public class Field implements Serializable {
                 int unitX = dragonX + dx[i];
                 int unitY = dragonY + dy[i];
 
-                if (unitX >= 0 && unitX < BOARD_WIDTH && unitY >= 0 && unitY < BOARD_HEIGHT && entities[unitY][unitX] instanceof Player) {
+                if (isInBoard(unitX, unitY) && entities[unitY][unitX] instanceof Player && connectedPlayers.contains(entities[unitY][unitX].getUnitId())) {
                     Player p = (Player) entities[unitY][unitX];
                     p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
 
