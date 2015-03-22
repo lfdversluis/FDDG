@@ -11,6 +11,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Random;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -23,6 +24,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     private ClientServerInterface server;
     private Field field;
     private boolean isAlive, serverAlive;
+    private String[] serverList;
 
     /**
      * Constructor: initializes the instance variables, the logger and binds the client to its registry
@@ -162,22 +164,35 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      *
      * @param serverURLs The URLs of the servers
      */
-    // TODO: randomly select one of the server instead of the first one
     public void selectServer(String[] serverURLs) {
-        try {
-            logger.info("Client "+ID+" trying to connect to "+serverURLs[0]);
-            server = (ClientServerInterface) Naming.lookup(serverURLs[0]);
-        } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            logger.severe("Could not connect to server: " + serverURLs[0]);
-            e.printStackTrace();
-            System.exit(1);
+        if(serverList == null){
+            serverList = serverURLs;
         }
+        final int totalAttempts = 10;
+        int attempts = 0;
+        while(attempts < totalAttempts) {
+            Random random = new Random();
+            int randomServerId = random.nextInt(serverURLs.length);
+            try {
+                logger.info("Client " + ID + " trying to connect to " + serverURLs[randomServerId]);
+                server = (ClientServerInterface) Naming.lookup(serverURLs[randomServerId]);
+                return;
+            } catch (NotBoundException | MalformedURLException | RemoteException e) {
+                logger.severe("Could not connect to server: " + serverURLs[randomServerId]);
+                e.printStackTrace();
+                attempts++;
+            }
+        }
+        logger.severe("All servers are down apparently (10 attempts failed)");
+        System.exit(1);
     }
 
     /**
      * This function gets called when two consecutive server heartbeats were missed.
      */
     public void serverCrashed() {
-        // TODO implement what to do when server has crashed.
+        // Server crashed so we reconnect to another one.
+        selectServer(serverList);
+        this.run();
     }
 }
