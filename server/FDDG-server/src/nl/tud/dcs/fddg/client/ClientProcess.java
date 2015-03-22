@@ -124,6 +124,8 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                     if (serverAlive) {
                         serverAlive = false;
                     } else {
+                        // Stop current run and reconnect to another server
+                        isAlive = false;
                         serverCrashed();
                     }
                 }
@@ -193,6 +195,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     public void serverCrashed() {
         // Server crashed so we reconnect to another one.
         selectServer(serverList);
+        isAlive = true;
         this.run();
     }
 }
