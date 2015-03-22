@@ -102,7 +102,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      * executes its strategy to win the game.
      */
     @Override
-    public synchronized void run() {
+    public void run() {
 
         // send a connect message to the server
         try {
