@@ -61,7 +61,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     @Override
     public void performAction(Action action) throws RemoteException {
-        logger.fine("Client "+this.ID+ "is performing a "+action);
+        logger.fine("Client "+this.ID+ " is performing a "+action.getClass().getName());
         // do additional work if the action is a delete unit action (as it requires access to this class' instance variables)
         if (action instanceof DeleteUnitAction) {
             DeleteUnitAction dua = (DeleteUnitAction) action;
