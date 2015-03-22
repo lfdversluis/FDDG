@@ -336,7 +336,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         //decrement pending acknowledgement counter
         int newCount = pendingAcknowledgements.get(requestID) - 1;
-        pendingAcknowledgements.replace(requestID, newCount);
+        if(pendingAcknowledgements.containsKey(requestID)) {
+            pendingAcknowledgements.put(requestID, newCount);
+        }
 
         //if all acknowledgements are received, remove the request and perform the action
         if (newCount == 0) {
