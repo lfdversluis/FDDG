@@ -161,7 +161,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                     broadcastActionToServers(a);
                 }
 
-                writer.write("Server " + this.ID + " clients " + connectedPlayers.size());
+                writer.println("Server " + this.ID + " clients " + connectedPlayers.size());
 
                 Thread.sleep(1000);
             }
