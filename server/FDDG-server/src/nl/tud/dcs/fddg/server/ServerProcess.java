@@ -18,6 +18,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -41,7 +42,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     // server administration
     private Map<Integer, ServerInterface> otherServers; //(id, RMI object)
     private int requestCounter;
-    private Map<Integer, ActionRequest> pendingRequests; //(requestID,request)
+    private ConcurrentMap<Integer, ActionRequest> pendingRequests; //(requestID,request)
     private Map<Integer, Timer> requestTimers; //(requestID, timer
     private Map<Integer, Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
     private Map<Integer, Integer> serverPings; // (ID, # consecutive pings missed)
@@ -78,7 +79,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         this.requestCounter = 0;
         this.otherServers = new HashMap<Integer, ServerInterface>();
-        this.pendingRequests = new HashMap<Integer, ActionRequest>();
+        this.pendingRequests = new ConcurrentHashMap<Integer, ActionRequest>();
         this.requestTimers = new HashMap<Integer, Timer>();
         this.pendingAcknowledgements = new HashMap<Integer, Integer>();
 
