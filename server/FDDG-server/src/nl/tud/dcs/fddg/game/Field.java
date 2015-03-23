@@ -364,18 +364,18 @@ public class Field implements Serializable {
             for (int playerId : playerMap.keySet()) {
                 Player p = playerMap.get(playerId);
 
-                if(!isInRange(playerId, dragonId, 2)) { continue; }
+                if(isInRange(playerId, dragonId, 2)) {
+                    p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
 
-                p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
+                    if (p.getCurHitPoints() <= 0) {
+                        DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
+                        actionSet.add(dua);
+                        removePlayer(p.getUnitId());
+                    }
 
-                if (p.getCurHitPoints() <= 0) {
-                    DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
-                    actionSet.add(dua);
-                    removePlayer(p.getUnitId());
+                    DamageAction da = new DamageAction(p.getUnitId(), d.getAttackPower());
+                    actionSet.add(da);
                 }
-
-                DamageAction da = new DamageAction(p.getUnitId(), d.getAttackPower());
-                actionSet.add(da);
             }
         }
         return actionSet;
