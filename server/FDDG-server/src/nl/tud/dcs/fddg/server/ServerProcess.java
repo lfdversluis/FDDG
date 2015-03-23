@@ -110,23 +110,20 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 }
 
                 // Ping all servers
-                if (!otherServers.isEmpty()) {
-                    for (int serverId : otherServers.keySet()) {
-                        try {
-                            otherServers.get(serverId).heartBeat(serverId);
-                            serverPings.put(serverId, 0);
-                        } catch (RemoteException e) {
-                            serverPings.put(serverId, serverPings.get(serverId) + 1);
-                        }
+                for (int serverId : otherServers.keySet()) {
+                    try {
+                        otherServers.get(serverId).heartBeat(serverId);
+                        serverPings.put(serverId, 0);
+                    } catch (RemoteException e) {
+                        serverPings.put(serverId, serverPings.get(serverId) + 1);
                     }
+                }
 
-                    // Check if a server has not answered to 2 or more consecutive pings.
-                    for (int serverId : serverPings.keySet()) {
-                        if (serverPings.get(serverId) > 1) {
-                            serverCrashed(serverId);
-                        }
+                // Check if a server has not answered to 2 or more consecutive pings.
+                for (int serverId : serverPings.keySet()) {
+                    if (serverPings.get(serverId) > 1) {
+                        serverCrashed(serverId);
                     }
-
                 }
 
                 //only attack the servers own players (not the others!!!!). Then, no acks are required
