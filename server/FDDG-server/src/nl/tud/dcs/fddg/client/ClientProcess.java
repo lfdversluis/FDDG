@@ -47,6 +47,11 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         consoleHandler.setLevel(Level.ALL);
         logger.addHandler(consoleHandler);
 
+        this.messagesFromServer = 0;
+        this.messagesToServer = 0;
+        this.pingsFromServer = 0;
+        this.pingsToServer = 0;
+
         logger.log(Level.INFO, "Starting client");
     }
 
