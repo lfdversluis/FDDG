@@ -361,15 +361,10 @@ public class Field implements Serializable {
         for (int dragonId : dragonMap.keySet()) {
             Dragon d = dragonMap.get(dragonId);
 
-            int dragonX = d.getxPos();
-            int dragonY = d.getyPos();
+            for (int playerId : playerMap.keySet()) {
+                Player p = playerMap.get(playerId);
 
-            for (int i = 0; i < 4; i++) {
-                int unitX = dragonX + dx[i];
-                int unitY = dragonY + dy[i];
-
-                if (isInBoard(unitX, unitY) && entities[unitY][unitX] instanceof Player && connectedPlayers.contains(entities[unitY][unitX].getUnitId())) {
-                    Player p = (Player) entities[unitY][unitX];
+                if(isInRange(playerId, dragonId, 2)) {
                     p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
 
                     if (p.getCurHitPoints() <= 0) {
