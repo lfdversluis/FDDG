@@ -359,7 +359,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     @Override
     public void reconnect(int clientID, String clientName) throws RemoteException {
 
-        amountOfPingsReceived++;
+        amountOfMessagesReceived++;
 
         try {
             if (!connectedPlayers.containsKey(clientID)) {
