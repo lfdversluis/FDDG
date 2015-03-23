@@ -490,6 +490,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
             logger.fine("Acknowledging request " + requestID + " to server " + senderID);
             otherServers.get(senderID).acknowledgeRequest(requestID);
+            serverAmountOfMessagedSent++;
         }
     }
 
@@ -502,6 +503,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     @Override
     public void acknowledgeRequest(int requestID) throws RemoteException {
         logger.finer("Received acknowledgement for request " + requestID);
+
+        serverAmountOfMessagesReceived++;
 
         //decrement pending acknowledgement counter (if the request still exists)
         if (pendingAcknowledgements.containsKey(requestID)) {
@@ -559,6 +562,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     @Override
     public void performAction(Action action) throws RemoteException {
         logger.fine("Performing action from " + action.getSenderId());
+
+        serverAmountOfMessagesReceived++;
 
         //perform the action on the local field
         action.perform(field);
