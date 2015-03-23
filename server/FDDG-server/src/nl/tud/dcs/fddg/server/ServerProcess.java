@@ -6,6 +6,7 @@ import nl.tud.dcs.fddg.game.actions.*;
 import nl.tud.dcs.fddg.gui.VisualizerGUI;
 import nl.tud.dcs.fddg.server.requests.ActionRequest;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -80,7 +81,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.pendingAcknowledgements = new HashMap<Integer, Integer>();
 
         try {
-            writer = new PrintWriter("ServerProcess_log_" + this.ID, "UTF-8");
+            File file = new File("logs/ServerProcess_log_"+ this.ID + ".txt");
+            file.getParentFile().mkdirs();
+            writer = new PrintWriter(file, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -321,7 +324,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     public void connect(int clientId, String clientName) throws RemoteException {
         logger.log(Level.INFO, "Client " + clientName + " connected");
 
-        amountOfPingsReceived++;
+        amountOfMessagesReceived++;
 
         try {
             ClientInterface ci = (ClientInterface) Naming.lookup(clientName);

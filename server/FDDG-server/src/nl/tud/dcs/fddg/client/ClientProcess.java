@@ -6,6 +6,7 @@ import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ClientServerInterface;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -118,7 +119,9 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         try {
             this.ID = server.register();
 
-            writer = new PrintWriter("ClientProcess_log_" + this.ID, "UTF-8");
+            File file = new File("logs/ClientProcess_log_"+ this.ID + ".txt");
+            file.getParentFile().mkdirs();
+            writer = new PrintWriter(file, "UTF-8");
 
             String ipAddress = InetAddress.getLocalHost().getHostAddress();
             String remoteName = "//"+ipAddress+":1099/FDDGClient/"+this.ID;
