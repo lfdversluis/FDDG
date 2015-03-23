@@ -7,9 +7,7 @@ import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ClientServerInterface;
 
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
@@ -114,8 +112,10 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         try {
             this.ID = server.register();
 
-            Naming.rebind("FDDGClient/" + this.ID, this);
-            server.connect(this.ID);
+            String ipAddress = InetAddress.getLocalHost().getHostAddress();
+            String remoteName = "//"+ipAddress+":1099/FDDGClient/"+this.ID;
+            Naming.rebind("FDDGClient/"+this.ID, this);
+            server.connect(this.ID, remoteName);
 
             while (isAlive && !field.gameHasFinished()) {
                 // Check if the server is still alive

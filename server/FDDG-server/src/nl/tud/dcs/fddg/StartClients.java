@@ -4,6 +4,7 @@ import nl.tud.dcs.fddg.client.ClientProcess;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -35,7 +36,7 @@ public class StartClients {
             serverURLs[i] = sc.nextLine();
         }
 
-        System.out.println("Starting " + (lastID - firstID + 1) + " clients...");
+        System.out.println("Starting " + (lastID - firstID + 1) + " client(s) on host: "+InetAddress.getLocalHost().getHostAddress());
 
         // create the client processes, bind them to the registry and start them
         try {
