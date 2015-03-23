@@ -322,8 +322,18 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      *
      * @param clientId The ID of the client that probably has crashed.
      */
-    public void clientCrashed(int clientId) {
-        // TODO implement what to do when a client with a certain ID crashed
+    public void clientCrashed(int clientId) throws RemoteException {
+        logger.info("Client "+clientId+" has crashed, removing him now");
+
+        //remove it from connectedPlayers
+        connectedPlayers.remove(clientId);
+
+        //make, perform and broadcast deleteUnitAction to all other clients
+        DeleteUnitAction delAction = new DeleteUnitAction(clientId);
+        performAction(delAction);
+
+        //broadcast deleteUnitAction to all other servers
+        broadcastActionToServers(delAction);
     }
 
     /**
