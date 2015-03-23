@@ -29,12 +29,11 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     private Logger logger;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
-    private String[] serverURLs;
+    private boolean gameFinishedByOtherServer;
 
     // client administration
     private volatile Map<Integer, ClientInterface> connectedPlayers;
     private Map<Integer, Boolean> clientPings;
-    private Map<Integer, Integer> serverPings;
     private int IDCounter;
 
     // server administration
@@ -42,6 +41,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     private int requestCounter;
     private Map<Integer, ActionRequest> pendingRequests; //(requestID, request)
     private Map<Integer, Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
+    private Map<Integer, Integer> serverPings; // (ID, # consecutive pings missed)
 
     /**
      * The constructor of the ServerProcess class.
@@ -61,21 +61,22 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);
         logger.addHandler(consoleHandler);
-
         this.gameStarted = false;
-        this.connectedPlayers = new ConcurrentHashMap<>();
-        this.clientPings = new HashMap<>();
-        this.serverPings = new HashMap<>();
+        this.serverPings = new HashMap<Integer, Integer>();
+        this.gameFinishedByOtherServer = false;
+        this.connectedPlayers = new ConcurrentHashMap<Integer, ClientInterface>();
+        this.clientPings = new HashMap<Integer, Boolean>();
         this.IDCounter = 0;
 
         this.requestCounter = 0;
-        this.otherServers = new HashMap<>();
-        this.pendingRequests = new HashMap<>();
-        this.pendingAcknowledgements = new HashMap<>();
+        this.otherServers = new HashMap<Integer, ServerInterface>();
+        this.pendingRequests = new HashMap<Integer, ActionRequest>();
+        this.pendingAcknowledgements = new HashMap<Integer, Integer>();
 
         // start GUI if necessary
-        if (useGUI)
+        if (useGUI) {
             this.visualizerGUI = new VisualizerGUI(field);
+        }
 
         logger.log(Level.INFO, "Starting server with id " + id);
     }
@@ -89,9 +90,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         try {
             do {
                 Thread.sleep(1000);
-            } while (!gameStarted);
+            } while (!gameStarted && !gameFinishedByOtherServer);
 
-            while (!field.gameHasFinished()) {
+            while (!gameFinishedByOtherServer && !field.gameHasFinished()) {
                 // Ping all clients
                 for (int clientId : connectedPlayers.keySet()) {
                     ClientInterface ci = connectedPlayers.get(clientId);
@@ -119,28 +120,13 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                         }
                     }
 
-                    boolean crashed = true;
-                    for (int amountOfFailedHartbeats : serverPings.keySet()) {
-                        if (amountOfFailedHartbeats < 2) {
-                            crashed = false;
-                            break;
+                    // Check if a server has not answered to 2 or more consecutive pings.
+                    for (int serverId : serverPings.keySet()) {
+                        if (serverPings.get(serverId) > 1) {
+                            serverCrashed(serverId);
                         }
                     }
 
-                    if (crashed) {
-                        // Keep trying until you connect
-                        while (true) {
-                            try {
-                                registerAndConnectToAll(serverURLs);
-                                break;
-                            } catch (Exception ignored) {
-
-                            }
-                        }
-
-                        Map.Entry<Integer, ServerInterface> entry = otherServers.entrySet().iterator().next();
-                        this.field = entry.getValue().sendField();
-                    }
                 }
 
                 //only attack the servers own players (not the others!!!!). Then, no acks are required
@@ -152,9 +138,19 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 Thread.sleep(1000);
             }
 
-            logger.log(Level.INFO, "Server " + ID + " finished the game.");
+            if (!gameFinishedByOtherServer) {
+                // game is finished on this server, so inform all other clients and servers
+                logger.info("Server " + ID + " finished the game.");
+                EndOfGameAction endAction = new EndOfGameAction(this.ID);
+                broadcastActionToClients(endAction);
+                broadcastActionToServers(endAction);
+            }
 
-        } catch (InterruptedException | RemoteException e) {
+            logger.info("Server " + ID + " is going to sleep and exit now");
+            Thread.sleep(1000);
+            System.exit(0);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -203,7 +199,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @param action The action of which the validity needs to be checked
      * @return true iff the action can safely be performed on this server
      */
-    private synchronized boolean isValidAction(Action action) {
+    private boolean isValidAction(Action action) {
         return action.isValid(field) && checkPendingRequestsForAction(action);
     }
 
@@ -244,7 +240,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      *
      * @param action The action that is requested
      */
-    private synchronized void sendRequestsForAction(Action action) throws RemoteException {
+    private void sendRequestsForAction(Action action) throws RemoteException {
         //create request
         ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
 
@@ -277,11 +273,11 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws RemoteException
      */
     @Override
-    public void connect(int clientId) throws RemoteException {
-        logger.log(Level.INFO, "Client with id " + clientId + " connected");
+    public void connect(int clientId, String clientName) throws RemoteException {
+        logger.log(Level.INFO, "Client " + clientName + " connected");
 
         try {
-            ClientInterface ci = (ClientInterface) Naming.lookup("FDDGClient/" + clientId);
+            ClientInterface ci = (ClientInterface) Naming.lookup(clientName);
             field.addPlayer(clientId);
             ci.initializeField(field);
 
@@ -292,7 +288,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             // Now the broadcast is done, add the player to the player map (so he doesn't add himself again on the field).
             connectedPlayers.put(clientId, ci);
 
-        } catch (NotBoundException | MalformedURLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -301,6 +297,26 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             gameStarted = true;
         }
         checkAndUpdateGUI();
+    }
+
+    /**
+     * Function that is called when a client's server crashed and it select another one
+     *
+     * @param clientID   The id of de client of which the server crashed
+     * @param clientName The name of the remote object of the client
+     * @throws java.rmi.RemoteException
+     */
+    @Override
+    public void reconnect(int clientID, String clientName) throws RemoteException {
+        try {
+            if (!connectedPlayers.containsKey(clientID)) {
+                connectedPlayers.put(clientID, (ClientInterface) Naming.lookup(clientName));
+            }
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -333,8 +349,31 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      *
      * @param clientId The ID of the client that probably has crashed.
      */
-    public void clientCrashed(int clientId) {
-        // TODO implement what to do when a client with a certain ID crashed
+    public void clientCrashed(int clientId) throws RemoteException {
+        logger.info("Client " + clientId + " has crashed, removing him now");
+
+        //remove it from connectedPlayers
+        connectedPlayers.remove(clientId);
+
+        //make, perform and broadcast deleteUnitAction to all other clients
+        DeleteUnitAction delAction = new DeleteUnitAction(clientId);
+        performAction(delAction);
+
+        //broadcast deleteUnitAction to all other servers
+        broadcastActionToServers(delAction);
+    }
+
+    /**
+     * This function gets called when a server suspects a peer server has dropped.
+     *
+     * @param serverId The ID of the server that probably has crashed.
+     */
+    public void serverCrashed(int serverId) throws RemoteException {
+        logger.info("Server " + serverId + " has crashed, removing him now");
+
+        //remove it from connectedPlayers and the serverPings.
+        otherServers.remove(serverId);
+        serverPings.remove(serverId);
     }
 
     /**
@@ -345,10 +384,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws RemoteException
      */
     public void registerAndConnectToAll(String[] serverURLs) throws MalformedURLException, RemoteException {
-        if (this.serverURLs == null) {
-            this.serverURLs = serverURLs;
-        }
-
         if (!otherServers.isEmpty()) {
             otherServers.clear();
         }
@@ -474,9 +509,20 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 field.removeDragon(dragonID);
                 action = new DeleteUnitAction(dragonID);
             }
+        } else if (action instanceof AddPlayerAction) {
+            //increment this server's IDcounter
+            int newPlayerID = ((AddPlayerAction) action).getPlayerId();
+            if (newPlayerID >= IDCounter) {
+                IDCounter = newPlayerID + 1;
+            }
         }
 
         checkAndUpdateGUI();
         broadcastActionToClients(action);
+
+        if (action instanceof EndOfGameAction) {
+            logger.info("Server " + action.getSenderId() + " finished the game.");
+            gameFinishedByOtherServer = true;
+        }
     }
 }

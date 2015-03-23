@@ -32,8 +32,8 @@ public class Field implements Serializable {
     public Field(String filename) throws FileNotFoundException {
         entities = new Unit[BOARD_HEIGHT][BOARD_WIDTH];
         unitIds = new HashSet<Integer>();
-        playerMap = new ConcurrentHashMap<>();
-        dragonMap = new ConcurrentHashMap<>();
+        playerMap = new ConcurrentHashMap<Integer, Player>();
+        dragonMap = new ConcurrentHashMap<Integer, Dragon>();
 
         random = new Random(System.currentTimeMillis());
 
@@ -211,7 +211,7 @@ public class Field implements Serializable {
      * @return The player that is in range to heal (can be null).
      */
     public Player isInRangeToHeal(int playerId) {
-        ArrayList<Player> eligible = new ArrayList<>();
+        ArrayList<Player> eligible = new ArrayList<Player>();
 
         Iterator<Integer> it = playerMap.keySet().iterator();
         while (it.hasNext()) {
@@ -298,12 +298,12 @@ public class Field implements Serializable {
      * -1 if no next step is possible.
      */
     public int getDirectionToNearestDragon(int startX, int startY) {
-        HashMap<Integer, Integer> stepMap = new HashMap<>();
+        HashMap<Integer, Integer> stepMap = new HashMap<Integer, Integer>();
         final int MAX_WIDTH_HEIGHT = Math.max(BOARD_HEIGHT, BOARD_WIDTH) + 5;
         int curPos = startX + startY * MAX_WIDTH_HEIGHT;
         State s = new State(curPos, new ArrayList<Integer>(), 0);
 
-        Queue<State> queue = new LinkedList<>();
+        Queue<State> queue = new LinkedList<State>();
         queue.add(s);
 
         stepMap.put(curPos, 0);
@@ -328,7 +328,7 @@ public class Field implements Serializable {
                     int newPos = newX + newY * MAX_WIDTH_HEIGHT;
                     if (!stepMap.containsKey(newPos) || (curSteps + 1) < stepMap.get(newPos)) {
                         // Make a copy (hard copy, no reference)
-                        ArrayList<Integer> updatedPath = new ArrayList<>(path);
+                        ArrayList<Integer> updatedPath = new ArrayList<Integer>(path);
                         updatedPath.add(newPos);
                         stepMap.put(newPos, curSteps + 1);
                         queue.add(new State(newPos, updatedPath, curSteps + 1));
@@ -356,7 +356,7 @@ public class Field implements Serializable {
      * This function lets all dragon alive on the field attack nearby players (that are connected to this server).
      */
     public Set<Action> dragonRage(Set<Integer> connectedPlayers) {
-        Set<Action> actionSet = new HashSet<>();
+        Set<Action> actionSet = new HashSet<Action>();
 
         for (int dragonId : dragonMap.keySet()) {
             Dragon d = dragonMap.get(dragonId);
