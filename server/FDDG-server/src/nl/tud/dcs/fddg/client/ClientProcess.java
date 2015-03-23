@@ -6,6 +6,8 @@ import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ClientServerInterface;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -25,6 +27,10 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     private boolean isAlive, serverAlive;
     private String[] serverList;
 
+    // Logging
+    private PrintWriter writer;
+    private int messagesToServer, messagesFromServer, pingsToServer, pingsFromServer;
+
     /**
      * Constructor: initializes the instance variables, the logger and binds the client to its registry
      *
@@ -40,6 +46,11 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);
         logger.addHandler(consoleHandler);
+
+        this.messagesFromServer = 0;
+        this.messagesToServer = 0;
+        this.pingsFromServer = 0;
+        this.pingsToServer = 0;
 
         logger.log(Level.INFO, "Starting client");
     }
@@ -64,6 +75,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     @Override
     public void performAction(Action action) throws RemoteException {
         logger.fine("Client " + this.ID + " is performing a " + action.getClass().getName());
+        messagesFromServer++;
         // do additional work if the action is a delete unit action (as it requires access to this class' instance variables)
         if (action instanceof DeleteUnitAction) {
             DeleteUnitAction dua = (DeleteUnitAction) action;
@@ -99,6 +111,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     @Override
     public void ping() throws RemoteException {
+        pingsFromServer++;
     }
 
     /**
@@ -112,6 +125,10 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         try {
             this.ID = server.register();
 
+            File file = new File("logs/ClientProcess_log_"+ this.ID + ".txt");
+            file.getParentFile().mkdirs();
+            writer = new PrintWriter(file, "UTF-8");
+
             String ipAddress = InetAddress.getLocalHost().getHostAddress();
             String remoteName = "//"+ipAddress+":1099/FDDGClient/"+this.ID;
             Naming.rebind("FDDGClient/"+this.ID, this);
@@ -121,6 +138,8 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 // Check if the server is still alive
                 try {
                     server.pong();
+                    pingsToServer++;
+
                     serverAlive = true;
                 } catch (RemoteException e) {
                     if (serverAlive) {
@@ -157,11 +176,22 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                     logger.fine("Client " + this.ID + " send request for a MoveAction");
                 }
 
+                messagesToServer++;
+
                 Thread.sleep(1000);
             }
 
             Thread.sleep(1000);
+
             logger.fine("Client " + this.ID + " stopping.");
+            writer.println("Client " + this.ID + " pings-to-server " + pingsToServer);
+            writer.println("Client "+ this.ID + " pings-from-server " + pingsFromServer);
+            writer.println("Client "+ this.ID + " messages-to-server " + messagesToServer);
+            writer.println("Client "+ this.ID + " messages-from-server " + messagesFromServer);
+            writer.println("Client "+ this.ID + " game finished");
+            writer.flush();
+            writer.close();
+
             System.exit(0);
 
         } catch (Exception e) {
@@ -189,6 +219,8 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 if(shouldReconnect) {
                     String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
                     server.reconnect(this.ID, clientName);
+                    messagesToServer++;
+                    writer.println("Client " + this.ID + "  connect " + randomServerId);
                 }
                 return;
             } catch (Exception e) {
@@ -198,6 +230,9 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             }
         }
         logger.severe("All servers are down apparently (10 attempts failed)");
+        writer.println("Client " + this.ID + " connect failure");
+        writer.flush();
+        writer.close();
         System.exit(1);
     }
 
@@ -206,6 +241,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     public void serverCrashed() {
         // Server crashed so we reconnect to another one.
+        writer.println("Client " + this.ID + " crash");
         selectServer(serverList, true);
         isAlive = true;
         this.run();
