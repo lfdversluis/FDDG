@@ -29,6 +29,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     private Logger logger;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
+    private boolean gameFinishedByOtherServer;
 
     // client administration
     private volatile Map<Integer, ClientInterface> connectedPlayers;
@@ -61,6 +62,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         logger.addHandler(consoleHandler);
 
         this.gameStarted = false;
+        this.gameFinishedByOtherServer = false;
         this.connectedPlayers = new ConcurrentHashMap<Integer, ClientInterface>();
         this.clientPings = new HashMap<Integer, Boolean>();
         this.IDCounter = 0;
@@ -86,9 +88,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         try {
             do {
                 Thread.sleep(1000);
-            } while (!gameStarted);
+            } while (!gameStarted && !gameFinishedByOtherServer);
 
-            while (!field.gameHasFinished()) {
+            while (!gameFinishedByOtherServer && !field.gameHasFinished()) {
                 // Ping all clients
                 for (int clientId : connectedPlayers.keySet()) {
                     ClientInterface ci = connectedPlayers.get(clientId);
@@ -114,7 +116,17 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 Thread.sleep(1000);
             }
 
-            logger.log(Level.INFO, "Server " + ID + " finished the game.");
+            if(!gameFinishedByOtherServer) {
+                // game is finished on this server, so inform all other clients and servers
+                logger.info("Server " + ID + " finished the game.");
+                EndOfGameAction endAction = new EndOfGameAction(this.ID);
+                broadcastActionToClients(endAction);
+                broadcastActionToServers(endAction);
+            }
+
+            logger.info("Server "+ID+" is going to sleep and exit now");
+            Thread.sleep(1000);
+            System.exit(0);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -263,6 +275,26 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             gameStarted = true;
         }
         checkAndUpdateGUI();
+    }
+
+    /**
+     * Function that is called when a client's server crashed and it select another one
+     *
+     * @param clientID   The id of de client of which the server crashed
+     * @param clientName The name of the remote object of the client
+     * @throws java.rmi.RemoteException
+     */
+    @Override
+    public void reconnect(int clientID, String clientName) throws RemoteException {
+        try {
+            if (!connectedPlayers.containsKey(clientID)) {
+                connectedPlayers.put(clientID, (ClientInterface) Naming.lookup(clientName));
+            }
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -423,9 +455,20 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 field.removeDragon(dragonID);
                 action = new DeleteUnitAction(dragonID);
             }
+        } else if (action instanceof AddPlayerAction) {
+            //increment this server's IDcounter
+            int newPlayerID = ((AddPlayerAction) action).getPlayerId();
+            if (newPlayerID >= IDCounter) {
+                IDCounter = newPlayerID + 1;
+            }
         }
 
         checkAndUpdateGUI();
         broadcastActionToClients(action);
+
+        if (action instanceof EndOfGameAction) {
+            logger.info("Server " + action.getSenderId() + " finished the game.");
+            gameFinishedByOtherServer = true;
+        }
     }
 }

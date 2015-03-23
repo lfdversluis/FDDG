@@ -2,7 +2,9 @@ package nl.tud.dcs.fddg.server;
 
 import nl.tud.dcs.fddg.game.actions.Action;
 
+import java.math.RoundingMode;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 /**
  * The RMI interface between the clients and the server.
@@ -34,6 +36,15 @@ public interface ClientServerInterface extends Remote {
      * @throws java.rmi.RemoteException
      */
     public void connect(int clientId, String clientName) throws java.rmi.RemoteException;
+
+    /**
+     * Function that is called when a client's server crashed and it select another one
+     *
+     * @param clientID   The id of de client of which the server crashed
+     * @param clientName The name of the remote object of the client
+     * @throws RemoteException
+     */
+    public void reconnect(int clientID, String clientName) throws RemoteException;
 
     /**
      * This function can be called by other servers to check if this server is still functional.
