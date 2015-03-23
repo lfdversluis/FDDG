@@ -161,6 +161,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             }
 
             Thread.sleep(1000);
+            logger.fine("Client " + this.ID + " stopping.");
             System.exit(0);
 
         } catch (Exception e) {
