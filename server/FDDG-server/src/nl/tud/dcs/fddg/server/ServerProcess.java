@@ -38,7 +38,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     private Map<Integer, ServerInterface> otherServers; //(id, RMI object)
     private int requestCounter;
     private Map<Integer, ActionRequest> pendingRequests; //(requestID,request)
-    private Map<Integer,Timer> requestTimers; //(requestID, timer
+    private Map<Integer, Timer> requestTimers; //(requestID, timer
     private Map<Integer, Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
 
     /**
@@ -116,7 +116,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 Thread.sleep(1000);
             }
 
-            if(!gameFinishedByOtherServer) {
+            if (!gameFinishedByOtherServer) {
                 // game is finished on this server, so inform all other clients and servers
                 logger.info("Server " + ID + " finished the game.");
                 EndOfGameAction endAction = new EndOfGameAction(this.ID);
@@ -124,7 +124,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 broadcastActionToServers(endAction);
             }
 
-            logger.info("Server "+ID+" is going to sleep and exit now");
+            logger.info("Server " + ID + " is going to sleep and exit now");
             Thread.sleep(1000);
             System.exit(0);
 
@@ -401,24 +401,24 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     public void acknowledgeRequest(int requestID) throws RemoteException {
         logger.finer("Received acknowledgement for request " + requestID);
 
-        //decrement pending acknowledgement counter
-        int newCount = pendingAcknowledgements.get(requestID) - 1;
+        //decrement pending acknowledgement counter (if the request still exists)
         if (pendingAcknowledgements.containsKey(requestID)) {
+            int newCount = pendingAcknowledgements.get(requestID) - 1;
             pendingAcknowledgements.put(requestID, newCount);
-        }
 
-        //if all acknowledgements are received, remove the request and perform the action
-        if (newCount == 0) {
-            logger.fine("All acknowledgements for request " + requestID + " received");
-            Action action = pendingRequests.get(requestID).getAction();
+            //if all acknowledgements are received, remove the request and perform the action
+            if (newCount == 0) {
+                logger.fine("All acknowledgements for request " + requestID + " received");
+                Action action = pendingRequests.get(requestID).getAction();
 
-            //perform action on local field + connected clients
-            performAction(action);
+                //perform action on local field + connected clients
+                performAction(action);
 
-            broadcastActionToServers(action);
+                broadcastActionToServers(action);
 
-            //cleanup
-            removeRequest(requestID);
+                //cleanup
+                removeRequest(requestID);
+            }
         }
     }
 
