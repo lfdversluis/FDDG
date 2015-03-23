@@ -17,7 +17,7 @@ public class Dragon extends Unit {
         maxHitPoints = random.nextInt(51) + 50;
         curHitPoints = maxHitPoints;
 
-        attackPower = random.nextInt(16) + 5;
+        attackPower = 0; // TODO random.nextInt(16) + 5
 
         this.xPos = x;
         this.yPos = y;

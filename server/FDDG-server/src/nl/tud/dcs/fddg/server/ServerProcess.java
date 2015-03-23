@@ -158,9 +158,15 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      *
      * @param action The action to be broadcasted.
      */
-    public void broadcastActionToClients(Action action) throws RemoteException {
-        for (ClientInterface client : connectedPlayers.values())
-            client.performAction(action);
+    public void broadcastActionToClients(Action action) {
+        for (ClientInterface client : connectedPlayers.values()) {
+            try {
+                client.performAction(action);
+            } catch (RemoteException e) {
+                logger.severe("Unable to send action to client.");
+            }
+        }
+
     }
 
     /**
