@@ -6,6 +6,7 @@ import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ClientServerInterface;
 
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -184,6 +185,8 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             try {
                 logger.info("Client " + ID + " trying to connect to " + serverURLs[randomServerId]);
                 server = (ClientServerInterface) Naming.lookup(serverURLs[randomServerId]);
+                String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
+                server.reconnect(this.ID, clientName);
                 return;
             } catch (Exception e) {
                 logger.severe("Could not connect to server: " + serverURLs[randomServerId]);
