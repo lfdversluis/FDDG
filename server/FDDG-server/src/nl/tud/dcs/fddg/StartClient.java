@@ -14,17 +14,16 @@ import java.util.Scanner;
  * Start one or more clients on the local machine
  * Created by Niels on 16-3-2015.
  */
-public class StartClients {
+public class StartClient {
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
-            System.err.println("Usage: StartClients <nr of clients to start> <server file>");
+        if (args.length < 1) {
+            System.err.println("Usage: StartClient <server file>");
             System.exit(1);
         }
 
         // parse arguments
-        int clientsToStart = Integer.parseInt(args[0]);
-        String serversFileName = args[1];
+        String serversFileName = args[0];
 
         // parse servers file
         Scanner sc = new Scanner(new File(serversFileName));
@@ -35,16 +34,13 @@ public class StartClients {
             serverURLs[i] = sc.nextLine();
         }
 
-        System.out.println("Starting " + clientsToStart + " client(s) on host: "+InetAddress.getLocalHost().getHostAddress());
+        System.out.println("Starting a client on host: "+InetAddress.getLocalHost().getHostAddress());
 
-        // create the client processes, bind them to the registry and start them
+        // create the client process, bind it to the registry and start it
         try {
-            for (int i = 0; i < clientsToStart; i++) {
-                ClientProcess client = new ClientProcess();
-                client.selectServer(serverURLs, false);
-                new Thread(client).start();
-                Thread.sleep(250); // TODO we hardcoded a timeout here between connecting the players
-            }
+            ClientProcess client = new ClientProcess();
+            client.selectServer(serverURLs, false);
+            new Thread(client).start();
         } catch (Exception e) {
             e.printStackTrace();
         }

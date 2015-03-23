@@ -4,6 +4,9 @@ server/FDDG-server/.idea/
 # Simulation files
 simulation/2007-07-14/
 
+# Logging files
+logs/*
+
 # Intellij
 .idea/*
 *.iml
