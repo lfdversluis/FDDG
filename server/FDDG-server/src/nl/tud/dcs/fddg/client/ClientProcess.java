@@ -173,9 +173,10 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
 
                     MoveAction moveAction = new MoveAction(this.ID, newX, newY);
                     server.requestAction(moveAction);
-                    messagesToServer++;
                     logger.fine("Client " + this.ID + " send request for a MoveAction");
                 }
+
+                messagesToServer++;
 
                 Thread.sleep(1000);
             }
@@ -207,7 +208,6 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         final int totalAttempts = 10;
         int attempts = 0;
         while (attempts < totalAttempts) {
-            messagesToServer++;
             Random random = new Random();
             int randomServerId = random.nextInt(serverURLs.length);
             try {
@@ -215,6 +215,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 server = (ClientServerInterface) Naming.lookup(serverURLs[randomServerId]);
                 String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
                 server.reconnect(this.ID, clientName);
+                messagesToServer++;
                 writer.println("Client " + this.ID + "  connect " + randomServerId);
                 return;
             } catch (Exception e) {
