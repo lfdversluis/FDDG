@@ -29,6 +29,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     private Logger logger;
     private VisualizerGUI visualizerGUI = null;
     private boolean gameStarted;
+    private boolean gameFinishedByOtherServer;
 
     // client administration
     private volatile Map<Integer, ClientInterface> connectedPlayers;
@@ -61,6 +62,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         logger.addHandler(consoleHandler);
 
         this.gameStarted = false;
+        this.gameFinishedByOtherServer = false;
         this.connectedPlayers = new ConcurrentHashMap<Integer, ClientInterface>();
         this.clientPings = new HashMap<Integer, Boolean>();
         this.IDCounter = 0;
@@ -86,9 +88,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         try {
             do {
                 Thread.sleep(1000);
-            } while (!gameStarted);
+            } while (!gameStarted && !gameFinishedByOtherServer);
 
-            while (!field.gameHasFinished()) {
+            while (!gameFinishedByOtherServer && !field.gameHasFinished()) {
                 // Ping all clients
                 for (int clientId : connectedPlayers.keySet()) {
                     ClientInterface ci = connectedPlayers.get(clientId);
@@ -114,7 +116,17 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 Thread.sleep(1000);
             }
 
-            logger.log(Level.INFO, "Server " + ID + " finished the game.");
+            if(!gameFinishedByOtherServer) {
+                // game is finished on this server, so inform all other clients and servers
+                logger.info("Server " + ID + " finished the game.");
+                EndOfGameAction endAction = new EndOfGameAction(this.ID);
+                broadcastActionToClients(endAction);
+                broadcastActionToServers(endAction);
+            }
+
+            logger.info("Server "+ID+" is going to sleep and exit now");
+            Thread.sleep(1000);
+            System.exit(0);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -362,7 +374,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         //decrement pending acknowledgement counter
         int newCount = pendingAcknowledgements.get(requestID) - 1;
-        if(pendingAcknowledgements.containsKey(requestID)) {
+        if (pendingAcknowledgements.containsKey(requestID)) {
             pendingAcknowledgements.put(requestID, newCount);
         }
 
@@ -427,5 +439,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         checkAndUpdateGUI();
         broadcastActionToClients(action);
+
+        if (action instanceof EndOfGameAction) {
+            logger.info("Server " + action.getSenderId() + " finished the game.");
+            gameFinishedByOtherServer = true;
+        }
     }
 }
