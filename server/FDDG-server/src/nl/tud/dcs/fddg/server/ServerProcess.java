@@ -12,9 +12,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -39,7 +37,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     // server administration
     private Map<Integer, ServerInterface> otherServers; //(id, RMI object)
     private int requestCounter;
-    private Map<Integer, ActionRequest> pendingRequests; //(requestID, request)
+    private Map<Integer, ActionRequest> pendingRequests; //(requestID,request)
+    private Map<Integer, Timer> requestTimers; //(requestID, timer
     private Map<Integer, Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
     private Map<Integer, Integer> serverPings; // (ID, # consecutive pings missed)
 
@@ -71,6 +70,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.requestCounter = 0;
         this.otherServers = new HashMap<Integer, ServerInterface>();
         this.pendingRequests = new HashMap<Integer, ActionRequest>();
+        this.requestTimers = new HashMap<Integer, Timer>();
         this.pendingAcknowledgements = new HashMap<Integer, Integer>();
 
         // start GUI if necessary
@@ -239,12 +239,21 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     private void sendRequestsForAction(Action action) throws RemoteException {
         //create request
-        ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
+        final ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
 
         //initialize acknowledgement counter for the request
         pendingRequests.put(request.getRequestID(), request);
         pendingAcknowledgements.put(request.getRequestID(), otherServers.size());
-        //TODO: remove request from these data structures when not all acks are received after a certain time
+
+        //init timer to remove request from the data structures when not all acks are received after 5s
+        Timer timer = new Timer();
+        requestTimers.put(request.getRequestID(), timer);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                removeRequest(request.getRequestID());
+            }
+        }, 5000);
 
         logger.fine("Sending request " + request.getRequestID() + " to all servers...");
 
@@ -434,24 +443,24 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     public void acknowledgeRequest(int requestID) throws RemoteException {
         logger.finer("Received acknowledgement for request " + requestID);
 
-        //decrement pending acknowledgement counter
-        int newCount = pendingAcknowledgements.get(requestID) - 1;
+        //decrement pending acknowledgement counter (if the request still exists)
         if (pendingAcknowledgements.containsKey(requestID)) {
+            int newCount = pendingAcknowledgements.get(requestID) - 1;
             pendingAcknowledgements.put(requestID, newCount);
-        }
 
-        //if all acknowledgements are received, remove the request and perform the action
-        if (newCount == 0) {
-            logger.fine("All acknowledgements for request " + requestID + " received");
-            Action action = pendingRequests.get(requestID).getAction();
+            //if all acknowledgements are received, remove the request and perform the action
+            if (newCount == 0) {
+                logger.fine("All acknowledgements for request " + requestID + " received");
+                Action action = pendingRequests.get(requestID).getAction();
 
-            //perform action on local field + connected clients
-            performAction(action);
+                //perform action on local field + connected clients
+                performAction(action);
 
-            broadcastActionToServers(action);
+                broadcastActionToServers(action);
 
-            //cleanup
-            removeRequest(requestID);
+                //cleanup
+                removeRequest(requestID);
+            }
         }
     }
 
@@ -466,11 +475,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     }
 
     /**
-     * Removes the request with requestID from the pending requests (and acknowledgement counter)
+     * Removes the request with requestID from the pending requests (and acknowledgement counter).
+     * It also stops and removes the timer associated with the request
      *
      * @param requestID The id of the request to be removed
      */
     private void removeRequest(int requestID) {
+        requestTimers.get(requestID).cancel();
+        requestTimers.remove(requestID);
         pendingAcknowledgements.remove(requestID);
         pendingRequests.remove(requestID);
     }
