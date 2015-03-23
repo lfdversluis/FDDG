@@ -3,6 +3,7 @@ package nl.tud.dcs.fddg.server;
 import nl.tud.dcs.fddg.client.ClientInterface;
 import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.*;
+import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.gui.VisualizerGUI;
 import nl.tud.dcs.fddg.server.requests.ActionRequest;
 
@@ -294,7 +295,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             field.addPlayer(clientId);
             ci.initializeField(field);
 
-            AddPlayerAction apa = new AddPlayerAction(clientId, field.getPlayer(clientId).getxPos(), field.getPlayer(clientId).getyPos());
+            Player newPlayer = field.getPlayer(clientId);
+            AddPlayerAction apa = new AddPlayerAction(clientId, newPlayer.getxPos(), newPlayer.getyPos(), newPlayer.getHitpoints(), newPlayer.getAttackPower());
             broadcastActionToClients(apa);
             broadcastActionToServers(apa); //inform other servers
 

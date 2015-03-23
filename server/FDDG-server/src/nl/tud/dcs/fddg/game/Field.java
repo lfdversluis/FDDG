@@ -101,16 +101,12 @@ public class Field implements Serializable {
     }
 
     /**
-     * This function places a Player on the field at a specific location.
-     *
-     * @param playerId The (unique) ID of the player to be placed on the field.
-     * @param x        The x-coordinate of the player.
-     * @param y        The y-coordinate of the player.
+     * This function places a Player on the field
+     * @param newPlayer The new player to be added.
      */
-    public void addPlayer(int playerId, int x, int y) {
-        Player p = new Player(x, y, playerId);
-        playerMap.put(playerId, p);
-        entities[y][x] = p;
+    public void addPlayer(Player newPlayer) {
+        playerMap.put(newPlayer.getUnitId(), newPlayer);
+        entities[newPlayer.getyPos()][newPlayer.getxPos()] = newPlayer;
     }
 
     /**

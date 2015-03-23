@@ -24,6 +24,17 @@ public class Player extends Unit {
         this.unitId = id;
     }
 
+    public Player(int x, int y, int id, int maxHitPoints, int attackPower) {
+        this.maxHitPoints = maxHitPoints;
+        curHitPoints = maxHitPoints;
+
+        this.attackPower = attackPower;
+
+        this.xPos = x;
+        this.yPos = y;
+        this.unitId = id;
+    }
+
     /**
      * This function is called to heal the player up to its maximal amount
      * of hit points.
