@@ -1,15 +1,18 @@
 package nl.tud.dcs.fddg.game.actions;
 
 import nl.tud.dcs.fddg.game.Field;
+import nl.tud.dcs.fddg.game.entities.Player;
 
 public class AddPlayerAction extends Action {
 
-    private int playerId, x, y;
+    private int playerId, x, y, maxHitPoints, attackPower;
 
-    public AddPlayerAction(int playerId, int x, int y) {
+    public AddPlayerAction(int playerId, int x, int y, int maxHitPoints, int attackPower) {
         this.playerId = playerId;
         this.x = x;
         this.y = y;
+        this.maxHitPoints = maxHitPoints;
+        this.attackPower = attackPower;
     }
 
     public int getX() {
@@ -32,7 +35,8 @@ public class AddPlayerAction extends Action {
      */
     @Override
     public void perform(Field field) {
-        field.addPlayer(playerId, x, y);
+        Player newPlayer = new Player(x, y, playerId, maxHitPoints, attackPower);
+        field.addPlayer(newPlayer);
     }
 
     /**

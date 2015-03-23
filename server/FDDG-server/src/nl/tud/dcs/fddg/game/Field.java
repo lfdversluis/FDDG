@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Field implements Serializable {
     public static final int BOARD_WIDTH = 25, BOARD_HEIGHT = 25;
-    private static final int INITIAL_DRAGONS = 20;
     private Unit[][] entities;
     private int[] dx = {0, 1, 0, -1};
     private int[] dy = {-1, 0, 1, 0};
@@ -37,31 +36,20 @@ public class Field implements Serializable {
 
         random = new Random(System.currentTimeMillis());
 
-        // fill the field with dragons
-//        int randX, randY;
-//        for (int i = 0; i < INITIAL_DRAGONS; i++) {
-//            do {
-//                randX = random.nextInt(BOARD_WIDTH);
-//                randY = random.nextInt(BOARD_HEIGHT);
-//            } while (!isFree(randX, randY));
-//
-//            Dragon d = new Dragon(randX, randY, getUniqueId());
-//            entities[randY][randX] = d;
-//            dragonMap.put(d.getUnitId(), d);
-//        }
-
         readFromFile(filename);
     }
 
     private void readFromFile(String filename) throws FileNotFoundException {
         Scanner sc = new Scanner(new File(filename));
+        int dragonCounter = 0;
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 String next = sc.next();
                 if (next.equals("D")) {
-                    Dragon dragon = new Dragon(x, y, getUniqueId());
+                    Dragon dragon = new Dragon(x, y, dragonCounter + 10000);
                     entities[y][x] = dragon;
                     dragonMap.put(dragon.getUnitId(), dragon);
+                    dragonCounter++;
                 }
             }
         }
@@ -113,16 +101,12 @@ public class Field implements Serializable {
     }
 
     /**
-     * This function places a Player on the field at a specific location.
-     *
-     * @param playerId The (unique) ID of the player to be placed on the field.
-     * @param x        The x-coordinate of the player.
-     * @param y        The y-coordinate of the player.
+     * This function places a Player on the field
+     * @param newPlayer The new player to be added.
      */
-    public void addPlayer(int playerId, int x, int y) {
-        Player p = new Player(x, y, playerId);
-        playerMap.put(playerId, p);
-        entities[y][x] = p;
+    public void addPlayer(Player newPlayer) {
+        playerMap.put(newPlayer.getUnitId(), newPlayer);
+        entities[newPlayer.getyPos()][newPlayer.getxPos()] = newPlayer;
     }
 
     /**

@@ -3,6 +3,7 @@ package nl.tud.dcs.fddg.server;
 import nl.tud.dcs.fddg.client.ClientInterface;
 import nl.tud.dcs.fddg.game.Field;
 import nl.tud.dcs.fddg.game.actions.*;
+import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.gui.VisualizerGUI;
 import nl.tud.dcs.fddg.server.requests.ActionRequest;
 
@@ -63,7 +64,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.ID = id;
         this.field = new Field(fieldFile);
         this.logger = Logger.getLogger(ServerProcess.class.getName());
-        logger.setLevel(Level.ALL);
+        logger.setLevel(Level.INFO);
         logger.setUseParentHandlers(false);
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);
@@ -159,6 +160,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 for (Action a : actionSet) {
                     broadcastActionToClients(a);
                     broadcastActionToServers(a);
+                    checkAndUpdateGUI();
                 }
 
                 writer.println("Server " + this.ID + " clients " + connectedPlayers.size());
@@ -199,10 +201,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      *
      * @param action The action to be broadcasted.
      */
-    public void broadcastActionToClients(Action action) throws RemoteException {
+    public void broadcastActionToClients(Action action) {
         for (ClientInterface client : connectedPlayers.values()) {
-            clientAmountOfMessagedSent++;
-            client.performAction(action);
+            try {
+                client.performAction(action);
+                clientAmountOfMessagedSent++;
+            } catch (RemoteException e) {
+                logger.severe("Unable to send action to client.");
+            }
         }
     }
 
@@ -223,7 +229,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void requestAction(Action action) throws RemoteException {
-        logger.fine("Received action request from client " + action.getSenderId());
+        logger.fine("Received " + action.getClass().getSimpleName() + " request from client " + action.getSenderId());
 
         clientAmountOfMessagesReceived++;
 
@@ -263,20 +269,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 if (request.getAction() instanceof MoveAction)
                     if (((MoveAction) request.getAction()).hasSameDestinationAs(move))
                         return false;
-        } else if (action instanceof AttackAction) {
-            //check if there is another attack request for the same dragon
-            AttackAction attack = (AttackAction) action;
-            for (ActionRequest request : pendingRequests.values())
-                if (request.getAction() instanceof AttackAction)
-                    if (((AttackAction) request.getAction()).getDragonId() == attack.getDragonId())
-                        return false;
-        } else if (action instanceof HealAction) {
-            //check if there is another heal request for the same target player
-            HealAction heal = (HealAction) action;
-            for (ActionRequest request : pendingRequests.values())
-                if (request.getAction() instanceof HealAction)
-                    if (((HealAction) request.getAction()).getTargetPlayer() == heal.getTargetPlayer())
-                        return false;
         }
         return true;
     }
@@ -304,7 +296,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             }
         }, 5000);
 
-        logger.fine("Sending request " + request.getRequestID() + " to all servers...");
+        logger.fine("Sending request " + request.getRequestID() + " with action " + request.getAction().getClass().getSimpleName() + " to all servers...");
 
         //broadcast the request to the other servers
         for (ServerInterface server : otherServers.values()) {
@@ -340,7 +332,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             field.addPlayer(clientId);
             ci.initializeField(field);
 
-            AddPlayerAction apa = new AddPlayerAction(clientId, field.getPlayer(clientId).getxPos(), field.getPlayer(clientId).getyPos());
+            Player newPlayer = field.getPlayer(clientId);
+            AddPlayerAction apa = new AddPlayerAction(clientId, newPlayer.getxPos(), newPlayer.getyPos(), newPlayer.getHitpoints(), newPlayer.getAttackPower());
             broadcastActionToClients(apa);
             broadcastActionToServers(apa); //inform other servers
 
@@ -488,7 +481,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             int senderID = request.getSenderID();
             int requestID = request.getRequestID();
 
-            logger.fine("Acknowledging request " + requestID + " to server " + senderID);
+            logger.fine("Acknowledging request " + requestID + " with " + request.getAction().getClass().getSimpleName() + " to server " + senderID);
             otherServers.get(senderID).acknowledgeRequest(requestID);
             serverAmountOfMessagedSent++;
         }
@@ -561,7 +554,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void performAction(Action action) throws RemoteException {
-        logger.fine("Performing action from " + action.getSenderId());
+        logger.fine("Performing " + action.getClass() + " from client " + action.getSenderId());
 
         serverAmountOfMessagesReceived++;
 
@@ -577,7 +570,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 action = new DeleteUnitAction(dragonID);
             }
         } else if (action instanceof AddPlayerAction) {
-            //increment this server's IDcounter
+            //increment this server's ID counter
             int newPlayerID = ((AddPlayerAction) action).getPlayerId();
             if (newPlayerID >= IDCounter) {
                 IDCounter = newPlayerID + 1;

@@ -17,7 +17,7 @@ public class StartClientsSimulation {
     public static void startClient(int logID) {
         try {
             ClientProcess client = new ClientProcess();
-            client.selectServer(serverURLs);
+            client.selectServer(serverURLs, false);
             Thread clientThread = new Thread(client);
             clientThread.start();
             clientMap.put(logID, clientThread);

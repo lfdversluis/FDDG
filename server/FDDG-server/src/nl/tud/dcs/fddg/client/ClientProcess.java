@@ -41,7 +41,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         this.isAlive = true;
         this.serverAlive = false;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
-        logger.setLevel(Level.SEVERE);
+        logger.setLevel(Level.INFO);
         logger.setUseParentHandlers(false);
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);
@@ -182,6 +182,8 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             }
 
             Thread.sleep(1000);
+
+            logger.fine("Client " + this.ID + " stopping.");
             writer.println("Client " + this.ID + " pings-to-server " + pingsToServer);
             writer.println("Client "+ this.ID + " pings-from-server " + pingsFromServer);
             writer.println("Client "+ this.ID + " messages-to-server " + messagesToServer);
@@ -189,6 +191,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             writer.println("Client "+ this.ID + " game finished");
             writer.flush();
             writer.close();
+
             System.exit(0);
 
         } catch (Exception e) {
@@ -201,7 +204,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      *
      * @param serverURLs The URLs of the servers
      */
-    public void selectServer(String[] serverURLs) {
+    public void selectServer(String[] serverURLs, boolean shouldReconnect) {
         if (serverList == null) {
             serverList = serverURLs;
         }
@@ -213,10 +216,12 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             try {
                 logger.info("Client " + ID + " trying to connect to " + serverURLs[randomServerId]);
                 server = (ClientServerInterface) Naming.lookup(serverURLs[randomServerId]);
-                String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
-                server.reconnect(this.ID, clientName);
-                messagesToServer++;
-                writer.println("Client " + this.ID + "  connect " + randomServerId);
+                if(shouldReconnect) {
+                    String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
+                    server.reconnect(this.ID, clientName);
+                    messagesToServer++;
+                    writer.println("Client " + this.ID + "  connect " + randomServerId);
+                }
                 return;
             } catch (Exception e) {
                 logger.severe("Could not connect to server: " + serverURLs[randomServerId]);
@@ -237,7 +242,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     public void serverCrashed() {
         // Server crashed so we reconnect to another one.
         writer.println("Client " + this.ID + " crash");
-        selectServer(serverList);
+        selectServer(serverList, true);
         isAlive = true;
         this.run();
     }

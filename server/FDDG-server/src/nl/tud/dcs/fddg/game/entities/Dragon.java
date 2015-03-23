@@ -13,11 +13,11 @@ public class Dragon extends Unit {
      * @param id The (unique) ID of the Dragon.
      */
     public Dragon(int x, int y, int id) {
-        Random random = new Random(System.currentTimeMillis());
-        maxHitPoints = random.nextInt(51) + 50;
-        curHitPoints = maxHitPoints;
+        Random random = new Random(1337); // we need a hard coded ID here to let the dragons be consistent on all servers
+        this.maxHitPoints = random.nextInt(51) + 50;
+        this.curHitPoints = maxHitPoints;
 
-        attackPower = random.nextInt(16) + 5;
+        this.attackPower = random.nextInt(16) + 5;
 
         this.xPos = x;
         this.yPos = y;
