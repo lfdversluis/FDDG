@@ -222,20 +222,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 if (request.getAction() instanceof MoveAction)
                     if (((MoveAction) request.getAction()).hasSameDestinationAs(move))
                         return false;
-        } else if (action instanceof AttackAction) {
-            //check if there is another attack request for the same dragon
-            AttackAction attack = (AttackAction) action;
-            for (ActionRequest request : pendingRequests.values())
-                if (request.getAction() instanceof AttackAction)
-                    if (((AttackAction) request.getAction()).getDragonId() == attack.getDragonId())
-                        return false;
-        } else if (action instanceof HealAction) {
-            //check if there is another heal request for the same target player
-            HealAction heal = (HealAction) action;
-            for (ActionRequest request : pendingRequests.values())
-                if (request.getAction() instanceof HealAction)
-                    if (((HealAction) request.getAction()).getTargetPlayer() == heal.getTargetPlayer())
-                        return false;
         }
         return true;
     }
