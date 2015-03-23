@@ -361,26 +361,21 @@ public class Field implements Serializable {
         for (int dragonId : dragonMap.keySet()) {
             Dragon d = dragonMap.get(dragonId);
 
-            int dragonX = d.getxPos();
-            int dragonY = d.getyPos();
+            for (int playerId : playerMap.keySet()) {
+                Player p = playerMap.get(playerId);
 
-            for (int i = 0; i < 4; i++) {
-                int unitX = dragonX + dx[i];
-                int unitY = dragonY + dy[i];
+                if(!isInRange(playerId, dragonId, 2)) { continue; }
 
-                if (isInBoard(unitX, unitY) && entities[unitY][unitX] instanceof Player && connectedPlayers.contains(entities[unitY][unitX].getUnitId())) {
-                    Player p = (Player) entities[unitY][unitX];
-                    p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
+                p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
 
-                    if (p.getCurHitPoints() <= 0) {
-                        DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
-                        actionSet.add(dua);
-                        removePlayer(p.getUnitId());
-                    }
-
-                    DamageAction da = new DamageAction(p.getUnitId(), d.getAttackPower());
-                    actionSet.add(da);
+                if (p.getCurHitPoints() <= 0) {
+                    DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
+                    actionSet.add(dua);
+                    removePlayer(p.getUnitId());
                 }
+
+                DamageAction da = new DamageAction(p.getUnitId(), d.getAttackPower());
+                actionSet.add(da);
             }
         }
         return actionSet;
