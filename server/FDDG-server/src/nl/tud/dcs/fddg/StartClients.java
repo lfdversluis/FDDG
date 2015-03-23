@@ -18,7 +18,7 @@ public class StartClients {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            System.err.println("Usage: StartClients <clients to start> <server file>");
+            System.err.println("Usage: StartClients <nr of clients to start> <server file>");
             System.exit(1);
         }
 
