@@ -64,15 +64,18 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     @Override
     public void performAction(Action action) throws RemoteException {
-        logger.fine("Client "+this.ID+ " is performing a "+action.getClass().getName());
+        logger.fine("Client " + this.ID + " is performing a " + action.getClass().getName());
         // do additional work if the action is a delete unit action (as it requires access to this class' instance variables)
         if (action instanceof DeleteUnitAction) {
             DeleteUnitAction dua = (DeleteUnitAction) action;
             int unitID = dua.getUnitId();
             if ((field.getDragon(unitID) == null) && (unitID == this.ID)) {
-                logger.info("I have been killed (player "+ID+")");
+                logger.info("I have been killed (player " + ID + ")");
                 isAlive = false;
             }
+        } else if (action instanceof EndOfGameAction) {
+            logger.info("Server " + action.getSenderId() + " finished the game.");
+            isAlive = false;
         }
 
         action.perform(field);
@@ -114,8 +117,6 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             server.connect(this.ID);
 
             while (isAlive && !field.gameHasFinished()) {
-                Thread.sleep(1000);
-
                 // Check if the server is still alive
                 try {
                     server.pong();
@@ -154,7 +155,12 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                     server.requestAction(moveAction);
                     logger.fine("Client " + this.ID + " send request for a MoveAction");
                 }
+
+                Thread.sleep(1000);
             }
+
+            Thread.sleep(1000);
+            System.exit(0);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -167,12 +173,12 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      * @param serverURLs The URLs of the servers
      */
     public void selectServer(String[] serverURLs) {
-        if(serverList == null){
+        if (serverList == null) {
             serverList = serverURLs;
         }
         final int totalAttempts = 10;
         int attempts = 0;
-        while(attempts < totalAttempts) {
+        while (attempts < totalAttempts) {
             Random random = new Random();
             int randomServerId = random.nextInt(serverURLs.length);
             try {
