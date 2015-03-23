@@ -379,10 +379,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws RemoteException
      */
     public void registerAndConnectToAll(String[] serverURLs) throws MalformedURLException, RemoteException {
-        if (!otherServers.isEmpty()) {
-            otherServers.clear();
-        }
-
         Naming.rebind(serverURLs[ID], this);
         for (int i = 0; i < serverURLs.length; i++)
             if (i != ID)
