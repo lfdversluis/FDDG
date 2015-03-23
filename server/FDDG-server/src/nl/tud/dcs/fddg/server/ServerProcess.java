@@ -177,7 +177,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @param action The action of which the validity needs to be checked
      * @return true iff the action can safely be performed on this server
      */
-    private synchronized boolean isValidAction(Action action) {
+    private boolean isValidAction(Action action) {
         return action.isValid(field) && checkPendingRequestsForAction(action);
     }
 
@@ -218,7 +218,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      *
      * @param action The action that is requested
      */
-    private synchronized void sendRequestsForAction(Action action) throws RemoteException {
+    private void sendRequestsForAction(Action action) throws RemoteException {
         //create request
         ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
 
