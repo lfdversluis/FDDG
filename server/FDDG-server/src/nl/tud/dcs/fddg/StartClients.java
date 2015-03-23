@@ -42,7 +42,7 @@ public class StartClients {
         try {
             for (int id = firstID; id <= lastID; id++) {
                 ClientProcess client = new ClientProcess();
-                client.selectServer(serverURLs);
+                client.selectServer(serverURLs, false);
                 new Thread(client).start();
                 Thread.sleep(250); // TODO we hardcoded a timeout here between connecting the players
             }

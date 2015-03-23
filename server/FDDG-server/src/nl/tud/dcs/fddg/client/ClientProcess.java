@@ -173,7 +173,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      *
      * @param serverURLs The URLs of the servers
      */
-    public void selectServer(String[] serverURLs) {
+    public void selectServer(String[] serverURLs, boolean shouldReconnect) {
         if (serverList == null) {
             serverList = serverURLs;
         }
@@ -185,8 +185,10 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             try {
                 logger.info("Client " + ID + " trying to connect to " + serverURLs[randomServerId]);
                 server = (ClientServerInterface) Naming.lookup(serverURLs[randomServerId]);
-                String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
-                server.reconnect(this.ID, clientName);
+                if(shouldReconnect) {
+                    String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
+                    server.reconnect(this.ID, clientName);
+                }
                 return;
             } catch (Exception e) {
                 logger.severe("Could not connect to server: " + serverURLs[randomServerId]);
@@ -203,7 +205,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     public void serverCrashed() {
         // Server crashed so we reconnect to another one.
-        selectServer(serverList);
+        selectServer(serverList, true);
         isAlive = true;
         this.run();
     }

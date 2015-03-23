@@ -55,7 +55,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.ID = id;
         this.field = new Field(fieldFile);
         this.logger = Logger.getLogger(ServerProcess.class.getName());
-        logger.setLevel(Level.ALL);
+        logger.setLevel(Level.INFO);
         logger.setUseParentHandlers(false);
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);
@@ -503,7 +503,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void performAction(Action action) throws RemoteException {
-        logger.fine("Performing action from " + action.getSenderId());
+        logger.fine("Performing " + action.getClass() + " from client " + action.getSenderId());
 
         //perform the action on the local field
         action.perform(field);
