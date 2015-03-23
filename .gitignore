@@ -13,3 +13,6 @@ simulation/2007-07-14/
 
 # binary files
 out/
+
+# config files
+setup/servers.txt
