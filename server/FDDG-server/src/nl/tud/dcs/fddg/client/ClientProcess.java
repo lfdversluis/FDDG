@@ -156,7 +156,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 }
             }
 
-        } catch (MalformedURLException | RemoteException | InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -179,7 +179,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 logger.info("Client " + ID + " trying to connect to " + serverURLs[randomServerId]);
                 server = (ClientServerInterface) Naming.lookup(serverURLs[randomServerId]);
                 return;
-            } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            } catch (Exception e) {
                 logger.severe("Could not connect to server: " + serverURLs[randomServerId]);
                 e.printStackTrace();
                 attempts++;

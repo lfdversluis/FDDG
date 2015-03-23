@@ -45,7 +45,7 @@ public class StartClients {
                 new Thread(client).start();
                 Thread.sleep(250); // TODO we hardcoded a timeout here between connecting the players
             }
-        } catch (RemoteException | InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
