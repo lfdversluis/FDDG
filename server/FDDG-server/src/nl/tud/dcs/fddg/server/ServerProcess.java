@@ -7,6 +7,8 @@ import nl.tud.dcs.fddg.gui.VisualizerGUI;
 import nl.tud.dcs.fddg.server.requests.ActionRequest;
 
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -42,6 +44,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     private Map<Integer, Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
     private Map<Integer, Integer> serverPings; // (ID, # consecutive pings missed)
 
+    // Logging
+    private PrintWriter writer;
+    private int amountOfMessagesReceived, amountOfMessagedSent, amountOfPingsSent, amountOfPingsReceived;
+
     /**
      * The constructor of the ServerProcess class.
      * It requires an ID and a flag indicating whether a GUI should be started or not..
@@ -73,6 +79,16 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.requestTimers = new HashMap<Integer, Timer>();
         this.pendingAcknowledgements = new HashMap<Integer, Integer>();
 
+        try {
+            writer = new PrintWriter("Server " + this.ID, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        this.amountOfMessagesReceived = 0;
+        this.amountOfMessagedSent = 0;
+        this.amountOfPingsReceived = 0;
+        this.amountOfPingsSent = 0;
+
         // start GUI if necessary
         if (useGUI) {
             this.visualizerGUI = new VisualizerGUI(field);
@@ -97,6 +113,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 for (int clientId : connectedPlayers.keySet()) {
                     ClientInterface ci = connectedPlayers.get(clientId);
 
+                    amountOfPingsSent++;
+
                     try {
                         ci.ping();
                         clientPings.put(clientId, true);
@@ -111,6 +129,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
                 // Ping all servers
                 for (int serverId : otherServers.keySet()) {
+                    amountOfPingsSent++;
+
                     try {
                         otherServers.get(serverId).heartBeat(serverId);
                         serverPings.put(serverId, 0);
@@ -132,6 +152,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                     broadcastActionToClients(a);
                     broadcastActionToServers(a);
                 }
+
+                writer.write("Server " + this.ID + " clients " + connectedPlayers.size());
+
                 Thread.sleep(1000);
             }
 
@@ -144,6 +167,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             }
 
             logger.info("Server " + ID + " is going to sleep and exit now");
+            writer.println("Server " + this.ID + " pings-sent " + amountOfPingsSent);
+            writer.println("Server " + this.ID + " pings-received " + amountOfPingsReceived);
+            writer.println("Server " + this.ID + " messages-sent " + amountOfMessagedSent);
+            writer.println("Server " + this.ID + " messages-received " + amountOfMessagesReceived);
             Thread.sleep(1000);
             System.exit(0);
 
@@ -158,8 +185,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @param action The action to be broadcasted.
      */
     public void broadcastActionToClients(Action action) throws RemoteException {
-        for (ClientInterface client : connectedPlayers.values())
+        for (ClientInterface client : connectedPlayers.values()) {
+            amountOfMessagedSent++;
             client.performAction(action);
+        }
     }
 
     /**
@@ -180,11 +209,16 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     @Override
     public void requestAction(Action action) throws RemoteException {
         logger.fine("Received action request from client " + action.getSenderId());
+
+        amountOfMessagesReceived++;
+
         if (isValidAction(action)) {
-            if (!otherServers.isEmpty())
+            if (!otherServers.isEmpty()) {
                 sendRequestsForAction(action);
-            else
+            }
+            else {
                 performAction(action);
+            }
         }
     }
 
@@ -258,8 +292,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         logger.fine("Sending request " + request.getRequestID() + " to all servers...");
 
         //broadcast the request to the other servers
-        for (ServerInterface server : otherServers.values())
+        for (ServerInterface server : otherServers.values()) {
+            amountOfMessagedSent++;
             server.requestAction(request);
+        }
     }
 
     /**
@@ -281,6 +317,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     @Override
     public void connect(int clientId, String clientName) throws RemoteException {
         logger.log(Level.INFO, "Client " + clientName + " connected");
+
+        amountOfPingsReceived++;
 
         try {
             ClientInterface ci = (ClientInterface) Naming.lookup(clientName);
@@ -314,6 +352,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void reconnect(int clientID, String clientName) throws RemoteException {
+
+        amountOfPingsReceived++;
+
         try {
             if (!connectedPlayers.containsKey(clientID)) {
                 connectedPlayers.put(clientID, (ClientInterface) Naming.lookup(clientName));
@@ -333,7 +374,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void heartBeat(int remoteId) throws RemoteException {
-
+        amountOfPingsReceived++;
     }
 
     /**
@@ -343,6 +384,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void pong() throws RemoteException {
+        amountOfPingsReceived++;
     }
 
     /**
@@ -424,6 +466,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void requestAction(ActionRequest request) throws RemoteException {
+
+        amountOfMessagesReceived++;
+
         if (isValidAction(request.getAction())) {
             int senderID = request.getSenderID();
             int requestID = request.getRequestID();
@@ -470,8 +515,10 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @param action The action to be broadcasted.
      */
     private void broadcastActionToServers(Action action) throws RemoteException {
-        for (ServerInterface server : otherServers.values())
+        for (ServerInterface server : otherServers.values()) {
+            amountOfMessagedSent++;
             server.performAction(action);
+        }
     }
 
     /**

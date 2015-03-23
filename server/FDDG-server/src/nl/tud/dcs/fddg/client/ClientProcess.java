@@ -6,6 +6,9 @@ import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ClientServerInterface;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -24,6 +27,9 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     private Field field;
     private boolean isAlive, serverAlive;
     private String[] serverList;
+
+    // Logging
+    private PrintWriter writer;
 
     /**
      * Constructor: initializes the instance variables, the logger and binds the client to its registry
@@ -112,6 +118,8 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         try {
             this.ID = server.register();
 
+            writer = new PrintWriter("ClientProcess_log_" + this.ID, "UTF-8");
+
             String ipAddress = InetAddress.getLocalHost().getHostAddress();
             String remoteName = "//"+ipAddress+":1099/FDDGClient/"+this.ID;
             Naming.rebind("FDDGClient/"+this.ID, this);
@@ -161,6 +169,9 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             }
 
             Thread.sleep(1000);
+            writer.write("Client game finished");
+            writer.flush();
+            writer.close();
             System.exit(0);
 
         } catch (Exception e) {
@@ -187,6 +198,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 server = (ClientServerInterface) Naming.lookup(serverURLs[randomServerId]);
                 String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
                 server.reconnect(this.ID, clientName);
+                writer.write("Client " + this.ID + "  connect " + randomServerId);
                 return;
             } catch (Exception e) {
                 logger.severe("Could not connect to server: " + serverURLs[randomServerId]);
@@ -195,6 +207,9 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             }
         }
         logger.severe("All servers are down apparently (10 attempts failed)");
+        writer.write("Client connect failure");
+        writer.flush();
+        writer.close();
         System.exit(1);
     }
 
@@ -203,6 +218,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     public void serverCrashed() {
         // Server crashed so we reconnect to another one.
+        writer.write("Client " + this.ID + " crash");
         selectServer(serverList);
         isAlive = true;
         this.run();
