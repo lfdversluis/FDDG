@@ -171,6 +171,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             writer.println("Server " + this.ID + " pings-received " + amountOfPingsReceived);
             writer.println("Server " + this.ID + " messages-sent " + amountOfMessagedSent);
             writer.println("Server " + this.ID + " messages-received " + amountOfMessagesReceived);
+            writer.flush();
+            writer.close();
             Thread.sleep(1000);
             System.exit(0);
 
