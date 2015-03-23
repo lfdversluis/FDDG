@@ -266,6 +266,26 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     }
 
     /**
+     * Function that is called when a client's server crashed and it select another one
+     *
+     * @param clientID   The id of de client of which the server crashed
+     * @param clientName The name of the remote object of the client
+     * @throws java.rmi.RemoteException
+     */
+    @Override
+    public void reconnect(int clientID, String clientName) throws RemoteException {
+        try {
+            if (!connectedPlayers.containsKey(clientID)) {
+                connectedPlayers.put(clientID, (ClientInterface) Naming.lookup(clientName));
+            }
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * This function sends a heartbeat to a remote machine, identified by its (unique) ID.
      *
      * @param remoteId The ID of the remote machine.
@@ -362,7 +382,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         //decrement pending acknowledgement counter
         int newCount = pendingAcknowledgements.get(requestID) - 1;
-        if(pendingAcknowledgements.containsKey(requestID)) {
+        if (pendingAcknowledgements.containsKey(requestID)) {
             pendingAcknowledgements.put(requestID, newCount);
         }
 

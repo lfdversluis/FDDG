@@ -6,6 +6,7 @@ import nl.tud.dcs.fddg.game.entities.Dragon;
 import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ClientServerInterface;
 
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -64,13 +65,13 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     @Override
     public void performAction(Action action) throws RemoteException {
-        logger.fine("Client "+this.ID+ " is performing a "+action.getClass().getName());
+        logger.fine("Client " + this.ID + " is performing a " + action.getClass().getName());
         // do additional work if the action is a delete unit action (as it requires access to this class' instance variables)
         if (action instanceof DeleteUnitAction) {
             DeleteUnitAction dua = (DeleteUnitAction) action;
             int unitID = dua.getUnitId();
             if ((field.getDragon(unitID) == null) && (unitID == this.ID)) {
-                logger.info("I have been killed (player "+ID+")");
+                logger.info("I have been killed (player " + ID + ")");
                 isAlive = false;
             }
         }
@@ -167,17 +168,19 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      * @param serverURLs The URLs of the servers
      */
     public void selectServer(String[] serverURLs) {
-        if(serverList == null){
+        if (serverList == null) {
             serverList = serverURLs;
         }
         final int totalAttempts = 10;
         int attempts = 0;
-        while(attempts < totalAttempts) {
+        while (attempts < totalAttempts) {
             Random random = new Random();
             int randomServerId = random.nextInt(serverURLs.length);
             try {
                 logger.info("Client " + ID + " trying to connect to " + serverURLs[randomServerId]);
                 server = (ClientServerInterface) Naming.lookup(serverURLs[randomServerId]);
+                String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
+                server.reconnect(this.ID, clientName);
                 return;
             } catch (Exception e) {
                 logger.severe("Could not connect to server: " + serverURLs[randomServerId]);
