@@ -43,13 +43,13 @@ public class AttackAction extends Action {
 
     /**
      * Checks whether this action is valid in the current field.
-     * Here, is checks whether the player is next to the dragon it wants to attack.
+     * Here, is checks whether the player is next (range <=2) to the dragon it wants to attack.
      *
      * @param field The current field
      * @return true iff the action is valid
      */
     @Override
     public boolean isValid(Field field) {
-        return field.isInRange(senderId, dragonId, 1);
+        return field.isInRange(senderId, dragonId, 2);
     }
 }
