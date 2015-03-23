@@ -220,7 +220,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     private void sendRequestsForAction(Action action) throws RemoteException {
         //create request
-        final ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
+        ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
 
         //initialize acknowledgement counter for the request
         pendingRequests.put(request.getRequestID(), request);
