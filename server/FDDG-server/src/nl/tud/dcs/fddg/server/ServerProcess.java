@@ -80,7 +80,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.pendingAcknowledgements = new HashMap<Integer, Integer>();
 
         try {
-            writer = new PrintWriter("Server " + this.ID, "UTF-8");
+            writer = new PrintWriter("ServerProcess_log_" + this.ID, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
