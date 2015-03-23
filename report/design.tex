@@ -92,11 +92,13 @@ When the client has successfully reconnected, the player is added on a random po
 
 \subsubsection{Load balancing}
 \label{subsubsec:load_balancing}
-	Since a client choses a server at random, the way clients chose a server can be seen as a normal distribution. 
+	Since a client chooses a server at random, the distribution of clients can be seen as a normal distribution. 
 	This means that the expected amount of clients per server will be roughly the same.
 	If a server crashes and the clients connected to this server start reconnect to another server, the amount of players will be equally divided over the operational servers as they will -- again -- pick a (functioning) server at random.
-	Once the crashed server recovers it will not receive players from heavier loaded servers. 
-	There are plenty of load balancing algorithms () but due to time constrains, this is something we consider future work.
+	Once a crashed server recovers, it will not receive players from heavier loaded servers but simply by players trying to connect to this server by trying. 
+	This should result in the load slowly becoming even again over time. 
+	A load balancing algorithm can be used to speed up this process.
+	There are plenty of load balancing algorithms for example \cite{wolff2001dynamic} and \cite{ballard2000client}, but due to time constrains this is something we consider future work.
 
 \subsection{Additional System Features}
 \label{subsec:additional_features}
