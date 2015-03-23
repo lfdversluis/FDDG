@@ -186,7 +186,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void requestAction(Action action) throws RemoteException {
-        logger.fine("Received action request from client " + action.getSenderId());
+        logger.fine("Received " + action.getClass().getSimpleName() + " request from client " + action.getSenderId());
         if (isValidAction(action)) {
             if (!otherServers.isEmpty())
                 sendRequestsForAction(action);
@@ -262,7 +262,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             }
         }, 5000);
 
-        logger.fine("Sending request " + request.getRequestID() + " to all servers...");
+        logger.fine("Sending request " + request.getRequestID() + " with action " + request.getAction().getClass().getSimpleName() + " to all servers...");
 
         //broadcast the request to the other servers
         for (ServerInterface server : otherServers.values())
@@ -435,7 +435,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             int senderID = request.getSenderID();
             int requestID = request.getRequestID();
 
-            logger.fine("Acknowledging request " + requestID + " to server " + senderID);
+            logger.fine("Acknowledging request " + requestID + " with " + request.getAction().getClass().getSimpleName() + " to server " + senderID);
             otherServers.get(senderID).acknowledgeRequest(requestID);
         }
     }

@@ -17,15 +17,14 @@ import java.util.Scanner;
 public class StartClients {
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 3) {
-            System.err.println("Usage: StartClients <first client ID> <last client ID> <server file>");
+        if (args.length < 2) {
+            System.err.println("Usage: StartClients <clients to start> <server file>");
             System.exit(1);
         }
 
         // parse arguments
-        int firstID = Integer.parseInt(args[0]);
-        int lastID = Integer.parseInt(args[1]);
-        String serversFileName = args[2];
+        int clientsToStart = Integer.parseInt(args[0]);
+        String serversFileName = args[1];
 
         // parse servers file
         Scanner sc = new Scanner(new File(serversFileName));
@@ -36,11 +35,11 @@ public class StartClients {
             serverURLs[i] = sc.nextLine();
         }
 
-        System.out.println("Starting " + (lastID - firstID + 1) + " client(s) on host: "+InetAddress.getLocalHost().getHostAddress());
+        System.out.println("Starting " + clientsToStart + " client(s) on host: "+InetAddress.getLocalHost().getHostAddress());
 
         // create the client processes, bind them to the registry and start them
         try {
-            for (int id = firstID; id <= lastID; id++) {
+            for (int i = 0; i < clientsToStart; i++) {
                 ClientProcess client = new ClientProcess();
                 client.selectServer(serverURLs, false);
                 new Thread(client).start();
