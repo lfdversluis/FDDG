@@ -505,7 +505,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 action = new DeleteUnitAction(dragonID);
             }
         } else if (action instanceof AddPlayerAction) {
-            //increment this server's IDcounter
+            //increment this server's ID counter
             int newPlayerID = ((AddPlayerAction) action).getPlayerId();
             if (newPlayerID >= IDCounter) {
                 IDCounter = newPlayerID + 1;
