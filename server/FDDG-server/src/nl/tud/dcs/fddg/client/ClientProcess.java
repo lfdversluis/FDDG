@@ -113,8 +113,8 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             this.ID = server.register();
 
             String ipAddress = InetAddress.getLocalHost().getHostAddress();
-            String remoteName = ipAddress+"/FDDGClient/"+this.ID;
-            Naming.rebind(remoteName, this);
+            String remoteName = "//"+ipAddress+":1099/FDDGClient/"+this.ID;
+            Naming.rebind("FDDGClient/"+this.ID, this);
             server.connect(this.ID, remoteName);
 
             while (isAlive && !field.gameHasFinished()) {
