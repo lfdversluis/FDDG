@@ -1,16 +1,17 @@
 \section{Experiments}
 % (recommended size: 1.5 pages)
-	In this section, we will first describe the realistic simulation of clients connecting/disconnecting from the server, a requirement of our customer. After that, we first discuss our experimental setup. Next, we describe the experiments we have conducted on FDDG and the outcome of these experiments.
+	In this section, we will first describe the realistic simulation of clients connecting/disconnecting from the server, a requirement of the customer WantGame BV. After that, we first discuss our experimental setup. Finally, we describe the experiments we have conducted on FDDG and the outcome of these experiments.
 	
 \subsection{Simulation of connecting/disconnecting clients}
+\label{subsec:simulation_clients}
 A requirement of our game is that a realistic game trace should be used to simulate the behavior of clients connecting and disconnecting to and from the server.
-A potential data set with game traces we can use is described in the paper of Guo et al \cite{guo2012game}.
+A potential data set with game traces we can use is described in the paper of Guo et al. \cite{guo2012game}.
 Here, the design of the GTA (Game Trace Archive) is explained and possible applications of the data are discussed.
-Amongst the genres of the analyzed games are Massively multiplayer online role-playing game (MMORPGs), board games and Real-time Strategy (RTS) games. 
+Amongst the genres of the analyzed games are Massively Multiplayer Online Role-Playing Game (MMORPGs), board games and Real-time Strategy (RTS) games. 
 Since our games closely resembles a MMORPG, we decided to use the WoWAH game trace \cite{lee2011world}.
-This game trace archive contains data about 91065 players during 1107 days. The dataset is available as a free download on their website.
+This game trace archive contains data about 91065 players during 1107 days. The dataset is available as a free download on their website\footnote{http://mmnet.iis.sinica.edu.tw/dl/wowah/}.
 We gathered data about the number of online players during 24 hours. 
-A visual representation of the amount of online avatars in the game trace can be found in figure \ref{fig:online_players_plot}. As we see, the number of online players is minimal during the mourning and maximal around midnight.
+A visual representation of the amount of online avatars in the game trace can be found in Figure \ref{fig:online_players_plot}. As we see, the number of online players is minimal during the morning and maximal around midnight.
 
 \begin{figure}[h!]
   \centering
@@ -20,9 +21,10 @@ A visual representation of the amount of online avatars in the game trace can be
   \label{fig:online_players_plot}
 \end{figure}
 
-We also keep track of the number of players connecting and disconnecting during 10-minutes time intervals. 
-Using this data, we were able to create a realistic pattern of players connecting and disconnecting to and from the server.
-A simulation file has been created, containing information about all events during 24 hours. This file can then be read and executed.
+We keep track of the number of players connecting and disconnecting during 10-minute time intervals.
+We used that interval because in the WoWAH dataset, samples are taken every 10 minutes.
+Using this data, we were able to create a realistic pattern of players connecting and disconnecting to and from the game.
+A simulation file has been created, containing information about all events during 24 hours. This file can be used to actually run the simulation of connecting and disconnecting players.
 
 \subsection{Experimental setup}
 \label{subsec:experimental_setup}
