@@ -47,7 +47,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
     // Logging
     private PrintWriter writer;
-    private int amountOfMessagesReceived, amountOfMessagedSent, amountOfPingsSent, amountOfPingsReceived;
+    private int serverAmountOfMessagesReceived, serverAmountOfMessagedSent, serverAmountOfPingsSent, serverAmountOfPingsReceived;
+    private int clientAmountOfMessagesReceived, clientAmountOfMessagedSent, clientAmountOfPingsSent, clientAmountOfPingsReceived;
 
     /**
      * The constructor of the ServerProcess class.
@@ -87,10 +88,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        this.amountOfMessagesReceived = 0;
-        this.amountOfMessagedSent = 0;
-        this.amountOfPingsReceived = 0;
-        this.amountOfPingsSent = 0;
+        this.serverAmountOfMessagesReceived = 0;
+        this.serverAmountOfMessagedSent = 0;
+        this.serverAmountOfPingsReceived = 0;
+        this.serverAmountOfPingsSent = 0;
+        this.clientAmountOfMessagesReceived = 0;
+        this.clientAmountOfMessagedSent = 0;
+        this.clientAmountOfPingsReceived = 0;
+        this.clientAmountOfPingsSent = 0;
 
         // start GUI if necessary
         if (useGUI) {
@@ -116,7 +121,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 for (int clientId : connectedPlayers.keySet()) {
                     ClientInterface ci = connectedPlayers.get(clientId);
 
-                    amountOfPingsSent++;
+                    clientAmountOfPingsSent++;
 
                     try {
                         ci.ping();
@@ -132,7 +137,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
                 // Ping all servers
                 for (int serverId : otherServers.keySet()) {
-                    amountOfPingsSent++;
+                    serverAmountOfPingsSent++;
 
                     try {
                         otherServers.get(serverId).heartBeat(serverId);
@@ -170,10 +175,14 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             }
 
             logger.info("Server " + ID + " is going to sleep and exit now");
-            writer.println("Server " + this.ID + " pings-sent " + amountOfPingsSent);
-            writer.println("Server " + this.ID + " pings-received " + amountOfPingsReceived);
-            writer.println("Server " + this.ID + " messages-sent " + amountOfMessagedSent);
-            writer.println("Server " + this.ID + " messages-received " + amountOfMessagesReceived);
+            writer.println("Server " + this.ID + " server-pings-sent " + serverAmountOfPingsSent);
+            writer.println("Server " + this.ID + " server-pings-received " + serverAmountOfPingsReceived);
+            writer.println("Server " + this.ID + " server-messages-sent " + serverAmountOfMessagedSent);
+            writer.println("Server " + this.ID + " server-messages-received " + serverAmountOfMessagesReceived);
+            writer.println("Server " + this.ID + " client-pings-sent " + clientAmountOfPingsSent);
+            writer.println("Server " + this.ID + " client-pings-received " + clientAmountOfPingsReceived);
+            writer.println("Server " + this.ID + " client-messages-sent " + clientAmountOfMessagedSent);
+            writer.println("Server " + this.ID + " client-messages-received " + clientAmountOfMessagesReceived);
             writer.print("Server " + this.ID + " game finished");
             writer.flush();
             writer.close();
@@ -192,7 +201,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     public void broadcastActionToClients(Action action) throws RemoteException {
         for (ClientInterface client : connectedPlayers.values()) {
-            amountOfMessagedSent++;
+            clientAmountOfMessagedSent++;
             client.performAction(action);
         }
     }
@@ -216,7 +225,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     public void requestAction(Action action) throws RemoteException {
         logger.fine("Received action request from client " + action.getSenderId());
 
-        amountOfMessagesReceived++;
+        clientAmountOfMessagesReceived++;
 
         if (isValidAction(action)) {
             if (!otherServers.isEmpty()) {
@@ -299,7 +308,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         //broadcast the request to the other servers
         for (ServerInterface server : otherServers.values()) {
-            amountOfMessagedSent++;
+            serverAmountOfMessagedSent++;
             server.requestAction(request);
         }
     }
@@ -324,7 +333,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     public void connect(int clientId, String clientName) throws RemoteException {
         logger.log(Level.INFO, "Client " + clientName + " connected");
 
-        amountOfMessagesReceived++;
+        clientAmountOfMessagesReceived++;
 
         try {
             ClientInterface ci = (ClientInterface) Naming.lookup(clientName);
@@ -359,7 +368,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     @Override
     public void reconnect(int clientID, String clientName) throws RemoteException {
 
-        amountOfMessagesReceived++;
+        serverAmountOfMessagesReceived++;
 
         try {
             if (!connectedPlayers.containsKey(clientID)) {
@@ -380,7 +389,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void heartBeat(int remoteId) throws RemoteException {
-        amountOfPingsReceived++;
+        serverAmountOfPingsReceived++;
     }
 
     /**
@@ -390,7 +399,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     @Override
     public void pong() throws RemoteException {
-        amountOfPingsReceived++;
+        clientAmountOfPingsReceived++;
     }
 
     /**
@@ -473,7 +482,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     @Override
     public void requestAction(ActionRequest request) throws RemoteException {
 
-        amountOfMessagesReceived++;
+        serverAmountOfMessagesReceived++;
 
         if (isValidAction(request.getAction())) {
             int senderID = request.getSenderID();
@@ -522,7 +531,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     private void broadcastActionToServers(Action action) throws RemoteException {
         for (ServerInterface server : otherServers.values()) {
-            amountOfMessagedSent++;
+            serverAmountOfMessagedSent++;
             server.performAction(action);
         }
     }
