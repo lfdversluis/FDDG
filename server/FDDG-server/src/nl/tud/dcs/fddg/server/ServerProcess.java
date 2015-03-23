@@ -131,6 +131,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                 for (Action a : actionSet) {
                     broadcastActionToClients(a);
                     broadcastActionToServers(a);
+                    checkAndUpdateGUI();
                 }
                 Thread.sleep(1000);
             }

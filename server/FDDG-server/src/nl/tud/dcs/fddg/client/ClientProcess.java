@@ -35,7 +35,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         this.isAlive = true;
         this.serverAlive = false;
         this.logger = Logger.getLogger(ClientProcess.class.getName());
-        logger.setLevel(Level.SEVERE);
+        logger.setLevel(Level.ALL);
         logger.setUseParentHandlers(false);
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);
