@@ -366,7 +366,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     public void serverCrashed(int serverId) throws RemoteException {
         logger.info("Server " + serverId + " has crashed, removing him now");
 
-        //remove it from connectedPlayers and the serverPings.
+        //remove it from otherServers and the serverPings.
         otherServers.remove(serverId);
         serverPings.remove(serverId);
     }
