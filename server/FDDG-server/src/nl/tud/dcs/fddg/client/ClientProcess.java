@@ -169,7 +169,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             }
 
             Thread.sleep(1000);
-            writer.println("Client game finished");
+            writer.println("Client "+ this.ID + " game finished");
             writer.flush();
             writer.close();
             System.exit(0);
@@ -207,7 +207,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             }
         }
         logger.severe("All servers are down apparently (10 attempts failed)");
-        writer.println("Client connect failure");
+        writer.println("Client " + this.ID + " connect failure");
         writer.flush();
         writer.close();
         System.exit(1);
