@@ -239,11 +239,11 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @throws RemoteException
      */
     @Override
-    public void connect(int clientId) throws RemoteException {
-        logger.log(Level.INFO, "Client with id " + clientId + " connected");
+    public void connect(int clientId, String clientName) throws RemoteException {
+        logger.log(Level.INFO, "Client " + clientName + " connected");
 
         try {
-            ClientInterface ci = (ClientInterface) Naming.lookup("FDDGClient/" + clientId);
+            ClientInterface ci = (ClientInterface) Naming.lookup(clientName);
             field.addPlayer(clientId);
             ci.initializeField(field);
 
@@ -362,7 +362,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         //decrement pending acknowledgement counter
         int newCount = pendingAcknowledgements.get(requestID) - 1;
-        if(pendingAcknowledgements.containsKey(requestID)) {
+        if (pendingAcknowledgements.containsKey(requestID)) {
             pendingAcknowledgements.put(requestID, newCount);
         }
 

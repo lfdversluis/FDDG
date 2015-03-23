@@ -33,7 +33,7 @@ public interface ClientServerInterface extends Remote {
      * @param clientId The ID of the client that wants to connect
      * @throws java.rmi.RemoteException
      */
-    public void connect(int clientId) throws java.rmi.RemoteException;
+    public void connect(int clientId, String clientName) throws java.rmi.RemoteException;
 
     /**
      * This function can be called by other servers to check if this server is still functional.
