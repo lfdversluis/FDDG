@@ -362,7 +362,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         //decrement pending acknowledgement counter
         int newCount = pendingAcknowledgements.get(requestID) - 1;
-        if(pendingAcknowledgements.containsKey(requestID)) {
+        if (pendingAcknowledgements.containsKey(requestID)) {
             pendingAcknowledgements.put(requestID, newCount);
         }
 
@@ -422,6 +422,12 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             if (field.getDragon(dragonID).getCurHitPoints() <= 0) {
                 field.removeDragon(dragonID);
                 action = new DeleteUnitAction(dragonID);
+            }
+        } else if (action instanceof AddPlayerAction) {
+            //increment this server's IDcounter
+            int newPlayerID = ((AddPlayerAction) action).getPlayerId();
+            if (newPlayerID >= IDCounter) {
+                IDCounter = newPlayerID + 1;
             }
         }
 
