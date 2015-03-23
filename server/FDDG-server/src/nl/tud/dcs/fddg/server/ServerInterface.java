@@ -44,13 +44,4 @@ public interface ServerInterface extends Remote {
      * @throws RemoteException
      */
     public void heartBeat(int remoteId) throws RemoteException;
-
-    /**
-     * Sends the entire field upon request to a peer. This function is called by
-     * a crashed server that is recovering.
-     *
-     * @return The current Field (state) of the game.
-     * @throws RemoteException
-     */
-    public Field sendField() throws RemoteException;
 }

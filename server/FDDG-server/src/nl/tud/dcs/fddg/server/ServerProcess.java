@@ -330,11 +330,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
     }
 
-    @Override
-    public Field sendField() throws RemoteException {
-        return field;
-    }
-
     /**
      * This function send back a reply whenever a "ping" comes in.
      *
