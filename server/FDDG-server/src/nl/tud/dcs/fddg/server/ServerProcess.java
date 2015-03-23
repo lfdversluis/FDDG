@@ -40,6 +40,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     private Map<Integer, ActionRequest> pendingRequests; //(requestID,request)
     private Map<Integer, Timer> requestTimers; //(requestID, timer
     private Map<Integer, Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
+    private Map<Integer, Integer> serverPings; // (ID, # consecutive pings missed)
 
     /**
      * The constructor of the ServerProcess class.
@@ -59,8 +60,8 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);
         logger.addHandler(consoleHandler);
-
         this.gameStarted = false;
+        this.serverPings = new HashMap<Integer, Integer>();
         this.gameFinishedByOtherServer = false;
         this.connectedPlayers = new ConcurrentHashMap<Integer, ClientInterface>();
         this.clientPings = new HashMap<Integer, Boolean>();
@@ -73,8 +74,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.pendingAcknowledgements = new HashMap<Integer, Integer>();
 
         // start GUI if necessary
-        if (useGUI)
+        if (useGUI) {
             this.visualizerGUI = new VisualizerGUI(field);
+        }
 
         logger.log(Level.INFO, "Starting server with id " + id);
     }
@@ -104,6 +106,23 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
                         } else {
                             clientPings.put(clientId, false);
                         }
+                    }
+                }
+
+                // Ping all servers
+                for (int serverId : otherServers.keySet()) {
+                    try {
+                        otherServers.get(serverId).heartBeat(serverId);
+                        serverPings.put(serverId, 0);
+                    } catch (RemoteException e) {
+                        serverPings.put(serverId, serverPings.get(serverId) + 1);
+                    }
+                }
+
+                // Check if a server has not answered to 2 or more consecutive pings.
+                for (int serverId : serverPings.keySet()) {
+                    if (serverPings.get(serverId) > 1) {
+                        serverCrashed(serverId);
                     }
                 }
 
@@ -220,7 +239,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      */
     private void sendRequestsForAction(Action action) throws RemoteException {
         //create request
-        ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
+        final ActionRequest request = new ActionRequest(requestCounter++, this.ID, action);
 
         //initialize acknowledgement counter for the request
         pendingRequests.put(request.getRequestID(), request);
@@ -332,7 +351,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @param clientId The ID of the client that probably has crashed.
      */
     public void clientCrashed(int clientId) throws RemoteException {
-        logger.info("Client "+clientId+" has crashed, removing him now");
+        logger.info("Client " + clientId + " has crashed, removing him now");
 
         //remove it from connectedPlayers
         connectedPlayers.remove(clientId);
@@ -343,6 +362,19 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
 
         //broadcast deleteUnitAction to all other servers
         broadcastActionToServers(delAction);
+    }
+
+    /**
+     * This function gets called when a server suspects a peer server has dropped.
+     *
+     * @param serverId The ID of the server that probably has crashed.
+     */
+    public void serverCrashed(int serverId) throws RemoteException {
+        logger.info("Server " + serverId + " has crashed, removing him now");
+
+        //remove it from otherServers and the serverPings.
+        otherServers.remove(serverId);
+        serverPings.remove(serverId);
     }
 
     /**
