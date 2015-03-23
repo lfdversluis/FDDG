@@ -43,9 +43,12 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         this.logger = Logger.getLogger(ClientProcess.class.getName());
         logger.setLevel(Level.INFO);
         logger.setUseParentHandlers(false);
-        Handler consoleHandler = new ConsoleHandler();
-        consoleHandler.setLevel(Level.ALL);
-        logger.addHandler(consoleHandler);
+
+        if(logger.getHandlers().length == 0) {
+            Handler consoleHandler = new ConsoleHandler();
+            consoleHandler.setLevel(Level.ALL);
+            logger.addHandler(consoleHandler);
+        }
 
         this.messagesFromServer = 0;
         this.messagesToServer = 0;
@@ -214,7 +217,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             Random random = new Random();
             int randomServerId = random.nextInt(serverURLs.length);
             try {
-                logger.info("Client " + ID + " trying to connect to " + serverURLs[randomServerId]);
+                logger.info("Client trying to connect to " + serverURLs[randomServerId]);
                 server = (ClientServerInterface) Naming.lookup(serverURLs[randomServerId]);
                 if(shouldReconnect) {
                     String clientName = "//" + InetAddress.getLocalHost().getHostAddress() + ":1099/FDDGClient/" + ID;
