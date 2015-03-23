@@ -44,7 +44,9 @@ for playerId in initialPlayersData.split(" "):
 outfile.write(str(len(newInitialPlayersData)) + "\n")
 
 for playerId in newInitialPlayersData:
-    outfile.write(playerId + " ")
+    outfile.write(playerId)
+    if playerId != newInitialPlayersData[-1]:
+        outfile.write(" ")
 
 outfile.write("\n")
 
