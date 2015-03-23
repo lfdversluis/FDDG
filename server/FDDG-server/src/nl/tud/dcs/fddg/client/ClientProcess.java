@@ -7,9 +7,7 @@ import nl.tud.dcs.fddg.game.entities.Player;
 import nl.tud.dcs.fddg.server.ClientServerInterface;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -31,6 +29,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
 
     // Logging
     private PrintWriter writer;
+    private int messagesToServer, messagesFromServer, pingsToServer, pingsFromServer;
 
     /**
      * Constructor: initializes the instance variables, the logger and binds the client to its registry
@@ -71,6 +70,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
     @Override
     public void performAction(Action action) throws RemoteException {
         logger.fine("Client " + this.ID + " is performing a " + action.getClass().getName());
+        messagesFromServer++;
         // do additional work if the action is a delete unit action (as it requires access to this class' instance variables)
         if (action instanceof DeleteUnitAction) {
             DeleteUnitAction dua = (DeleteUnitAction) action;
@@ -106,6 +106,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     @Override
     public void ping() throws RemoteException {
+        pingsFromServer++;
     }
 
     /**
@@ -132,6 +133,8 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 // Check if the server is still alive
                 try {
                     server.pong();
+                    pingsToServer++;
+
                     serverAlive = true;
                 } catch (RemoteException e) {
                     if (serverAlive) {
@@ -165,6 +168,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
 
                     MoveAction moveAction = new MoveAction(this.ID, newX, newY);
                     server.requestAction(moveAction);
+                    messagesToServer++;
                     logger.fine("Client " + this.ID + " send request for a MoveAction");
                 }
 
@@ -172,6 +176,10 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
             }
 
             Thread.sleep(1000);
+            writer.println("Client " + this.ID + " pings-to-server " + pingsToServer);
+            writer.println("Client "+ this.ID + " pings-from-server " + pingsFromServer);
+            writer.println("Client "+ this.ID + " messages-to-server " + messagesToServer);
+            writer.println("Client "+ this.ID + " messages-from-server " + messagesFromServer);
             writer.println("Client "+ this.ID + " game finished");
             writer.flush();
             writer.close();
@@ -194,6 +202,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
         final int totalAttempts = 10;
         int attempts = 0;
         while (attempts < totalAttempts) {
+            messagesToServer++;
             Random random = new Random();
             int randomServerId = random.nextInt(serverURLs.length);
             try {
