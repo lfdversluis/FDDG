@@ -341,24 +341,26 @@ public class Field implements Serializable {
      */
     public Set<Action> dragonRage(Set<Integer> connectedPlayers) {
         Set<Action> actionSet = new HashSet<Action>();
+        Set<Integer> playersToDelete = new HashSet<Integer>();
 
         for (int dragonId : dragonMap.keySet()) {
             Dragon d = dragonMap.get(dragonId);
 
-            for (int playerId : playerMap.keySet()) {
+            for (int playerId : connectedPlayers) {
                 Player p = playerMap.get(playerId);
 
-                if(isInRange(playerId, dragonId, 2)) {
-                    p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
-
-                    if (p.getCurHitPoints() <= 0) {
+                if(isInRange(playerId, dragonId, 2) && !playersToDelete.contains(playerId)) {
+                    if (p.getCurHitPoints() - d.getAttackPower() <= 0 && p.getCurHitPoints() > 0) {
+                        p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
                         DeleteUnitAction dua = new DeleteUnitAction(p.getUnitId());
                         actionSet.add(dua);
+                        playersToDelete.add(p.getUnitId());
                         removePlayer(p.getUnitId());
+                    } else {
+                        p.setCurHitPoints(p.getCurHitPoints() - d.getAttackPower());
+                        DamageAction da = new DamageAction(p.getUnitId(), d.getAttackPower());
+                        actionSet.add(da);
                     }
-
-                    DamageAction da = new DamageAction(p.getUnitId(), d.getAttackPower());
-                    actionSet.add(da);
                 }
             }
         }
