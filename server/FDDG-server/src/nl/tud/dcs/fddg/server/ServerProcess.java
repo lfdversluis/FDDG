@@ -420,7 +420,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      *
      * @param serverId The ID of the server that probably has crashed.
      */
-    public void serverCrashed(int serverId) throws RemoteException {
+    public void serverCrashed(int serverId) {
         logger.info("Server " + serverId + " has crashed, removing him now");
 
         //remove it from otherServers and the serverPings.
@@ -526,10 +526,16 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      *
      * @param action The action to be broadcasted.
      */
-    private void broadcastActionToServers(Action action) throws RemoteException {
-        for (ServerInterface server : otherServers.values()) {
+    private void broadcastActionToServers(Action action) {
+        for (int serverId : otherServers.keySet()) {
             serverAmountOfMessagedSent++;
-            server.performAction(action);
+            try {
+                ServerInterface server = otherServers.get(serverId);
+                server.performAction(action);
+            } catch(Exception e) {
+                serverCrashed(serverId);
+            }
+
         }
     }
 
