@@ -75,7 +75,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.gameFinishedByOtherServer = false;
         this.connectedPlayers = new ConcurrentHashMap<Integer, ClientInterface>();
         this.clientPings = new HashMap<Integer, Boolean>();
-        System.out.println("THIS.ID ======= " + this.ID);
         this.IDCounter = 1000 * this.ID;
 
         this.requestCounter = 0;
@@ -528,7 +527,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @param action The action to be broadcasted.
      */
     private void broadcastActionToServers(Action action) {
-        for (Integer serverId : otherServers.keySet()) {
+        for (int serverId : otherServers.keySet()) {
             serverAmountOfMessagedSent++;
             try {
                 ServerInterface server = otherServers.get(serverId);
