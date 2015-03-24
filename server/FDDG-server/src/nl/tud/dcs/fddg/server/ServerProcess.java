@@ -75,7 +75,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.gameFinishedByOtherServer = false;
         this.connectedPlayers = new ConcurrentHashMap<Integer, ClientInterface>();
         this.clientPings = new HashMap<Integer, Boolean>();
-        this.IDCounter = 0;
+        this.IDCounter = 1000 * this.ID;
 
         this.requestCounter = 0;
         this.otherServers = new HashMap<Integer, ServerInterface>();
@@ -571,12 +571,6 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
             if (field.getDragon(dragonID) != null && field.getDragon(dragonID).getCurHitPoints() <= 0) {
                 field.removeDragon(dragonID);
                 action = new DeleteUnitAction(dragonID);
-            }
-        } else if (action instanceof AddPlayerAction) {
-            //increment this server's ID counter
-            int newPlayerID = ((AddPlayerAction) action).getPlayerId();
-            if (newPlayerID >= IDCounter) {
-                IDCounter = newPlayerID + 1;
             }
         }
 
