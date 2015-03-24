@@ -70,7 +70,25 @@ A simulation file has been created, containing information about all events duri
 		
 	\subsubsection{Scalability}
 	\label{subsubsec:scalability}
-		The minimum requirements of running 5 servers, 100 clients and 20 dragons were easily fulfilled. We therefore decided to try 10 servers, 200 clients and 40 dragons (twice as much for every parameter). The results were ...
+		The minimum requirements of running 5 servers, 100 clients and 20 dragons were fulfilled. 
+		As discussed earlier, 5 servers were ran on 5 nodes of the DAS4 super computer and 100 clients in bunches of 50 on 2 nodes. 
+		No tests were performed that went beyond this setting, but we believe we that the limit was not reached yet. Testing the scalability further is recommended for future work.
+		
+	\subsubsection{Performance}
+	\label{subsubsec:performance}
+		To test the performance of the system, the response times between a client requesting an action and the server acknowledging this request (after having communicated with its peers) was measured. 
+		The results of this experiment are visible in Figure \ref{fig:boxplot_response_times}.
+		The first observation is that almost all of the requests took no more than $\pm$30 ms which is very satisfactory. 
+		The next observation are the outliers which can reach up to $\pm$500 ms.
+		Since FDDG is a MMORPG, 500 ms is an acceptable amount of response time.
+		
+		\begin{figure}[h!]
+		  \centering
+		    \includegraphics[width=0.6\textwidth, height=0.59\textheight]{images/boxplot_response_times}
+		    
+		  \caption{A boxplot visualizing the response times of actions between clients and server.}
+		  \label{fig:boxplot_response_times}
+		\end{figure}
 		
 	\subsubsection{Message complexity of the system}
 	\label{subsubsec:nummessages}
