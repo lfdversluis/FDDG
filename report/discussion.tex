@@ -7,19 +7,42 @@
 % results reported in Section 6.b for system workloads that are orders of magnitude
 % higher than what you have tried in real-world experiments.
 
-	As discussed earlier in section \ref{subsec:system_overview}, we decided to use a mirrored game design with multiple servers. 
-	Since the field has is 25x25 (625 points), storing the entire field doesn't require much storage. 
-	Moreover, since every server maintains the whole board, a server crash can be easily overcome.
-	Once the crashed server recovers, one of the operational servers can send the entire field to that server. 
-	The crashed server can then initialize itself and immediately participate in the system again. 
-	As result this also means that the current design is highly fault tolerant as we can tolerate crashes of all but one server simultaneously. 
-	Only if all servers crash simultaneously, data and game state will be unrecoverable.
-	We can conclude that the current setting offers WantGame a consistent and available system. 
-	The drawbacks of this approach is the loss of performance due to an increased amount of messages being sent. 
-	This is because of actions being broadcast to all servers and clients in order to maintain a mirrored game state. 
-	Also, network issues are not covered by this design. 
-	If two servers \emph{A} and \emph{B} are unable to communicate with each other, but are able to connect and communicate with the remaining servers, they no longer will be synchronized. 
-	Both \emph{A} and \emph{B} will still broadcast to the remaining servers (which then will still check if the actions can be performed), but not to the server they assume has crashed. 
-	As a result, players who are connected to \emph{A} will appear to stand still for server \emph{B} and vice versa. This means that the consistency between the servers is lost. However, since the remaining servers still perform checks for both \emph{A} and \emph{B} and process their changes, it can never lead to a conflicting state.
+	In this chapter the tradeoffs inherent in the design of the system are discussed. Based on the results provided in section \ref{sec:experiments} we will provide a verdict whether WantGame should use a distributed system as discussed in the document.
+	
+	
+	\subsection{Tradeoffs system design}
+	\label{subsec:tradeoffs_system_design}
+		As discussed earlier in section \ref{subsec:system_overview}, we decided to use a mirrored game design with multiple servers. 
+		Since the field has is 25x25 (625 points), storing the entire field doesn't require much storage. 
+		Moreover, since every server maintains the whole board, a server crash can be easily overcome.
+		Once the crashed server is restarted, one of the operational servers can send the entire field to that server. 
+		The crashed server can then initialize itself and immediately participate in the system again. 
+		As result this also means that the current design is fault tolerant as we can tolerate crashes of all but one server simultaneously. 
+		Only if all servers crash simultaneously, the data and game state will be unrecoverable.
+		We can conclude that the current setting offers WantGame a consistent and available system. 
+		The drawbacks of this approach is the loss of performance due to an increased amount of messages being sent. 
+		This is because of actions being broadcast to all servers and clients in order to maintain a mirrored game state. 
+		Also, network issues are not covered by this design. 
+		If two servers \emph{A} and \emph{B} are unable to communicate with each other, but are able to connect and communicate with the remaining servers, they no longer will be synchronized. 
+		Both \emph{A} and \emph{B} will still broadcast to the remaining servers (which then will still check if the actions can be performed), but not to the server they assume has crashed. 
+		As a result, players who are connected to \emph{A} will appear to stand still for server \emph{B} and vice versa. This means that the consistency between the servers is lost. However, since the remaining servers still perform checks for both \emph{A} and \emph{B} and process their changes, it can never lead to a conflicting state.
+	
+	\subsection{Load balancing}
+	\label{subsec:load_balancing}
+		Since a client chooses a server at random, the distribution of clients can be seen as a normal distribution. 
+		This means that the expected amount of clients per server will be roughly the same.
+		If a server crashes and the clients connected to this server start to reconnect to another server, the amount of players will be equally divided over the operational servers as they will -- again -- pick a (functioning) server at random.
+		Once a crashed server recovers, it will not receive players from heavier loaded servers but simply by players trying to connect to this server by trying. 
+		This should result in the load slowly becoming even again over time. 
+		A load balancing algorithm can be used to speed up this process.
+		There are plenty of load balancing algorithms for example \cite{wolff2001dynamic} and \cite{ballard2000client}, but due to time constraints this is something we consider future work.
+		
+	\subsection{Scalability of the system}
+	\label{subsec:scalability_system_discussion}
+		As discussed in Subsubsection \ref{subsubsec:scalability}, we did not fully explore the scalability of the system. We did conclude that the current setting is suitable for WantGame's desires. Should WantGame want to expands, allocating more servers can easily be done to support more clients. We therefore believe the current design allows scaling of the system.
+		
+	\subsection{Our recommendation}
+	\label{subsec:our_recommendation}
+		Based on 
 	
 	TODO results from 6b. (experiments).
