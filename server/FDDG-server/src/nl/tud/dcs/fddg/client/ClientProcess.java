@@ -147,10 +147,14 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 } catch (RemoteException e) {
                     if (serverAlive) {
                         serverAlive = false;
+                        // we sleep 1 second, then retry with a ping
+                        Thread.sleep(1000);
+                        continue;
                     } else {
                         // Stop current run and reconnect to another server
                         isAlive = false;
                         serverCrashed();
+                        break;
                     }
                 }
 
@@ -160,9 +164,11 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                 if (playerToHeal != null) {
                     server.requestAction(new HealAction(this.ID, playerToHeal.getUnitId()));
                     logger.fine("Client " + this.ID + " send request for a HealAction");
+                    writer.println("Client " + this.ID + " send request for a HealAction");
                 } else if ((dragonToAttack = field.dragonIsInRangeToAttack(this.ID)) != null) {
                     server.requestAction(new AttackAction(this.ID, dragonToAttack.getUnitId()));
                     logger.fine("Client " + this.ID + " send request for a AttackAction");
+                    writer.println("Client " + this.ID + " send request for a AttackAction");
                 } else {
                     Player p = field.getPlayer(this.ID);
                     int move = field.getDirectionToNearestDragon(p.getxPos(), p.getyPos());
@@ -177,6 +183,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
                     MoveAction moveAction = new MoveAction(this.ID, newX, newY);
                     server.requestAction(moveAction);
                     logger.fine("Client " + this.ID + " send request for a MoveAction");
+                    writer.println("Client " + this.ID + " send request for a MoveAction");
                 }
 
                 messagesToServer++;
@@ -244,7 +251,7 @@ public class ClientProcess extends UnicastRemoteObject implements nl.tud.dcs.fdd
      */
     public void serverCrashed() {
         // Server crashed so we reconnect to another one.
-        writer.println("Client " + this.ID + " crash");
+        writer.println("Server crashed");
         selectServer(serverList, true);
         isAlive = true;
         this.run();
