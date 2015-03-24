@@ -35,7 +35,10 @@ public class HealAction extends Action {
     @Override
     public void perform(Field field) {
         Player thisPlayer = field.getPlayer(senderId);
-        field.getPlayer(targetPlayer).heal(thisPlayer.getAttackPower());
+        Player thatPlayer = field.getPlayer(targetPlayer);
+        if(thisPlayer != null && thatPlayer != null) {
+            thatPlayer.heal(thisPlayer.getAttackPower());
+        }
     }
 
     /**

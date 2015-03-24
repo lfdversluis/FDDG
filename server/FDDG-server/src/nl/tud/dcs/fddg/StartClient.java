@@ -34,6 +34,8 @@ public class StartClient {
             serverURLs[i] = sc.nextLine();
         }
 
+        sc.close();
+
         System.out.println("Starting a client on host: "+InetAddress.getLocalHost().getHostAddress());
 
         // create the client process, bind it to the registry and start it

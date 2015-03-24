@@ -26,7 +26,9 @@ public class DeleteUnitAction extends Action {
     public void perform(Field field) {
         if (field.getDragon(unitId) == null) {
             Player p = field.getPlayer(unitId);
-            field.removePlayer(p.getUnitId());
+            if(p != null) {
+                field.removePlayer(p.getUnitId());
+            }
         } else {
             Dragon d = field.getDragon(unitId);
             field.removeDragon(d.getUnitId());

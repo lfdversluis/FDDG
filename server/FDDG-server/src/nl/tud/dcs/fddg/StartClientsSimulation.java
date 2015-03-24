@@ -31,7 +31,7 @@ public class StartClientsSimulation {
 
     public static void stopClient(int logID) {
         Thread clientThread = clientMap.get(logID);
-        clientThread.stop();
+        clientThread.interrupt();
     }
 
     public static void main(String[] args) throws Exception {

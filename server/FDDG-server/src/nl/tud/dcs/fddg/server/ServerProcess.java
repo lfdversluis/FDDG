@@ -18,6 +18,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -41,7 +42,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
     // server administration
     private Map<Integer, ServerInterface> otherServers; //(id, RMI object)
     private int requestCounter;
-    private Map<Integer, ActionRequest> pendingRequests; //(requestID,request)
+    private ConcurrentMap<Integer, ActionRequest> pendingRequests; //(requestID,request)
     private Map<Integer, Timer> requestTimers; //(requestID, timer
     private Map<Integer, Integer> pendingAcknowledgements; //(requestID, nr of acks still to receive)
     private Map<Integer, Integer> serverPings; // (ID, # consecutive pings missed)
@@ -74,11 +75,11 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         this.gameFinishedByOtherServer = false;
         this.connectedPlayers = new ConcurrentHashMap<Integer, ClientInterface>();
         this.clientPings = new HashMap<Integer, Boolean>();
-        this.IDCounter = 0;
+        this.IDCounter = 1000 * this.ID;
 
         this.requestCounter = 0;
         this.otherServers = new HashMap<Integer, ServerInterface>();
-        this.pendingRequests = new HashMap<Integer, ActionRequest>();
+        this.pendingRequests = new ConcurrentHashMap<Integer, ActionRequest>();
         this.requestTimers = new HashMap<Integer, Timer>();
         this.pendingAcknowledgements = new HashMap<Integer, Integer>();
 
@@ -539,10 +540,12 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @param requestID The id of the request to be removed
      */
     private void removeRequest(int requestID) {
-        requestTimers.get(requestID).cancel();
-        requestTimers.remove(requestID);
-        pendingAcknowledgements.remove(requestID);
-        pendingRequests.remove(requestID);
+        if(requestTimers.containsKey(requestID)) {
+            requestTimers.get(requestID).cancel();
+            requestTimers.remove(requestID);
+            pendingAcknowledgements.remove(requestID);
+            pendingRequests.remove(requestID);
+        }
     }
 
     /**
@@ -565,15 +568,9 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         if (action instanceof AttackAction) {
             AttackAction aa = (AttackAction) action;
             int dragonID = aa.getDragonId();
-            if (field.getDragon(dragonID).getCurHitPoints() <= 0) {
+            if (field.getDragon(dragonID) != null && field.getDragon(dragonID).getCurHitPoints() <= 0) {
                 field.removeDragon(dragonID);
                 action = new DeleteUnitAction(dragonID);
-            }
-        } else if (action instanceof AddPlayerAction) {
-            //increment this server's ID counter
-            int newPlayerID = ((AddPlayerAction) action).getPlayerId();
-            if (newPlayerID >= IDCounter) {
-                IDCounter = newPlayerID + 1;
             }
         }
 

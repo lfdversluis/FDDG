@@ -1,5 +1,6 @@
 2
 //localhost:1099/FDDGServer/0
 //localhost:1099/FDDGServer/1
-//localhost:1099/FDDGServer/2
-//localhost:1099/FDDGServer/3
+//10.0.1.129:1099/FDDGServer/2
+//10.0.1.2:1099/FDDGServer/3
+//10.0.1.2:1099/FDDGServer/4
