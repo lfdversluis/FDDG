@@ -1,0 +1,21 @@
+Client response 21
+Client 21 send request for a AttackAction
+Client response 16
+Client 21 send request for a AttackAction
+Client response 19
+Client 21 send request for a HealAction
+Client 21 send request for a HealAction
+Client response 14
+Client 21 send request for a HealAction
+Client 21 send request for a HealAction
+Client response 15
+Client 21 send request for a HealAction
+Client response 14
+Client 21 send request for a HealAction
+Client response 13
+Client 21 send request for a HealAction
+Client 21 pings-to-server 9
+Client 21 pings-from-server 6
+Client 21 messages-to-server 9
+Client 21 messages-from-server 454
+Client 21 game finished

@@ -1,0 +1,93 @@
+Client response 10
+Client 23 send request for a MoveAction
+Client response 7
+Client 23 send request for a MoveAction
+Client response 131
+Client 23 send request for a MoveAction
+Client response 7
+Client 23 send request for a MoveAction
+Client response 7
+Client 23 send request for a HealAction
+Client response 6
+Client 23 send request for a HealAction
+Client response 8
+Client 23 send request for a AttackAction
+Client response 7
+Client 23 send request for a HealAction
+Client response 7
+Client 23 send request for a AttackAction
+Client response 8
+Client 23 send request for a HealAction
+Client response 9
+Client 23 send request for a AttackAction
+Client response 9
+Client 23 send request for a HealAction
+Client response 9
+Client 23 send request for a HealAction
+Client response 9
+Client 23 send request for a HealAction
+Client response 9
+Client 23 send request for a HealAction
+Client response 15
+Client 23 send request for a AttackAction
+Client response 309
+Client 23 send request for a MoveAction
+Client response 160
+Client 23 send request for a MoveAction
+Client response 162
+Client 23 send request for a MoveAction
+Client response 12
+Client 23 send request for a MoveAction
+Client 23 send request for a HealAction
+Client response 9
+Client 23 send request for a HealAction
+Client response 9
+Client 23 send request for a HealAction
+Client response 9
+Client 23 send request for a HealAction
+Client response 9
+Client 23 send request for a MoveAction
+Client response 8
+Client 23 send request for a AttackAction
+Client response 8
+Client 23 send request for a AttackAction
+Client response 9
+Client 23 send request for a AttackAction
+Client response 8
+Client 23 send request for a AttackAction
+Client response 8
+Client 23 send request for a HealAction
+Client response 9
+Client 23 send request for a HealAction
+Client response 8
+Client 23 send request for a HealAction
+Client response 8
+Client 23 send request for a HealAction
+Client response 8
+Client 23 send request for a HealAction
+Client response 8
+Client 23 send request for a HealAction
+Client response 8
+Client 23 send request for a HealAction
+Client response 8
+Client 23 send request for a HealAction
+Client response 7
+Client 23 send request for a HealAction
+Client 23 send request for a AttackAction
+Client response 9
+Client 23 send request for a HealAction
+Client response 8
+Client 23 send request for a MoveAction
+Client response 8
+Client 23 send request for a MoveAction
+Client response 8
+Client 23 send request for a MoveAction
+Client response 8
+Client 23 send request for a MoveAction
+Client response 7
+Client 23 send request for a MoveAction
+Client 23 pings-to-server 45
+Client 23 pings-from-server 41
+Client 23 messages-to-server 45
+Client 23 messages-from-server 1275
+Client 23 game finished

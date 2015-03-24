@@ -1,0 +1,11 @@
+Client 32 send request for a HealAction
+Client response 11
+Client 32 send request for a MoveAction
+Client 32 send request for a HealAction
+Client response 11
+Client 32 send request for a MoveAction
+Client 32 pings-to-server 4
+Client 32 pings-from-server 4
+Client 32 messages-to-server 4
+Client 32 messages-from-server 163
+Client 32 game finished

@@ -1,0 +1,20 @@
+Client response 11
+Client 38 send request for a AttackAction
+Client response 10
+Client 38 send request for a AttackAction
+Client response 9
+Client 38 send request for a HealAction
+Client response 9
+Client 38 send request for a HealAction
+Client response 16
+Client 38 send request for a AttackAction
+Client response 312
+Client 38 send request for a HealAction
+Client response 161
+Client 38 send request for a HealAction
+Client 38 send request for a HealAction
+Client 38 pings-to-server 8
+Client 38 pings-from-server 8
+Client 38 messages-to-server 8
+Client 38 messages-from-server 317
+Client 38 game finished

@@ -1,0 +1,28 @@
+Client 3022 send request for a HealAction
+Client response 6
+Client 3022 send request for a MoveAction
+Client 3022 send request for a MoveAction
+Client response 8
+Client 3022 send request for a HealAction
+Client response 6
+Client 3022 send request for a HealAction
+Client response 7
+Client 3022 send request for a HealAction
+Client 3022 send request for a HealAction
+Client response 6
+Client 3022 send request for a MoveAction
+Client response 6
+Client 3022 send request for a MoveAction
+Client response 6
+Client 3022 send request for a HealAction
+Client 3022 send request for a HealAction
+Client response 5
+Client 3022 send request for a MoveAction
+Client response 6
+Client 3022 send request for a MoveAction
+Client 3022 send request for a HealAction
+Client 3022 pings-to-server 14
+Client 3022 pings-from-server 11
+Client 3022 messages-to-server 14
+Client 3022 messages-from-server 670
+Client 3022 game finished

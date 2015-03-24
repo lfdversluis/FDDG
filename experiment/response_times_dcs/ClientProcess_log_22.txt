@@ -1,0 +1,15 @@
+Client response 9
+Client 22 send request for a HealAction
+Client response 6
+Client 22 send request for a MoveAction
+Client response 6
+Client 22 send request for a MoveAction
+Client response 6
+Client 22 send request for a MoveAction
+Client response 8
+Client 22 send request for a HealAction
+Client 22 pings-to-server 5
+Client 22 pings-from-server 4
+Client 22 messages-to-server 5
+Client 22 messages-from-server 288
+Client 22 game finished

@@ -1,0 +1,38 @@
+Client response 10
+Client 1020 send request for a MoveAction
+Client 1020 send request for a HealAction
+Client response 8
+Client 1020 send request for a HealAction
+Client response 8
+Client 1020 send request for a AttackAction
+Client response 7
+Client 1020 send request for a HealAction
+Client response 7
+Client 1020 send request for a HealAction
+Client response 7
+Client 1020 send request for a AttackAction
+Client response 7
+Client 1020 send request for a AttackAction
+Client response 236
+Client 1020 send request for a HealAction
+Client response 7
+Client 1020 send request for a HealAction
+Client response 6
+Client 1020 send request for a HealAction
+Client response 6
+Client 1020 send request for a HealAction
+Client response 8
+Client 1020 send request for a HealAction
+Client response 7
+Client 1020 send request for a HealAction
+Client response 7
+Client 1020 send request for a AttackAction
+Client response 7
+Client 1020 send request for a HealAction
+Client response 7
+Client 1020 send request for a HealAction
+Client 1020 pings-to-server 17
+Client 1020 pings-from-server 16
+Client 1020 messages-to-server 17
+Client 1020 messages-from-server 398
+Client 1020 game finished

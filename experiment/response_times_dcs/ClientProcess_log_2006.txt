@@ -1,0 +1,9 @@
+Client response 12
+Client 2006 send request for a AttackAction
+Client response 10
+Client 2006 send request for a AttackAction
+Client 2006 pings-to-server 2
+Client 2006 pings-from-server 2
+Client 2006 messages-to-server 2
+Client 2006 messages-from-server 50
+Client 2006 game finished

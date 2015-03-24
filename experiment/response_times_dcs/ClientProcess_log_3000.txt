@@ -1,0 +1,7 @@
+Client response 33
+Client 3000 send request for a AttackAction
+Client 3000 pings-to-server 1
+Client 3000 pings-from-server 2
+Client 3000 messages-to-server 1
+Client 3000 messages-from-server 8
+Client 3000 game finished

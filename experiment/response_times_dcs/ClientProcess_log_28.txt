@@ -1,0 +1,28 @@
+Client response 6
+Client 28 send request for a HealAction
+Client 28 send request for a HealAction
+Client response 4
+Client 28 send request for a HealAction
+Client response 3
+Client 28 send request for a HealAction
+Client response 3
+Client 28 send request for a HealAction
+Client response 6
+Client 28 send request for a MoveAction
+Client response 4
+Client 28 send request for a MoveAction
+Client response 4
+Client 28 send request for a HealAction
+Client response 4
+Client 28 send request for a HealAction
+Client response 7
+Client 28 send request for a HealAction
+Client response 5
+Client 28 send request for a MoveAction
+Client response 6
+Client 28 send request for a HealAction
+Client 28 pings-to-server 12
+Client 28 pings-from-server 11
+Client 28 messages-to-server 12
+Client 28 messages-from-server 448
+Client 28 game finished

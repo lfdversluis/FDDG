@@ -1,0 +1,125 @@
+Client response 11
+Client 3020 send request for a HealAction
+Client response 9
+Client 3020 send request for a MoveAction
+Client response 9
+Client 3020 send request for a MoveAction
+Client response 9
+Client 3020 send request for a HealAction
+Client response 8
+Client 3020 send request for a MoveAction
+Client response 10
+Client 3020 send request for a HealAction
+Client 3020 send request for a AttackAction
+Client 3020 send request for a HealAction
+Client response 8
+Client 3020 send request for a MoveAction
+Client response 8
+Client 3020 send request for a MoveAction
+Client response 8
+Client 3020 send request for a MoveAction
+Client response 10
+Client 3020 send request for a MoveAction
+Client response 11
+Client 3020 send request for a MoveAction
+Client response 8
+Client 3020 send request for a HealAction
+Client 3020 send request for a HealAction
+Client response 9
+Client 3020 send request for a HealAction
+Client response 9
+Client 3020 send request for a HealAction
+Client 3020 send request for a HealAction
+Client response 8
+Client 3020 send request for a MoveAction
+Client response 8
+Client 3020 send request for a HealAction
+Client response 213
+Client 3020 send request for a MoveAction
+Client response 9
+Client 3020 send request for a MoveAction
+Client 3020 send request for a MoveAction
+Client response 9
+Client 3020 send request for a MoveAction
+Client response 8
+Client 3020 send request for a MoveAction
+Client response 210
+Client 3020 send request for a HealAction
+Client response 7
+Client 3020 send request for a MoveAction
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 7
+Client 3020 send request for a HealAction
+Client response 7
+Client 3020 send request for a MoveAction
+Client response 6
+Client 3020 send request for a HealAction
+Client 3020 send request for a HealAction
+Client response 7
+Client 3020 send request for a HealAction
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client 3020 send request for a HealAction
+Client response 7
+Client 3020 send request for a MoveAction
+Client response 6
+Client 3020 send request for a HealAction
+Client 3020 send request for a HealAction
+Client response 7
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a MoveAction
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a MoveAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a MoveAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 5
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a MoveAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 7
+Client 3020 send request for a HealAction
+Client response 7
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a HealAction
+Client response 5
+Client 3020 send request for a MoveAction
+Client response 5
+Client 3020 send request for a HealAction
+Client 3020 send request for a HealAction
+Client 3020 send request for a HealAction
+Client response 6
+Client 3020 send request for a MoveAction
+Client response 6
+Client 3020 send request for a HealAction
+Client 3020 pings-to-server 67
+Client 3020 pings-from-server 62
+Client 3020 messages-to-server 67
+Client 3020 messages-from-server 1641
+Client 3020 game finished

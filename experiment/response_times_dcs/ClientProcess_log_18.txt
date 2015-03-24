@@ -1,0 +1,14 @@
+Client 18 send request for a HealAction
+Client 18 send request for a HealAction
+Client response 10
+Client 18 send request for a HealAction
+Client response 11
+Client 18 send request for a MoveAction
+Client 18 send request for a HealAction
+Client response 9
+Client 18 send request for a HealAction
+Client 18 pings-to-server 6
+Client 18 pings-from-server 3
+Client 18 messages-to-server 6
+Client 18 messages-from-server 350
+Client 18 game finished

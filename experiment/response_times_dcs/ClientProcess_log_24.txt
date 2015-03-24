@@ -1,0 +1,190 @@
+Client response 9
+Client 24 send request for a MoveAction
+Client response 11
+Client 24 send request for a AttackAction
+Client response 11
+Client 24 send request for a HealAction
+Client response 10
+Client 24 send request for a HealAction
+Client response 129
+Client 24 send request for a HealAction
+Client response 12
+Client 24 send request for a HealAction
+Client response 126
+Client 24 send request for a HealAction
+Client response 11
+Client 24 send request for a HealAction
+Client response 13
+Client 24 send request for a AttackAction
+Client response 12
+Client 24 send request for a HealAction
+Client response 14
+Client 24 send request for a HealAction
+Client response 64
+Client 24 send request for a HealAction
+Client response 10
+Client 24 send request for a HealAction
+Client response 12
+Client 24 send request for a HealAction
+Client response 22
+Client 24 send request for a AttackAction
+Client 24 send request for a HealAction
+Client response 475
+Client 24 send request for a HealAction
+Client response 166
+Client 24 send request for a HealAction
+Client response 12
+Client 24 send request for a HealAction
+Client response 304
+Client 24 send request for a HealAction
+Client response 12
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 10
+Client 24 send request for a HealAction
+Client response 9
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 9
+Client 24 send request for a HealAction
+Client response 9
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a AttackAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 9
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a AttackAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 138
+Client 24 send request for a HealAction
+Client response 11
+Client 24 send request for a HealAction
+Client response 6
+Client 24 send request for a HealAction
+Client response 6
+Client 24 send request for a HealAction
+Client response 6
+Client 24 send request for a HealAction
+Client response 5
+Client 24 send request for a HealAction
+Client response 5
+Client 24 send request for a HealAction
+Client response 4
+Client 24 send request for a HealAction
+Client response 5
+Client 24 send request for a HealAction
+Client response 5
+Client 24 send request for a HealAction
+Client response 5
+Client 24 send request for a HealAction
+Client response 5
+Client 24 send request for a HealAction
+Client response 6
+Client 24 send request for a HealAction
+Client response 6
+Client 24 send request for a HealAction
+Client response 6
+Client 24 send request for a HealAction
+Client response 5
+Client 24 send request for a HealAction
+Client response 320
+Client 24 send request for a HealAction
+Client response 8
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 6
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 6
+Client 24 send request for a HealAction
+Client response 6
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 313
+Client 24 send request for a HealAction
+Client response 7
+Client 24 send request for a HealAction
+Client response 4
+Client 24 send request for a HealAction
+Client response 4
+Client 24 send request for a HealAction
+Client response 4
+Client 24 send request for a HealAction
+Client response 3
+Client 24 send request for a HealAction
+Client response 4
+Client 24 send request for a HealAction
+Client response 4
+Client 24 send request for a HealAction
+Client response 3
+Client 24 send request for a HealAction
+Client response 3
+Client 24 send request for a HealAction
+Client response 3
+Client 24 send request for a HealAction
+Client response 2
+Client 24 send request for a AttackAction
+Client 24 send request for a AttackAction
+Client response 4
+Client 24 send request for a MoveAction
+Client response 4
+Client 24 send request for a MoveAction
+Client response 4
+Client 24 send request for a MoveAction
+Client response 4
+Client 24 send request for a MoveAction
+Client 24 send request for a HealAction
+Client response 5
+Client 24 send request for a MoveAction
+Client response 4
+Client 24 send request for a HealAction
+Client response 3
+Client 24 send request for a AttackAction
+Client 24 send request for a HealAction
+Client response 5
+Client 24 send request for a HealAction
+Client 24 send request for a HealAction
+Client 24 pings-to-server 95
+Client 24 pings-from-server 91
+Client 24 messages-to-server 95
+Client 24 messages-from-server 1784
+Client 24 game finished

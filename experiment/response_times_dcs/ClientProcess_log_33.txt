@@ -1,0 +1,11 @@
+Client response 6
+Client 33 send request for a AttackAction
+Client response 6
+Client 33 send request for a AttackAction
+Client response 6
+Client 33 send request for a HealAction
+Client 33 pings-to-server 3
+Client 33 pings-from-server 3
+Client 33 messages-to-server 3
+Client 33 messages-from-server 153
+Client 33 game finished

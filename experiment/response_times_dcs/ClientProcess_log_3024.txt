@@ -1,0 +1,14 @@
+Client response 6
+Client response 6
+Client 3024 send request for a MoveAction
+Client response 6
+Client response 6
+Client 3024 send request for a MoveAction
+Client response 6
+Client response 7
+Client 3024 send request for a AttackAction
+Client 3024 pings-to-server 402
+Client 3024 pings-from-server 386
+Client 3024 messages-to-server 402
+Client 3024 messages-from-server 2259
+Client 3024 game finished

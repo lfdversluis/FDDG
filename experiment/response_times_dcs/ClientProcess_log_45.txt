@@ -1,0 +1,63 @@
+Client response 9
+Client 45 send request for a MoveAction
+Client response 8
+Client 45 send request for a MoveAction
+Client response 325
+Client 45 send request for a HealAction
+Client response 298
+Client 45 send request for a HealAction
+Client response 6
+Client 45 send request for a HealAction
+Client response 7
+Client 45 send request for a HealAction
+Client response 6
+Client 45 send request for a AttackAction
+Client response 7
+Client 45 send request for a AttackAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 7
+Client 45 send request for a HealAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 6
+Client 45 send request for a HealAction
+Client response 6
+Client 45 send request for a AttackAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 6
+Client 45 send request for a HealAction
+Client response 4
+Client 45 send request for a HealAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 5
+Client 45 send request for a HealAction
+Client response 5
+Client 45 send request for a MoveAction
+Client response 4
+Client 45 send request for a MoveAction
+Client response 5
+Client 45 send request for a MoveAction
+Client response 5
+Client 45 send request for a MoveAction
+Client response 4
+Client 45 send request for a MoveAction
+Client response 5
+Client 45 send request for a AttackAction
+Client 45 pings-to-server 29
+Client 45 pings-from-server 28
+Client 45 messages-to-server 29
+Client 45 messages-from-server 776
+Client 45 game finished

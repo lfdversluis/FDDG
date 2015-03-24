@@ -1,0 +1,42 @@
+Client response 14
+Client 17 send request for a HealAction
+Client 17 send request for a HealAction
+Client response 12
+Client 17 send request for a MoveAction
+Client response 13
+Client 17 send request for a HealAction
+Client response 13
+Client 17 send request for a MoveAction
+Client response 15
+Client 17 send request for a MoveAction
+Client response 24
+Client 17 send request for a AttackAction
+Client response 14
+Client 17 send request for a HealAction
+Client response 267
+Client 17 send request for a AttackAction
+Client response 12
+Client 17 send request for a MoveAction
+Client response 11
+Client 17 send request for a MoveAction
+Client response 281
+Client 17 send request for a MoveAction
+Client response 11
+Client 17 send request for a MoveAction
+Client response 11
+Client 17 send request for a MoveAction
+Client response 10
+Client 17 send request for a MoveAction
+Client response 11
+Client 17 send request for a MoveAction
+Client response 10
+Client 17 send request for a HealAction
+Client 17 send request for a HealAction
+Client response 11
+Client 17 send request for a HealAction
+Client 17 send request for a HealAction
+Client 17 pings-to-server 20
+Client 17 pings-from-server 14
+Client 17 messages-to-server 20
+Client 17 messages-from-server 890
+Client 17 game finished

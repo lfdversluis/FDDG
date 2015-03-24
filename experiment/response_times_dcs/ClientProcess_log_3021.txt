@@ -1,0 +1,20 @@
+Client response 13
+Client 3021 send request for a AttackAction
+Client response 10
+Client 3021 send request for a HealAction
+Client response 11
+Client 3021 send request for a MoveAction
+Client response 9
+Client 3021 send request for a MoveAction
+Client response 11
+Client 3021 send request for a MoveAction
+Client 3021 send request for a HealAction
+Client response 10
+Client 3021 send request for a MoveAction
+Client response 10
+Client 3021 send request for a AttackAction
+Client 3021 pings-to-server 8
+Client 3021 pings-from-server 6
+Client 3021 messages-to-server 8
+Client 3021 messages-from-server 445
+Client 3021 game finished

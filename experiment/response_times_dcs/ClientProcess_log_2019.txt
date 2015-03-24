@@ -1,0 +1,7 @@
+Client response 13
+Client 2019 send request for a AttackAction
+Client 2019 pings-to-server 1
+Client 2019 pings-from-server 1
+Client 2019 messages-to-server 1
+Client 2019 messages-from-server 26
+Client 2019 game finished

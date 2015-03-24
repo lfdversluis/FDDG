@@ -1,0 +1,21 @@
+Client response 7
+Client 36 send request for a MoveAction
+Client response 7
+Client 36 send request for a MoveAction
+Client response 6
+Client 36 send request for a HealAction
+Client response 9
+Client 36 send request for a MoveAction
+Client response 6
+Client 36 send request for a MoveAction
+Client response 7
+Client 36 send request for a AttackAction
+Client response 7
+Client 36 send request for a HealAction
+Client 36 send request for a HealAction
+Client 36 send request for a HealAction
+Client 36 pings-to-server 9
+Client 36 pings-from-server 8
+Client 36 messages-to-server 9
+Client 36 messages-from-server 341
+Client 36 game finished

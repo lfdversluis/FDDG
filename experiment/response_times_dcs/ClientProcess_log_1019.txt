@@ -1,0 +1,23 @@
+Client response 10
+Client 1019 send request for a MoveAction
+Client response 6
+Client 1019 send request for a HealAction
+Client response 7
+Client 1019 send request for a HealAction
+Client response 7
+Client 1019 send request for a MoveAction
+Client response 6
+Client 1019 send request for a MoveAction
+Client response 7
+Client 1019 send request for a MoveAction
+Client response 5
+Client 1019 send request for a MoveAction
+Client response 6
+Client 1019 send request for a MoveAction
+Client response 5
+Client 1019 send request for a HealAction
+Client 1019 pings-to-server 9
+Client 1019 pings-from-server 8
+Client 1019 messages-to-server 9
+Client 1019 messages-from-server 344
+Client 1019 game finished

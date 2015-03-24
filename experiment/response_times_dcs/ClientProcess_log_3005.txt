@@ -1,0 +1,7 @@
+Client response 15
+Client 3005 send request for a MoveAction
+Client 3005 pings-to-server 1
+Client 3005 pings-from-server 2
+Client 3005 messages-to-server 1
+Client 3005 messages-from-server 37
+Client 3005 game finished

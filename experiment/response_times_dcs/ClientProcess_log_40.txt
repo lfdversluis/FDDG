@@ -1,0 +1,118 @@
+Client response 4
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 2
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 2
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a AttackAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 0
+Client 40 send request for a HealAction
+Client response 0
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 0
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client 40 send request for a AttackAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 2
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 0
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a HealAction
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 0
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 1
+Client 40 send request for a HealAction
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a MoveAction
+Client response 0
+Client 40 send request for a HealAction
+Client response 2
+Client 40 send request for a HealAction
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client response 1
+Client 40 send request for a HealAction
+Client 40 send request for a HealAction
+Client 40 pings-to-server 60
+Client 40 pings-from-server 57
+Client 40 messages-to-server 60
+Client 40 messages-from-server 1319
+Client 40 game finished

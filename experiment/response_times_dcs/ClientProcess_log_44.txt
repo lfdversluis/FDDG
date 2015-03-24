@@ -1,0 +1,12 @@
+Client response 11
+Client 44 send request for a MoveAction
+Client response 86
+Client 44 send request for a HealAction
+Client 44 send request for a HealAction
+Client response 323
+Client 44 send request for a HealAction
+Client 44 pings-to-server 4
+Client 44 pings-from-server 4
+Client 44 messages-to-server 4
+Client 44 messages-from-server 165
+Client 44 game finished
