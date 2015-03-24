@@ -1,6 +1,7 @@
 package nl.tud.dcs.fddg.game.actions;
 
 import nl.tud.dcs.fddg.game.Field;
+import nl.tud.dcs.fddg.game.entities.Player;
 
 public class DamageAction extends Action {
     private int playerId;
@@ -35,7 +36,17 @@ public class DamageAction extends Action {
      */
     @Override
     public void perform(Field field) {
-        field.getPlayer(playerId).setCurHitPoints(field.getPlayer(playerId).getCurHitPoints() - damage);
+        try {
+            Player p = field.getPlayer(playerId);
+            if(p != null) {
+                p.setCurHitPoints(p.getCurHitPoints() - damage);
+            }
+
+        } catch(Exception e) {
+            System.out.println("ERRORERRORERROR ------" + field + ", " + playerId + ", " + field.getPlayer(playerId));
+            e.printStackTrace();
+        }
+
     }
 
     /**

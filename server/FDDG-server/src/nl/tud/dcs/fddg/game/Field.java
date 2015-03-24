@@ -143,7 +143,7 @@ public class Field implements Serializable {
 
         // TODO we forgot something... apparently the player can move anywhere it likes. No distance = 1 check?!
 
-        if (!canMove(x, y)) {
+        if (p == null || !canMove(x, y)) {
             return false;
         }
 

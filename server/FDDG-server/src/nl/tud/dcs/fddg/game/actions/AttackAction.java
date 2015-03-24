@@ -38,7 +38,9 @@ public class AttackAction extends Action {
     public void perform(Field field) {
         Dragon dragon = field.getDragon(dragonId);
         Player player = field.getPlayer(senderId);
-        dragon.getHit(player.getAttackPower());
+        if(player != null && dragon != null) {
+            dragon.getHit(player.getAttackPower());
+        }
     }
 
     /**

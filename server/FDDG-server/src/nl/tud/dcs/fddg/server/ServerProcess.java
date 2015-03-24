@@ -540,10 +540,12 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
      * @param requestID The id of the request to be removed
      */
     private void removeRequest(int requestID) {
-        requestTimers.get(requestID).cancel();
-        requestTimers.remove(requestID);
-        pendingAcknowledgements.remove(requestID);
-        pendingRequests.remove(requestID);
+        if(requestTimers.containsKey(requestID)) {
+            requestTimers.get(requestID).cancel();
+            requestTimers.remove(requestID);
+            pendingAcknowledgements.remove(requestID);
+            pendingRequests.remove(requestID);
+        }
     }
 
     /**
@@ -566,7 +568,7 @@ public class ServerProcess extends UnicastRemoteObject implements ClientServerIn
         if (action instanceof AttackAction) {
             AttackAction aa = (AttackAction) action;
             int dragonID = aa.getDragonId();
-            if (field.getDragon(dragonID).getCurHitPoints() <= 0) {
+            if (field.getDragon(dragonID) != null && field.getDragon(dragonID).getCurHitPoints() <= 0) {
                 field.removeDragon(dragonID);
                 action = new DeleteUnitAction(dragonID);
             }

@@ -94,7 +94,7 @@ public class VisualizerGUI {
 
                 } else if (unit instanceof Player) {
                     panel.setBackground(Color.GREEN);
-                    label.setText("P");
+                    label.setText("P " + unit.getUnitId());
                     healthPanel.setVisible(true);
 
                     double percentage = unit.getHitPointsPercentage();
