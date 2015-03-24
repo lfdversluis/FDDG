@@ -21,7 +21,7 @@ public class StartClientsSimulation {
             Thread clientThread = new Thread(client);
             clientThread.start();
             clientMap.put(logID, clientThread);
-            Thread.sleep(250); // TODO we hardcoded a timeout here between connecting the players
+            Thread.sleep(250); // we hardcoded a timeout here between connecting the players
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

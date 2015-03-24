@@ -141,8 +141,6 @@ public class Field implements Serializable {
     public boolean movePlayer(int playerId, int x, int y) {
         Player p = playerMap.get(playerId);
 
-        // TODO we forgot something... apparently the player can move anywhere it likes. No distance = 1 check?!
-
         if (p == null || !canMove(x, y)) {
             return false;
         }
@@ -243,7 +241,6 @@ public class Field implements Serializable {
      * @param playerId The (unique) ID of the player object.
      * @return The player object that belongs to the ID.
      */
-    // TODO Check if map contains?
     public Player getPlayer(int playerId) {
         return playerMap.get(playerId);
     }
@@ -254,7 +251,6 @@ public class Field implements Serializable {
      * @param dragonId The (unique) ID of the dragon object.
      * @return The dragon object that belongs to the ID.
      */
-    // TODO Check if map contains?
     public Dragon getDragon(int dragonId) {
         return dragonMap.get(dragonId);
     }
