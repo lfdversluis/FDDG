@@ -100,3 +100,23 @@ A simulation file has been created, containing information about all events duri
 		With five servers, each server received and sent around 150 heartbeats. 
 		The total number of heartbeats sent to clients is for each server around 105. 
 		We can conclude that these numbers are not significant and the main cause of messages in the system is caused by actions in the game.
+
+\subsubsection{Load balancing}
+\label{subsubsec:exp_load}
+To make the system scalable and to keep the performance of the system high, it is essential that the load on the system is roughly equally divided across all servers.
+In the current design the load on a server is mostly determined by the amount of clients that connect to it during the game. 
+This is the case because the server has to handle all requests for this clients, from the request itself to checking the validity of the action until the broadcast to actually perform the action.
+
+As all clients select a random server from the list of servers, the load should already be balanced by design.
+However, to get more insight in this and to verify whether the load is actually balanced evenly in practice, an experiment was performed. 
+For this experiment five runs of the game were performed. In each run the total number of connected clients was logged for each server. 
+The results of this experiment are visualized in Figure \ref{fig:connected_players_plot}. 
+As can be seen from the figure, the load on each server is indeed roughly the expected load of twenty clients per server, meaning that the load is balanced well.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth]{images/connected_players_plot}
+    
+  \caption{The number of connected clients per server during five game runs}
+  \label{fig:connected_players_plot}
+\end{figure}
