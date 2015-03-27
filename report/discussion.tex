@@ -2,7 +2,7 @@
 % (recommended size: 1 page): 
 
 % Summarize the main findings of your work
-% and discuss the tradeoffs inherent in the design of the DAS system. Should WantGame
+% and discuss the tradeoffs inherent in the design of the system. Should WantGame
 % use a distributed system to implement the DAS system? Try to extrapolate from the
 % results reported in Section 6.b for system workloads that are orders of magnitude
 % higher than what you have tried in real-world experiments.
@@ -17,9 +17,13 @@
 		Moreover, since every server maintains the entire board, a server crash can be easily overcome.
 		Once the crashed server is restarted, one of the operational servers can send the entire field to that server. 
 		The crashed server can then initialize itself and immediately participate in the system again. 
-		As a result this also means that the current design is highly fault tolerant, as we can tolerate crashes of all but one server simultaneously. 
+		Peers that were connected to the crashed server can immediately reconnect to a different (operational) server and resume playing.
+		Finally, because every server maintains the whole field state, a client can connect to any server, in particular the server with the best response time or lowest load will be most preferable.
+		This should result in performances discussed in Section \ref{subsubsec:performance}.
+		As a result this also means that the current design has a good performance and is highly fault tolerant, as we can tolerate crashes of all but one server simultaneously. 
 		Only if all servers crash simultaneously, the data and game state will be unrecoverable.
 		We can conclude that the current setting offers WantGame a consistent and available system. 
+		
 		The drawbacks of this approach is the loss of performance due to an increased amount of messages being sent. 
 		This is because of actions being broadcast to all servers and clients in order to maintain a mirrored game state. 
 		Also, network issues are not covered by this design. 
@@ -41,12 +45,14 @@
 		
 	\subsection{Scalability of the system}
 	\label{subsec:scalability_system_discussion}
-		As discussed in Subsubsection \ref{subsubsec:scalability}, we did not fully explore the scalability of the system. We did conclude that the current setting is suitable for WantGame's desires. Should WantGame want to expands, allocating more servers can easily be done to support more clients. We therefore believe the current design allows scaling of the system.
-		% MISSCHIEN HIER NOG IETS OVER SUPER VEEL SPELERS = BROADCAST NOPE
-		% OF GROTER VELD = OPDELEN? = MORE SOPHISTICATED APPROACH?
-		
-	\subsection{Our recommendation}
-	\label{subsec:our_recommendation}
-		Based on the tradeoffs mentioned in the section, we do recommend WantGame to implement a distributed system described by this document. 
-	
-	TODO results from 6b. (experiments).
+		As discussed in Subsubsection \ref{subsubsec:scalability}, we did not fully explore the scalability of the system. 
+		We did conclude that the current setting is suitable for WantGame's desires. 
+		Should WantGame wish to expand, allocating more servers can easily be done to support more clients. 
+		We therefore believe the current design allows for scaling of the system.
+		Since we broadcast messages to other servers, this scaling will have a limit. 
+		Once the number of servers becomes too large, the mirrored game design will become insufficient.
+		Since the servers broadcast messages, the amount of messages will grow quadratic. 
+		With 10 servers, the amount of messages broadcasted if all servers send a message simultaneously will be equal to 100, which is the current amount of supported players.
+		In other words, a more sophisticated approach will be required. 
+		One possible solution is to partition the field and assign groups of servers a field to manage. 
+		New challenges will surface with this approach, but since we do not focus on this design, we will not discuss these in this document.
