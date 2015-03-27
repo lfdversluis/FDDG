@@ -24,7 +24,7 @@
 		Only if all servers crash simultaneously, the data and game state will be unrecoverable.
 		We can conclude that the current setting offers WantGame a consistent and available system. 
 		
-		The drawback of this approach is the loss of performance due to an increased amount of messages being sent. 
+		The drawback of this approach are the loss of performance due to an increased amount of messages being sent and, following the cap theorem, the system does not allow different states of servers. 
 		This is because of actions being broadcast to all servers and clients in order to maintain a mirrored game state. 
 		Also, network issues are not covered by this design. 
 		If two servers \emph{A} and \emph{B} are unable to communicate with each other, but are able to connect and communicate with the remaining servers, they no longer will be synchronized. 
