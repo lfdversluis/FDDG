@@ -107,11 +107,11 @@ To make the system scalable and to keep the performance of the system high, it i
 In the current design the load on a server is mostly determined by the amount of clients that connect to it during the game. 
 This is because the server has to handle all requests for these clients, from the request itself, to checking the validity of the action until the broadcast to actually perform the action.
 
-As all clients select a random server from the list of servers, the load should already be balanced by design.
+As all clients select a random server from the list of servers, the load should already be uniformly distributed by design.
 However, to get more insight in this and to verify whether the load is actually balanced evenly in practice, an experiment was performed. 
-For this experiment five runs of the game were performed. In each run the total number of connected clients was logged for each server. 
+For this experiment five runs of the game were executed. In each run the total number of connected clients was logged for each server. 
 The results of this experiment are visualized in Figure \ref{fig:connected_players_plot}. 
-As can be seen from the figure, the load on each server is indeed roughly the expected load of twenty clients per server, meaning that the load is balanced well.
+As can be seen in the figure, the load on each server is indeed roughly the expected load of twenty clients per server, meaning that the load is balanced well.
 
 \begin{figure}[h!]
   \centering
