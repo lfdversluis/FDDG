@@ -13,7 +13,7 @@
 	\subsection{Tradeoffs system design}
 	\label{subsec:tradeoffs_system_design}
 		As discussed earlier in section \ref{subsec:system_overview}, we decided to use a mirrored game design with multiple servers. 
-		Since the field has is 25x25 (625 points), storing the entire field doesn't require much storage. 
+		Since the field is a grid of size 25x25 (625 points), storing the entire field does not require much storage. 
 		Moreover, since every server maintains the whole board, a server crash can be easily overcome.
 		Once the crashed server is restarted, one of the operational servers can send the entire field to that server. 
 		The crashed server can then initialize itself and immediately participate in the system again. 
