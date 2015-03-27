@@ -20,11 +20,11 @@
 		Peers that were connected to the crashed server can immediately reconnect to a different (operational) server and resume playing.
 		Finally, because every server maintains the whole field state, a client can connect to any server, in particular the server with the best response time or lowest load will be most preferable.
 		This should result in performances discussed in Section \ref{subsubsec:performance}.
-		As a result this also means that the current design has a good performance and is highly fault tolerant, as we can tolerate crashes of all but one server simultaneously. 
+		As a result this also means that the current design provides a high availability rate and is highly fault tolerant, as we can tolerate crashes of all but one server simultaneously. 
 		Only if all servers crash simultaneously, the data and game state will be unrecoverable.
 		We can conclude that the current setting offers WantGame a consistent and available system. 
 		
-		The drawbacks of this approach is the loss of performance due to an increased amount of messages being sent. 
+		The drawback of this approach is the loss of performance due to an increased amount of messages being sent. 
 		This is because of actions being broadcast to all servers and clients in order to maintain a mirrored game state. 
 		Also, network issues are not covered by this design. 
 		If two servers \emph{A} and \emph{B} are unable to communicate with each other, but are able to connect and communicate with the remaining servers, they no longer will be synchronized. 
