@@ -102,5 +102,11 @@ When the client has successfully reconnected, the player is added on a random po
 
 \subsection{Additional System Features}
 \label{subsec:additional_features}
-(optional): Describe each additional feature of your system, one sub-section per feature
+The design of the distributed system as described above is able to handle multiple failures at the same time. 
+In particular, it can still operate in case all but one servers crash. 
+This is the case because all clients that were connected to the crashed servers will discover their server has crashed and will try to reconnect to another server.
+In this way, they will at some point connect to the single server that is still operational and can continue to request actions.
+The only reason why the system might not operate well in the case of this many failures would be that all clients will connect to a single server, resulting in a high load on that server.
+If the operational server is not able to handle that load well, the system's performance will either drop significantly or that server will crash as well.
+
  
