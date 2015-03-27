@@ -110,12 +110,12 @@ A simulation file has been created, containing information about all events duri
 		This number can be reduced by switching to another model for consistency.\\
 		To gain more insight in the number of messages, we ran the setup with 5 servers and 20 dragons. 
 		We had two runs, one with 50 clients and one with 100 clients. 
-		In both cases, it took around one minute to finish the game (in both games, all players were killed). 
+		In both cases, it took around one minute to finish the game (in both games all players were killed). 
 		With 50 clients, the total number of messages was around 5600 from the beginning to the end of the game. 
 		With 100 clients, a total of 14900 messages between servers and clients are exchanged. 
 		The fact that this number is way below the approximated number of messages in the system can be explained by the fact that not all clients were active during the total duration of the game. 
-		Moreover, players that have died during the game, have no chance of performing actions. We also noticed that the number of messages sent by a server to clients are about 2.5 times larger than the number of messages to other servers.\\
+		Moreover, players that have died during the game, ca no longer performing actions. We also noticed that the number of messages sent by a server to clients are about 2.5 times larger than the number of messages to other servers.\\
 		The final analysis discussed here is the number of heartbeats between clients and servers. 
 		With five servers, each server received and sent around 150 heartbeats. 
 		The total number of heartbeats sent to clients is for each server around 105. 
-		We can conclude that these numbers are not significant and the main cause of messages in the system is caused by actions in the game.
+		We can conclude that these numbers do no contribute significantly to the amount messages in the system.
