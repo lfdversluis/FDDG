@@ -105,7 +105,7 @@ A simulation file has been created, containing information about all events duri
 \label{subsubsec:exp_load}
 To make the system scalable and to keep the performance of the system high, it is essential that the load on the system is roughly equally divided across all servers.
 In the current design the load on a server is mostly determined by the amount of clients that connect to it during the game. 
-This is the case because the server has to handle all requests for this clients, from the request itself to checking the validity of the action until the broadcast to actually perform the action.
+This is because the server has to handle all requests for these clients, from the request itself, to checking the validity of the action until the broadcast to actually perform the action.
 
 As all clients select a random server from the list of servers, the load should already be balanced by design.
 However, to get more insight in this and to verify whether the load is actually balanced evenly in practice, an experiment was performed. 
