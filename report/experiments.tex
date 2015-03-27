@@ -1,4 +1,5 @@
 \section{Experiments}
+\label{sec:experiments}
 % (recommended size: 1.5 pages)
 	In this section, we will first describe the realistic simulation of clients connecting/disconnecting from the server, a requirement of the customer WantGame BV. After that, we first discuss our experimental setup. Finally, we describe the experiments we have conducted on FDDG and the outcome of these experiments.
 	
@@ -69,8 +70,27 @@ A simulation file has been created, containing information about all events duri
 		When a server fails, clients should immediately reconnect to one of the other available servers. When killing a server, we noticed that the clients connected to this server, were trying to select another server that is still available. Only if all servers are down, clients will stop trying to connect to one of the servers.
 		
 	\subsubsection{Scalability}
-	\label{subsubsec:scalability}
-		The minimum requirements of running 5 servers, 100 clients and 20 dragons were easily fulfilled. We therefore decided to try 10 servers, 200 clients and 40 dragons (twice as much for every parameter). The results were ...
+	\label{subsubsec:scalability} 
+		One of the requirements by WantGame was that the system should be scalable. Their aim is to run 5 servers and allow 100 clients to connect with these servers.
+		To test this setting, 5 servers were ran on 5 nodes of the DAS-4 supercomputer and 100 clients in bunches of 50 on 2 nodes. We conclude that the design is suitable for this setup and meets the requirement set by WantGame.
+		We do note that no tests were performed that went beyond this setting, but we believe we that the limit was not reached yet. Testing the scalability further is recommended for future work.
+		
+	\subsubsection{Performance}
+	\label{subsubsec:performance}
+		To test the performance of the system, the response times between a client requesting an action and the server acknowledging this request (after having communicated with its peers) was measured. 
+		The results of this experiment are visible in Figure \ref{fig:boxplot_response_times}.
+		The first observation is that almost all of the requests took no more than $\pm$30 ms which is quite satisfactory. Since all nodes ran in the same cluster, this number may be higher when nodes are physically distributed.
+		The next observation are the outliers which can reach up to $\pm$500 ms. 
+		This may be due to servers getting a lot of request simultaneously, which cause some delay.
+		Since FDDG is a MMORPG, 500 ms is an acceptable worst case of response time.
+		
+		\begin{figure}[h!]
+		  \centering
+		    \includegraphics[width=0.6\textwidth, height=0.59\textheight]{images/boxplot_response_times}
+		    
+		  \caption{A boxplot visualizing the response times of actions between clients and server.}
+		  \label{fig:boxplot_response_times}
+		\end{figure}
 		
 	\subsubsection{Message complexity of the system}
 	\label{subsubsec:nummessages}
@@ -87,16 +107,16 @@ A simulation file has been created, containing information about all events duri
 		The formula above excluded heartbeat messages sent between clients and servers.
 		We can use this formula to make an approximation of the amount of messages that has to be sent between the servers and clients. 
 		Suppose $ s = 5 $ and $ c = 100 $. 
-		If every client performs an action every second, a total of 678.000 messages to be exchanged or about 6780 messages for every client. 
+		If every client performs an action every second, a total of 678.000 messages or 6780 messages per client have to be exchanged. 
 		This number can be reduced by switching to another model for consistency.\\
 		To gain more insight in the number of messages, we ran the setup with 5 servers and 20 dragons. 
 		We had two runs, one with 50 clients and one with 100 clients. 
-		In both cases, it took around one minute to finish the game (in both games, all players were killed). 
+		In both cases, it took around one minute to finish the game (in both games all players were killed). 
 		With 50 clients, the total number of messages was around 5600 from the beginning to the end of the game. 
 		With 100 clients, a total of 14900 messages between servers and clients are exchanged. 
 		The fact that this number is way below the approximated number of messages in the system can be explained by the fact that not all clients were active during the total duration of the game. 
-		Moreover, players that have died during the game, have no chance of performing actions. We also noticed that the number of messages sent by a server to clients are about 2.5 times larger than the number of messages to other servers.\\
+		Moreover, players that have died during the game, ca no longer performing actions. We also noticed that the number of messages sent by a server to clients are about 2.5 times larger than the number of messages to other servers.\\
 		The final analysis discussed here is the number of heartbeats between clients and servers. 
 		With five servers, each server received and sent around 150 heartbeats. 
 		The total number of heartbeats sent to clients is for each server around 105. 
-		We can conclude that these numbers are not significant and the main cause of messages in the system is caused by actions in the game.
+		We can conclude that these numbers do no contribute significantly to the amount messages in the system.
