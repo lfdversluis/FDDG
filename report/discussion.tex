@@ -17,7 +17,7 @@
 		Moreover, since every server maintains the entire board, a server crash can be easily overcome.
 		Once the crashed server is restarted, one of the operational servers can send the entire field to that server. 
 		The crashed server can then initialize itself and immediately participate in the system again. 
-		As result this also means that the current design is fault tolerant as we can tolerate crashes of all but one server simultaneously. 
+		As a result this also means that the current design is highly fault tolerant, as we can tolerate crashes of all but one server simultaneously. 
 		Only if all servers crash simultaneously, the data and game state will be unrecoverable.
 		We can conclude that the current setting offers WantGame a consistent and available system. 
 		The drawbacks of this approach is the loss of performance due to an increased amount of messages being sent. 
@@ -25,7 +25,9 @@
 		Also, network issues are not covered by this design. 
 		If two servers \emph{A} and \emph{B} are unable to communicate with each other, but are able to connect and communicate with the remaining servers, they no longer will be synchronized. 
 		Both \emph{A} and \emph{B} will still broadcast to the remaining servers (which then will still check if the actions can be performed), but not to the server they assume has crashed. 
-		As a result, players who are connected to \emph{A} will appear to stand still for server \emph{B} and vice versa. This means that the consistency between the servers is lost. However, since the remaining servers still perform checks for both \emph{A} and \emph{B} and process their changes, it can never lead to a conflicting state.
+		As a result, players who are connected to \emph{A} will appear to stand still for server \emph{B} and vice versa. 
+		This means that the consistency between the servers is lost. 
+		However, since the remaining servers still perform checks for both \emph{A} and \emph{B} and process their changes, it can never lead to a conflicting state.
 	
 	\subsection{Load balancing}
 	\label{subsec:load_balancing}
