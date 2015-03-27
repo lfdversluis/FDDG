@@ -48,11 +48,7 @@
 		As discussed in Subsubsection \ref{subsubsec:scalability}, we did not fully explore the scalability of the system. 
 		We did conclude that the current setting is suitable for WantGame's desires. 
 		Should WantGame wish to expand, allocating more servers can easily be done to support more clients. 
-		We therefore believe the current design allows for scaling of the system.
-		Since we broadcast messages to other servers, this scaling will have a limit. 
-		Once the number of servers becomes too large, the mirrored game design will become insufficient.
-		Since the servers broadcast messages, the amount of messages will grow quadratic. 
-		With 10 servers, the amount of messages broadcasted if all servers send a message simultaneously will be equal to 100, which is the current amount of supported players.
-		In other words, a more sophisticated approach will be required. 
+		This scaling, however, does have a limit. Once the number of servers becomes too large, the mirrored game design will become insufficient.
+		Since the servers broadcast messages, the amount of messages will grow quite fast as shown in Section \ref{subsubsec:nummessages}. This means that in the future, a more sophisticated approach will be required. 
 		One possible solution is to partition the field and assign groups of servers a field to manage. 
 		New challenges will surface with this approach, but since we do not focus on this design, we will not discuss these in this document.
