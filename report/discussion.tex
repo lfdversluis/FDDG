@@ -14,7 +14,7 @@
 	\label{subsec:tradeoffs_system_design}
 		As discussed earlier in section \ref{subsec:system_overview}, we decided to use a mirrored game design with multiple servers. 
 		Since the field has a size 25x25 tiles (625 tiles in total), storing the entire field does not require much storage. 
-		Moreover, since every server maintains the whole board, a server crash can be easily overcome.
+		Moreover, since every server maintains the entire board, a server crash can be easily overcome.
 		Once the crashed server is restarted, one of the operational servers can send the entire field to that server. 
 		The crashed server can then initialize itself and immediately participate in the system again. 
 		As result this also means that the current design is fault tolerant as we can tolerate crashes of all but one server simultaneously. 
