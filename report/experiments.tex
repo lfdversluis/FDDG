@@ -55,11 +55,12 @@ A simulation file has been created, containing information about all events duri
 	\subsubsection{Consistency}
 	\label{subsubsec:consistency}
 		One of the properties of the game is that there is consistency amongst the servers.
-		In order to test the consistency between the servers, we made use of the GUI and see whether two or more servers are synchronized and lead to the same end state.
+		In order to test the consistency between the servers, the Graphical User Interface (GUI) that has been created for debugging purposes, was used.
+		We used the GUI to see whether two or more servers are synchronized and lead to the same end state.
 		While testing the consistency, some minor bugs were found that have led to an inconsistent game state. These were fixed during the experiments.
-		We tested the consistency with several setups. For example, we made dragons much stronger than players to see the impact of players dying very fast after they are spawned.
-		Moreover, we manually tested what happened when players can easily kill dragons.
-		We were not able to find inconsistencies while manually testing. We have concluded that the games we simulated end in the same final state on all servers.
+		The consistency has been checked with several setups. For example, dragons were made much stronger than players to see the impact of players dying very fast after they spawned.
+		Moreover, a manual test was performed to see what happens when players can easily kill dragons. For this purpose, we lowered the attack power of each dragon.
+		Using the setups described above, the consistency was analyzed. During our tests, no inconsistencies have been found by us. The conclusion is that the games we simulated end in the same final state on all servers.
 		
 	\subsubsection{Fault-tolerant}
 	\label{subsubsec:fault-tolerant}
