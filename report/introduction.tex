@@ -1,16 +1,16 @@
 \section{Introduction}
 In a world in which online multiplayer computer games become more and more part of our lives, the systems that power the games need to be able to handle an increasing amount of users.
-For this increase in users the capabilities of centralized systems are no longer sufficient as they are a single point of failure and are not that scalable.
-Therefore, the design of the gaming systems has shifted towards distributed systems.
+For this increase in users the capabilities of centralized systems are no longer sufficient as they contain a single point of failure and are not that scalable.
+Therefore, the design of gaming systems has shifted towards distributed systems where multiple servers handle the game.
 However, these systems are harder to design and have many unknowns regarding consistency, scalability, etc.
 
 To overcome these difficulties and unknowns WantGame BV asked us to design and implement a distributed system for their new `Dragon Arena' game.
-Furthermore, they also want us to perform experiments with realistic scenario to see whether the designed system is feasible as their game engine.
+Furthermore, they want us to perform experiments with realistic scenario to see whether the designed system is feasible as their game engine.
 
 The distributed system that has been designed for this game consists of multiple servers that communicate with each other about whether or not an action requested by a client is valid or not. 
-Furthermore, when an action is declared valid by the servers, the server that received the request needs to broadcast the action to all servers and clients to make sure the game state remains consistent across all nodes.
+Moreover, when an action is declared valid by the servers, the server that received the request needs to broadcast the action to all servers and clients to make sure the game state remains consistent across all nodes.
 More details on the chosen design for the distributed system are provided in Section \ref{sec:design}.
 
-In the remainder of this report more information about the application and its requirements will be given first in Section \ref{sec:background}. 
+In the remainder of this report, more information about the application and its requirements will be given first in Section \ref{sec:background}. 
 Second, the design of the chosen distributed system will be explained in Section \ref{sec:design}, followed by the experiments that have been performed as well as their results in Section \ref{sec:experiments}.
 Finally, the designed and implemented system and its trade-offs will be discussed in Section \ref{sec:discussion} followed by a conclusion that contains the verdict whether the system is feasible for WantGame BV or not.
