@@ -55,8 +55,12 @@ A simulation starts as soon as the first client joins the server. The game is th
 
 	\subsubsection{Consistency}
 	\label{subsubsec:consistency}
-		In order to test consistency, a simulation was run with exactly the same setup multiple times.
-		It was checked that the result was consistent, that is the same field state at the end of each simulation. 
+		One of the properties of the game is that there is consistency amongst the servers.
+		In order to test the consistency between the servers, the Graphical User Interface (GUI) that has been created for debugging purposes, was used to see whether two or more servers are synchronized and lead to the same end state.
+		While testing the consistency, some minor bugs were found that have led to an inconsistent game state. These were fixed during the experiments.
+		The consistency has been checked with several setups. For example, dragons were made much stronger than players to see the impact of players dying very fast after they spawned.
+		Moreover, a manual test was performed to see what happens when players can easily kill dragons. For this purpose, the attack power was lowered for each dragon.
+		Using the setups described above, the consistency was analyzed. During our tests, no inconsistencies have been found. The conclusion is that the games simulated end in the same final state on all servers.
 		
 	\subsubsection{Fault-tolerant}
 	\label{subsubsec:fault-tolerant}
@@ -121,4 +125,24 @@ A simulation starts as soon as the first client joins the server. The game is th
 		The final analysis discussed here is the number of heartbeats between clients and servers. 
 		With five servers, each server received and sent around 150 heartbeats. 
 		The total number of heartbeats sent to clients is for each server around 105. 
-		We can conclude that these numbers do no contribute significantly to the amount messages in the system.
+		We can conclude that these numbers are not significant and the main cause of messages in the system is caused by actions in the game.
+
+\subsubsection{Load balancing}
+\label{subsubsec:exp_load}
+To make the system scalable and to keep the performance of the system high, it is essential that the load on the system is roughly equally divided across all servers.
+In the current design the load on a server is mostly determined by the amount of clients that connect to it during the game. 
+This is because the server has to handle all requests for these clients, from the request itself, to checking the validity of the action until the broadcast to actually perform the action.
+
+As all clients select a random server from the list of servers, the load should already be uniformly distributed by design.
+However, to get more insight in this and to verify whether the load is actually balanced evenly in practice, an experiment was performed. 
+For this experiment five runs of the game were executed. In each run the total number of connected clients was logged for each server. 
+The results of this experiment are visualized in Figure \ref{fig:connected_players_plot}. 
+As can be seen in the figure, the load on each server is indeed roughly the expected load of twenty clients per server, meaning that the load is balanced well.
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=\textwidth]{images/connected_players_plot}
+    
+  \caption{The number of connected clients per server during five game runs}
+  \label{fig:connected_players_plot}
+\end{figure}
