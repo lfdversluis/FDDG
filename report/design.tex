@@ -1,8 +1,8 @@
 \section{System design}
 \label{sec:design}
 In this chapter, the design of the system is explained. The focus of section \ref{subsec:system_overview} will be the overview of the implemented distributed system.
-Here, the architecture of the system is discussed, what fault-tolerance mechanism is being used and how the system replicates the game over multiple distributed servers. 
-In section \ref{subsec:additional_features}, we discuss additional features we've implemented in the game.
+Here, the architecture of the system is discussed, which fault-tolerance mechanism is used and how the system replicates the game state across multiple distributed servers. 
+In section \ref{subsec:additional_features}, we discuss additional features we have implemented in the game.
 
 \subsection{System overview}
 \label{subsec:system_overview}
@@ -17,7 +17,7 @@ Finally, the topic of how to handle client and server crashes is covered in sect
 
 \subsubsection{(Dis)connecting clients}
 \label{subsubsec:disconnecting_clients}
-The process of clients connecting to the server is visualized in Figure \ref{fig:connect_diagram}. 
+The process of clients connecting to a server is visualized in Figure \ref{fig:connect_diagram}. 
 Every client node has a list of IP addresses of the game servers. When a new client wants to enter the game, it first randomly selects a server from this list and tries to connect with it (1). 
 When the connection succeeds, the server first informs all other servers of the new client (2) and then it sends the current game state to the client as well as the unique identifier of the client (3). 
 After the client receives this message it can start performing actions.
@@ -40,13 +40,13 @@ The player is then removed from the field. Finally, upon receiving this confirma
 
 \subsubsection{Clients performing actions}
 \label{subsubsec:clients_actions}
-The process of clients performing actions is visualized in Figure \ref{fig:update_diagram}. 
 When a client wants to perform an action, it starts by sending a request for this action to the server it is connected to (1). 
 Then the server first checks whether this action is valid and can be performed (to avoid clients spoofing requests). 
 If the action is valid, the server will send a request for the action to all the other game servers (2). 
 The other servers check the validity of the action and when a server agree on a particular action, it will send an acknowledgment back to the server (3). 
 If the server receives an acknowledgment from all other servers, it knows the action can be performed and informs all other servers that the action has been executed (4). 
 Finally, all servers execute the action as well and send the update of the game state to all the connected clients (5). 
+This process of clients performing actions is visualized in Figure \ref{fig:update_diagram}. 
 As mentioned, we have to keep in mind that players can spoof the values they send to the server. 
 For example, they can perform a move action to a tile that is more than distance one away from their current position.
 
