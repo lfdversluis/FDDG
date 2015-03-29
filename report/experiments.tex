@@ -5,7 +5,7 @@
 	
 \subsection{Simulation of connecting/disconnecting clients}
 \label{subsec:simulation_clients}
-One of the requirements of our game, is that a realistic game trace should be used to simulate the behavior of clients connecting and disconnecting to and from the server.
+One of the requirements of the game, is that a realistic game trace should be used to simulate the behavior of clients connecting and disconnecting to and from the server.
 A potential data set with game traces is described in the paper of Guo et al. \cite{guo2012game}.
 Here, the design of the GTA (Game Trace Archive) is explained and possible applications of the data are discussed.
 Amongst the genres of the analyzed games are Massively Multiplayer Online Role-Playing Game (MMORPGs), board games and Real-time Strategy (RTS) games. 
@@ -34,11 +34,11 @@ A simulation file has been created, containing information about all events duri
 % libraries you have used to implement and deploy your system, other tools and
 % libraries used to conduct your experiments.
 
-To experiment with FDDG and inspect the performance, the game was simulated on the DAS-4 supercomputer.
+To experiment with FDDG and analyze the performance, the game was simulated on the DAS-4 supercomputer.
 The common setup of the experiments consisted of 5 servers where each server runs on one of the DAS-4 nodes. Furthermore, we have two nodes with 50 client running on each node.
 By running the simulations on the DAS-4, it is guaranteed that the game was tested in a truly distributed system, where processes were running on physical different nodes.
 The disadvantage of running the game on the DAS-4 is that we cannot see the GUI that allows for easier debugging and observation of the game state.
-Furthermore, a self-created message system that makes use of \emph{actions} was implemented to send updates and acknowledgments inside the game.
+Furthermore, a self-created message system that makes use of \emph{actions} was implemented to send updates and acknowledgments inside the game. We write the actions performed by clients and servers to log files.
 A simulation starts as soon as the first client joins the server. The game is then considered active and will run until either all players are dead or all dragons are slain.
 
 
@@ -51,14 +51,14 @@ A simulation starts as soon as the first client joins the server. The game is th
 % i. Service metrics of the experiment, such as runtime and response time of
 % the service, etc.
 % ii. (optional) Usage metrics and costs of the experiment.
-	Experiments were ran concerning the consistency, fault-tolerance and scalability of the game. Below are the results of the experiments conducted for each of these features. Moreover, an analysis of the number of messages in the game was made as well.
+	Experiments were ran concerning the consistency, fault-tolerance, scalability and performance of the game. Below are the results of the experiments conducted for each of these features. Moreover, an analysis of the number of messages in the game and the load balancing was made as well.
 
 	\subsubsection{Consistency}
 	\label{subsubsec:consistency}
-		One of the properties of the game is that there is consistency amongst the servers.
+		One of the requirements of the game is that there is consistency amongst the servers.
 		In order to test the consistency between the servers, the Graphical User Interface (GUI) that has been created for debugging purposes, was used to see whether two or more servers are synchronized and lead to the same end state.
 		While testing the consistency, some minor bugs were found that have led to an inconsistent game state. These were fixed during the experiments.
-		The consistency has been checked with several setups. For example, dragons were made much stronger than players to see the impact of players dying very fast after they spawned.
+		The consistency has been analyzed using several setups. For example, dragons were made much stronger than players to see the impact of players dying very fast after they spawned.
 		Moreover, a manual test was performed to see what happens when players can easily kill dragons. For this purpose, the attack power was lowered for each dragon.
 		Using the setups described above, the consistency was analyzed. During our tests, no inconsistencies have been found. The conclusion is that the games simulated end in the same final state on all servers.
 		
@@ -71,12 +71,12 @@ A simulation starts as soon as the first client joins the server. The game is th
 		\end{enumerate}
 		
 		More information about the design of fault tolerance in the system can be found in section \ref{subsubsec:client_server_crashes}. If a client crashes, the server should notice that after two failed heartbeats to this client. During the simulations, the event that a server sends two failed heartbeats to the client is logged. Using the GUI, it is possible to determine whether the player is really removed from the server. This turned out to be the case if clients are crashed on purpose. The servers remove the disconnected player from the field and continue the game.\\
-		When a server fails, clients should immediately reconnect to one of the other available servers. When killing a server, it was noticed that the clients connected to this server, were trying to select another server that is still available. Only if all servers are down, clients will stop trying to connect to one of the servers.
+		When a server fails, clients should reconnect to one of the other available servers after two failed heartbeats. When killing a server, it was noticed that the clients connected to this server, were trying to select another server that is still available. Only if all servers are down, clients will stop trying to connect to one of the servers.
 		
 	\subsubsection{Scalability}
 	\label{subsubsec:scalability} 
-		One of the requirements by WantGame is that the system should be scalable. It is their aim to run 5 servers and allow 100 clients to connect with these servers.
-		To test this setting, 5 servers were ran on 5 nodes of the DAS-4 supercomputer and 100 clients in bunches of 50 on 2 nodes. Here, it is concluded that the design is suitable for this setup and meets the requirement set by WantGame.
+		One of the requirements of WantGame is that the system should be scalable. It is their aim to run 5 servers and allow 100 clients to connect with these servers and play the game.
+		To test this setting, 5 servers were ran on 5 nodes of the DAS-4 supercomputer and 100 clients in bunches of 50 on 2 nodes. These test were successful and the game finished without any inconsistencies. It is concluded that the design is suitable for this setup and meets the requirement set by WantGame.
 		Please note that no tests were performed that went beyond this setting, but it is believed that the limit was not yet reached. Testing the scalability further is recommended for future work.
 		
 	\subsubsection{Performance}
@@ -85,14 +85,14 @@ A simulation starts as soon as the first client joins the server. The game is th
 		The results of this experiment are visible in Figure \ref{fig:boxplot_response_times}.
 		The first observation is that almost all of the requests took no more than $\pm$30 ms which is quite satisfactory. Since all nodes ran in the same cluster, this number may be higher when nodes are physically distributed.
 		The next observation are the outliers which can reach up to $\pm$500 ms. 
-		This may be due to servers getting a lot of request simultaneously, which cause some delay.
-		Since FDDG is a MMORPG, 500 ms is an acceptable worst case of response time.
+		This may be due to servers getting a lot of request simultaneously, which might cause some delay.
+		Since FDDG is a MMORPG, 500 ms is an acceptable worst case regarding response time.
 		
 		\begin{figure}[h!]
 		  \centering
 		    \includegraphics[width=0.6\textwidth, height=0.59\textheight]{images/boxplot_response_times}
 		    
-		  \caption{A boxplot visualizing the response times of actions between clients and server.}
+		  \caption{A boxplot visualizing the response times of actions between clients and servers.}
 		  \label{fig:boxplot_response_times}
 		\end{figure}
 		
@@ -111,21 +111,21 @@ A simulation starts as soon as the first client joins the server. The game is th
 		More information about this process can be found in section \ref{subsubsec:clients_actions}. 
 		The total number of messages required for one action can be described by the following formula ($ n $ is the total number of messages, $ s $ is the number of servers, $ c $ is the number of clients):
 		$$ n = 3(s - 1) + c + 1 $$
-		The formula above excluded heartbeat messages sent between clients and servers.
+		The formula above excludes heartbeat messages sent between clients and servers.
 		This formula is used to make an approximation of the amount of messages that has to be sent between the servers and clients. 
 		Suppose $ s = 5 $ and $ c = 100 $. 
 		If every client performs an action every second, a total of 678.000 messages or 6780 messages per client have to be exchanged. 
-		This number can be reduced by switching to another model for consistency.\\
-		To gain more insight in the number of messages, a setup with 5 servers and 20 dragons was run. 
+		This number can be reduced by switching to another model for consistency (for instance, a model where a subset of the servers have to acknowledge an action).\\
+		To gain more insight in the number of messages exchanged, a setup with 5 servers and 20 dragons was run. 
 		In two runs, one with 50 clients and one with 100 clients, it took around one minute to finish the game (in both games all players were killed). 
 		With 50 clients, the total number of messages was around 5600 from the beginning to the end of the game. 
 		With 100 clients, a total of 14900 messages between servers and clients are exchanged. 
-		The fact that this number is way below the approximated number of messages in the system can be explained by the fact that not all clients were active during the total duration of the game. 
-		Moreover, players that have died during the game, ca no longer performing actions. We also noticed that the number of messages sent by a server to clients are about 2.5 times larger than the number of messages to other servers.\\
+		The fact that this number is way below the approximated number of messages in the system can be explained by the fact that not all clients were active during the total duration of the game; there is a delay between two clients connecting to the game. 
+		Moreover, players that have died during the game, can no longer performing actions. We also noticed that the number of messages sent by a server to clients is about 2.5 times larger than the number of messages to other servers.\\
 		The final analysis discussed here is the number of heartbeats between clients and servers. 
 		With five servers, each server received and sent around 150 heartbeats. 
 		The total number of heartbeats sent to clients is for each server around 105. 
-		We can conclude that these numbers are not significant and the main cause of messages in the system is caused by actions in the game.
+		We can conclude that the number of heartbeats is not significant for our analysis and that the main cause of messages in the system is caused by actions in the game.
 
 \subsubsection{Load balancing}
 \label{subsubsec:exp_load}
