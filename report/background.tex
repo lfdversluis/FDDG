@@ -3,7 +3,7 @@
 The Dragon Arena game is a game in which players need to kill all dragons in the virtual world to successfully end the game. 
 This virtual world is a simple grid of 25x25 squares in which each square can contain at most one player or dragon at any point in time. 
 Both the players and the dragons have a certain amount of health and attack points. 
-Every time one of the two entities attacks the other one, its attack points are subtracted from the others health points until no more health points remain and the entity is removed from the game.
+Players can attack dragons and dragons can attack players. When attacking an entity, the amount of attack points are subtracted from the health points of the entity begin attacked until no more health points remain. At this point, the entity is removed from the game.
 
 To keep all players satisfied it is necessary that they all have roughly the same view on the current state of the virtual world. 
 Therefore this state needs to be kept consistent across the system's servers.
@@ -12,7 +12,7 @@ As the system should also be able to let at least 100 players and 20 dragons pla
 
 The client and server nodes in the Dragon Arena System (DAS) can also crash at any point during the game. 
 Therefore, the system as a whole needs to be resilient against these failures. 
-Furthermore, the system should also be able to add these nodes to the system again when they are restarted.
+Furthermore, the system should be able to add these nodes to the system again when they are restarted.
 
 Finally, players do not want to experience delays when performing actions, as this will likely cause them to leave the game.
-Therefore, the performance of the game needs to be sufficiently high in all circumstances. 
+Therefore, the performance of the game needs to be sufficiently high in all circumstances.
