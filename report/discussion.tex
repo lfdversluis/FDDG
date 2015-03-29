@@ -1,0 +1,55 @@
+\section{Discussion}
+\label{sec:discussion}
+% (recommended size: 1 page): 
+
+% Summarize the main findings of your work
+% and discuss the tradeoffs inherent in the design of the system. Should WantGame
+% use a distributed system to implement the DAS system? Try to extrapolate from the
+% results reported in Section 6.b for system workloads that are orders of magnitude
+% higher than what you have tried in real-world experiments.
+
+	In this chapter the tradeoffs inherent in the design of the system are discussed. Based on the results provided in section \ref{sec:experiments} we will provide a verdict whether WantGame should use a distributed system as discussed in the document.
+	
+	
+	\subsection{Tradeoffs system design}
+	\label{subsec:tradeoffs_system_design}
+		As discussed earlier in section \ref{subsec:system_overview}, FDDG uses a mirrored game design with multiple servers. 
+		Since the field has a size of 25x25 tiles (625 tiles in total), storing the entire field does not require much storage. 
+		Moreover, since every server maintains the entire board, a server crash can be easily overcome.
+		Once the crashed server is restarted, one of the operational servers can send the entire field to that server. 
+		The crashed server can then initialize itself and immediately participate in the system again. 
+		Peers that were connected to the crashed server can immediately reconnect to a different (operational) server and resume playing.
+		Finally, because every server maintains the whole field state, a client can connect to any server, in particular the server with the best response time or lowest load will be most preferable.
+		This should result in performances discussed in Section \ref{subsubsec:performance}.
+		As a result this also means that the current design provides a high availability rate and is highly fault tolerant, as the system can tolerate crashes of all but one server simultaneously. 
+		Only if all servers crash simultaneously, the data and game state will be unrecoverable.
+		From this it is concluded that the current setting offers WantGame a consistent and available system. 
+		
+		The drawback of this approach is the loss of performance due to an increased amount of messages being sent and, following the CAP theorem, the system does not allow different states of servers. 
+		This is because of actions being broadcast to all servers and clients in order to maintain a mirrored game state. 
+		Also, network issues are not covered by this design. 
+		If two servers \emph{A} and \emph{B} are unable to communicate with each other, but are able to connect and communicate with the remaining servers, they no longer will be synchronized. 
+		Both \emph{A} and \emph{B} will still broadcast to the remaining servers (which then will still check if the actions can be performed), but not to the server they assume has crashed. 
+		As a result, players who are connected to \emph{A} will appear to stand still for server \emph{B} and vice versa. 
+		This means that the consistency between the servers is lost. 
+		However, since the remaining servers still perform checks for both \emph{A} and \emph{B} and process their changes, it can never lead to a conflicting state.
+	
+	\subsection{Load balancing}
+	\label{subsec:load_balancing}
+		Since a client chooses a server at random, the distribution of clients can be seen as a uniform distribution. 
+		This means that the expected amount of clients per server will be roughly the same.
+		If a server crashes and the clients connected to this server start to reconnect to another server, the amount of players will be equally divided over the operational servers as they will, again, pick a (functioning) server at random.
+		Once a crashed server recovers, it will not receive players from heavier loaded servers but simply by players trying to connect to this server at a later point in time. 
+		This should result in the load slowly becoming even again over time. 
+		A load balancing algorithm can be used to speed up this process.
+		There are plenty of load balancing algorithms designed for distributed systems as described in this document, for example \cite{wolff2001dynamic} and \cite{ballard2000client}. Since such an algorithm was not implemented, it is considered future work.
+		
+	\subsection{Scalability of the system}
+	\label{subsec:scalability_system_discussion}
+		As discussed in Section \ref{subsubsec:scalability}, the scalability of the system was not fully explored. 
+		The extent of the experiments shew that the system meets WantGame's requirements concerning scalability. 
+		Should WantGame wish to expand, allocating more servers can easily be done to support more clients. 
+		This scaling, however, does have a limit. Once the number of servers becomes too large, the mirrored game design will become insufficient.
+		Since the servers broadcast messages, the amount of messages will grow quite fast as shown in Section \ref{subsubsec:nummessages}. This means that in the future, a more sophisticated approach will be required. 
+		One possible solution is to partition the field and assign groups of servers a field to manage. 
+		New challenges will surface with this approach, which will not be discussed further in this document. 
