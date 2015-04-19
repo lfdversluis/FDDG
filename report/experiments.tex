@@ -38,7 +38,7 @@ To experiment with FDDG and analyze the performance, the game was simulated on t
 The common setup of the experiments consisted of 5 servers where each server runs on one of the DAS-4 nodes. Furthermore, we have two nodes with 50 client running on each node.
 By running the simulations on the DAS-4, it is guaranteed that the game was tested in a truly distributed system, where processes were running on physical different nodes.
 The disadvantage of running the game on the DAS-4 is that we cannot see the GUI that allows for easier debugging and observation of the game state.
-Furthermore, a self-created message system that makes use of \emph{actions} was implemented to send updates and acknowledgments inside the game. We write the actions performed by clients and servers to log files.
+Furthermore, a self-created message system that makes use of \emph{actions} is implemented to send updates and acknowledgments inside the game. Actions performed by clients and servers are written to log files.
 A simulation starts as soon as the first client joins the server. The game is then considered active and will run until either all players are dead or all dragons are slain.
 
 
@@ -51,7 +51,7 @@ A simulation starts as soon as the first client joins the server. The game is th
 % i. Service metrics of the experiment, such as runtime and response time of
 % the service, etc.
 % ii. (optional) Usage metrics and costs of the experiment.
-	Experiments were ran concerning the consistency, fault tolerance, scalability and performance of the game. Below are the results of the experiments conducted for each of these features. Moreover, an analysis of the number of messages in the game and the load balancing was made as well.
+	Experiments are conducted concerning the consistency, fault tolerance, scalability and performance of the game. Below are the results of the experiments for each of these features. Moreover, an analysis of the number of messages in the game and the load balancing is provided.
 
 	\subsubsection{Consistency}
 	\label{subsubsec:consistency}
@@ -60,7 +60,7 @@ A simulation starts as soon as the first client joins the server. The game is th
 		While testing the consistency, some minor bugs were found that have led to an inconsistent game state. These were fixed during the experiments.
 		The consistency has been analyzed using several setups. For example, dragons were made much stronger than players to see the impact of players dying very fast after they spawned.
 		Moreover, a manual test was performed to see what happens when players can easily kill dragons. For this purpose, the attack power was lowered for each dragon.
-		Using the setups described above, the consistency was analyzed. During our tests, no inconsistencies have been found. The conclusion is that the games simulated end in the same final state on all servers.
+		Using the setups described above, the consistency was analyzed. During the tests, no inconsistencies have been found. The conclusion is that the games simulated end in the same final state on all servers.
 		
 	\subsubsection{Fault tolerance}
 	\label{subsubsec:fault-tolerant}
@@ -90,9 +90,9 @@ A simulation starts as soon as the first client joins the server. The game is th
 		
 		\begin{figure}[h!]
 		  \centering
-		    \includegraphics[width=0.5\textwidth, height=0.59\textheight]{images/boxplot_response_times}
+		    \includegraphics[width=\textwidth]{images/boxplot_reposonse_times_horizontal}
 		    
-		  \caption{A boxplot visualizing the response times of actions between clients and servers.}
+		  \caption{A visualization of the response times of actions between clients and servers.}
 		  \label{fig:boxplot_response_times}
 		\end{figure}
 		
