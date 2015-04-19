@@ -1,24 +1,25 @@
 \section{System design}
-In this chapter, we explain the design of our system. The focus of section \ref{subsec:system_overview} will be the overview of our implemented system.
-Here we explain what the architecture of the system looks like, how we implement a fault-tolerance mechanism and how we replicate the game over multiple distributed servers. 
-In section \ref{subsec:additional_features}, we discuss additional features we've implemented.
+\label{sec:design}
+In this chapter, the design of the system is explained. The focus of section \ref{subsec:system_overview} will be the overview of the implemented distributed system.
+Here, the architecture of the system is discussed, which fault tolerance mechanism is used and how the system replicates the game state across multiple distributed servers. 
+In section \ref{subsec:additional_features}, we discuss additional features we have implemented in the game.
 
 \subsection{System overview}
 \label{subsec:system_overview}
-The distributed system we designed consists of several server nodes and we build the system to deal with around 20 players on each server. 
+The distributed system that has been designed consists of several server nodes and is designed to deal with at least 20 players on each server. 
 Each client node represents a single player in the virtual world and connects to a single server.
 All servers contain the current state of the virtual world and they inform each other of game updates to keep the game states of the servers consistent. 
 This is the mirrored game design as seen during the lectures and explained in Cronin et al. \cite{cronin2002efficient}. 
-In this section we will provide more details on the design of the system by describing what happens within the system in the possible scenarios. 
-In section \ref{subsubsec:disconnecting_clients} we discuss the scenario of clients connecting and disconnecting. 
-In section \ref{subsubsec:clients_actions} we explain the process of clients performing actions such as healing, moving and attacking dragons. 
-Finally, we explain how we handle client and server crashes in section \ref{subsubsec:client_server_crashes}.
+In this section, more details are provided on the design of the system, by describing what happens within the system in possible scenarios. 
+In section \ref{subsubsec:disconnecting_clients} the scenario of clients connecting and disconnecting is discussed. 
+In section \ref{subsubsec:clients_actions} the process of clients performing actions such as healing, moving and attacking dragons is explained. 
+Finally, the topic of how to handle client and server crashes is covered in section \ref{subsubsec:client_server_crashes}.
 
 \subsubsection{(Dis)connecting clients}
 \label{subsubsec:disconnecting_clients}
-The process of clients connecting to the server is visualized in Figure \ref{fig:connect_diagram}. 
+The process of clients connecting to a server is visualized in Figure \ref{fig:connect_diagram}. 
 Every client node has a list of IP addresses of the game servers. When a new client wants to enter the game, it first randomly selects a server from this list and tries to connect with it (1). 
-When the connection succeeds, the server first informs all other servers of the new client (2) and then it sends the current game state to the client as well as the identifier of the client (3). 
+When the connection succeeds, the server first informs all other servers of the new client (2) and then it sends the current game state to the client as well as the unique identifier of the client (3). 
 After the client receives this message it can start performing actions.
 
 When the connection to a server cannot be established, the client simply selects another server from the list and tries again until one of the servers responds. 
@@ -39,26 +40,25 @@ The player is then removed from the field. Finally, upon receiving this confirma
 
 \subsubsection{Clients performing actions}
 \label{subsubsec:clients_actions}
-This process of clients performing actions is visualized in Figure \ref{fig:update_diagram}. 
-When a client wants to perform an action, it sends a request for this action to the server it is connected to (1). 
+When a client wants to perform an action, it starts by sending a request for this action to the server it is connected to (1). 
 Then the server first checks whether this action is valid and can be performed (to avoid clients spoofing requests). 
 If the action is valid, the server will send a request for the action to all the other game servers (2). 
-When the other servers agree on this action, they will send an acknowledgment back to the server (3). 
+The other servers check the validity of the action and when a server agree on a particular action, it will send an acknowledgment back to the server (3). 
 If the server receives an acknowledgment from all other servers, it knows the action can be performed and informs all other servers that the action has been executed (4). 
-Finally, all servers send the update of the game state to all the connected clients (5). 
-We have to keep in mind that players can spoof the values they send to the server. 
-For example, they can perform a move action to a tile that is more than distance one away from their current position. 
-To defend against these modifications, every action is validated by the server.
+Finally, all servers execute the action as well and send the update of the game state to all the connected clients (5). 
+This process of clients performing actions is visualized in Figure \ref{fig:update_diagram}. 
+As mentioned, we have to keep in mind that players can spoof the values they send to the server. 
+For example, they can perform a move action to a tile that is more than distance one away from their current position.
 
 This process of sending requests and acknowledgments is necessary to keep the game state consistent across all servers and therefore also all clients. 
 Moreover, this process is also resilient against lost messages. 
-When the client request (1) is lost, the action will simply not be performed. 
+When a client request (1) is lost, the action will not be performed. 
 The same holds when one or more of the server requests (2) or acknowledgments (3) get lost. 
 When one of the messages sent in step (4) gets lost, the action will still be performed, making the game state in the server to which the message was send (as well as its clients) inconsistent with the other servers. 
-However, this inconsistency is only temporary as the next action of the same client will repair the missed update. 
-This is the case because for instance the requests for a move do not contain the direction of the move, but instead the position on the grid to which the player wants to move.
+However, this inconsistency is only temporary as the next action of the same client will repair the missed update, provided this action gets received. 
+This is the case because, for instance, the requests for a move do not contain the direction of the move, but instead the position on the grid to which the player wants to move.
 
-Another case we have to consider is clients sending concurrent updates. 
+We also have to consider the case where clients are sending concurrent updates. 
 What happens if two clients, connected to different servers, want to move to the same (free) tile? 
 The moment a server receives an update for the move, it sends a request to the other servers, however, the other server where this action is about to happen, will reject the action and vice versa. 
 This means that in the case of concurrent updates, the update will not be performed at all.
@@ -74,33 +74,29 @@ This means that in the case of concurrent updates, the update will not be perfor
 \subsubsection{Client and server crashes}
 \label{subsubsec:client_server_crashes}
 The final scenario that we discuss in this chapter, is the crash of a server or client node. 
-To know when a certain server has crashed, the servers send heartbeat messages to each other. 
+To keep track of when a certain server has crashed, the servers send heartbeat messages to each other. 
 When a server has missed two consecutive heartbeat messages of a certain server, it assumes that server has crashed and it will stop sending messages to it.
 When this server comes back online, it will send a message to all other servers to let them know it is available again. 
 Then one of the servers will send the current game state to the `new' server so it can start participating in the system again.
-We don't make a distinction between a networking problem between servers and a server crash. 
+We do not make a distinction between a networking problem between servers and a server crash. 
 In both cases, the server appears to be offline for the other servers. 
 Note that a server that cannot communicate with one of the other servers, will still accept requests from clients.
 
-Besides the heartbeat messages sent to other servers, the servers also send heartbeat messages to their clients to check if they are still connected. 
+Besides the heartbeat messages sent to other servers, the servers also send heartbeat messages to their clients to check if they are still connected (and vice versa). 
 When a client misses two consecutive messages, it will be considered offline and will be removed from the game.
-When this client comes back online it can simply try to connect to one of the server as described above.
+When this client comes back online it can try to connect to one of the server as described above.
 
 Finally, when two consecutive heartbeat messages to a server fail, the client assumes the server has crashed. 
 Then this client will pick another server from its lists of servers and try to connect to it so it can resume the game. 
 When the client has successfully reconnected, the player is added on a random position in the field again.
 
-\subsubsection{Load balancing}
-\label{subsubsec:load_balancing}
-	Since a client chooses a server at random, the distribution of clients can be seen as a normal distribution. 
-	This means that the expected amount of clients per server will be roughly the same.
-	If a server crashes and the clients connected to this server start to reconnect to another server, the amount of players will be equally divided over the operational servers as they will -- again -- pick a (functioning) server at random.
-	Once a crashed server recovers, it will not receive players from heavier loaded servers but simply by players trying to connect to this server by trying. 
-	This should result in the load slowly becoming even again over time. 
-	A load balancing algorithm can be used to speed up this process.
-	There are plenty of load balancing algorithms for example \cite{wolff2001dynamic} and \cite{ballard2000client}, but due to time constraints this is something we consider future work.
-
 \subsection{Additional System Features}
 \label{subsec:additional_features}
-(optional): Describe each additional feature of your system, one sub-section per feature
+The design of the distributed system as described above is able to handle multiple failures at the same time. 
+In particular, it can still operate in case all but one servers crash. 
+This follows from the fact that all clients that were connected to the crashed servers will discover their server has crashed and will try to reconnect to another server.
+In this way, they will at some point connect to the single server that is still operational and can continue to request actions.
+The only reason why the system might not operate well in the case of this many failures would be that all clients will connect to a single server, resulting in a high load on that server.
+If the operational server is not able to handle that load well, the system's performance will either drop significantly or that server will crash as well.
+
  
