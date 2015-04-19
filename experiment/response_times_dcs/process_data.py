@@ -18,10 +18,10 @@ fig.suptitle('Server-client response time', fontsize=14, fontweight='bold')
 
 ax1 = fig.add_subplot(111)
 
-ax1.set_xlabel('')
-ax1.set_ylabel('Resonse time (ms)')
-pylab.xticks([1], [''])
+ax1.set_ylabel('')
+ax1.set_xlabel('Resonse time (ms)')
+pylab.yticks([1], [''])
 
-plt.boxplot(responses)
+plt.boxplot(responses, vert=False)
 
 plt.show()
