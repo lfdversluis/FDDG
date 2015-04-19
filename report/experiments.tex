@@ -1,7 +1,7 @@
 \section{Experiments}
 \label{sec:experiments}
 % (recommended size: 1.5 pages)
-	In this section, a realistic simulation of clients connecting/disconnecting from the server is first described. This is one of the requirements of the customer WantGame BV. After that, the experimental setup used is provided. Finally, the experiments that have been conducted on the Fault-tolerant Distributed Dragon Game (FDDG) and the outcome of these experiments are presented.
+	In this section, a realistic simulation of clients connecting/disconnecting from the server is first described. This is one of the requirements of the customer WantGame BV. After that, the experimental setup used is provided. Finally, the experiments that have been conducted on the Fault-tolerant Distributed Dragon Game (FDDG) and the outcome of these experiments are presented. The code we've used for the experiments is open-source and available on Github\footnote{https://github.com/lfdversluis/FDDG}.
 	
 \subsection{Simulation of connecting/disconnecting clients}
 \label{subsec:simulation_clients}
@@ -10,7 +10,7 @@ A potential data set with game traces is described in the paper of Guo et al. \c
 Here, the design of the GTA (Game Trace Archive) is explained and possible applications of the data are discussed.
 Amongst the genres of the analyzed games are Massively Multiplayer Online Role-Playing Game (MMORPGs), board games and Real-time Strategy (RTS) games. 
 Since FDDG closely resembles a MMORPG, the WoWAH game trace \cite{lee2011world} was used.
-This game trace archive contains data about 91065 players during 1107 days. The dataset is available as a free download on the author's website\footnote{http://mmnet.iis.sinica.edu.tw/dl/wowah/}.
+This game trace archive contains data about 91.065 players during 1107 days. The dataset is available as a free download on the author's website\footnote{http://mmnet.iis.sinica.edu.tw/dl/wowah/}.
 From this dataset, the number of online players during 24 hours was extracted to use in the simulations. 
 A visual representation of the amount of online avatars in the game trace can be found in Figure \ref{fig:online_players_plot}. Here, one can see that the number of online players is minimal during the morning and maximal around midnight.
 
@@ -36,6 +36,8 @@ A simulation file has been created, containing information about all events duri
 
 To experiment with FDDG and analyze the performance, the game was simulated on the DAS-4 supercomputer.
 The common setup of the experiments consisted of 5 servers where each server runs on one of the DAS-4 nodes. Furthermore, we have two nodes with 50 client running on each node.
+The nodes used for the experiments are all from the same TU Delft cluster.
+This means that the interconnection between nodes should be good and that latency should not be a bottleneck for our system.
 By running the simulations on the DAS-4, it is guaranteed that the game was tested in a truly distributed system, where processes were running on physical different nodes.
 The disadvantage of running the game on the DAS-4 is that we cannot see the GUI that allows for easier debugging and observation of the game state.
 Furthermore, a self-created message system that makes use of \emph{actions} is implemented to send updates and acknowledgments inside the game. Actions performed by clients and servers are written to log files.
@@ -112,7 +114,7 @@ A simulation starts as soon as the first client joins the server. The game is th
 		To gain more insight in the number of messages exchanged, a setup with 5 servers and 20 dragons was run. 
 		In two runs, one with 50 clients and one with 100 clients, it took around one minute to finish the game (in both games all players were killed). 
 		With 50 clients, the total number of messages was around 5600 from the beginning to the end of the game. 
-		With 100 clients, a total of 14900 messages between servers and clients are exchanged. 
+		With 100 clients, a total of 14.900 messages between servers and clients are exchanged. 
 		The fact that this number is way below the approximated number of messages in the system can be explained by the fact that not all clients were active during the total duration of the game; there is a delay between two clients connecting to the game. 
 		Moreover, players that have died during the game, can no longer performing actions. We also noticed that the number of messages sent by a server to clients is about 2.5 times larger than the number of messages to other servers.\\
 		The final analysis discussed here is the number of heartbeats between clients and servers. 

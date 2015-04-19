@@ -9,7 +9,8 @@ In section \ref{subsec:additional_features}, we discuss additional features we h
 The distributed system that has been designed consists of several server nodes and is designed to deal with at least 20 players on each server. 
 Each client node represents a single player in the virtual world and connects to a single server.
 All servers contain the current state of the virtual world and they inform each other of game updates to keep the game states of the servers consistent. 
-This is the mirrored game design as seen during the lectures and explained in Cronin et al. \cite{cronin2002efficient}. 
+This is the mirrored game design as seen during the lectures and explained in Cronin et al. \cite{cronin2002efficient}.
+The game is written in Java and makes use of the Java RMI library to invoke remote object methods. RMI was preferred over Java sockets because RMI has a higher abstraction level, thus making the implementation of the system easier. 
 In this section, more details are provided on the design of the system, by describing what happens within the system in possible scenarios. 
 In section \ref{subsubsec:disconnecting_clients} the scenario of clients connecting and disconnecting is discussed. 
 In section \ref{subsubsec:clients_actions} the process of clients performing actions such as healing, moving and attacking dragons is explained. 
@@ -61,7 +62,7 @@ This is the case because, for instance, the requests for a move do not contain t
 We also have to consider the case where clients are sending concurrent updates. 
 What happens if two clients, connected to different servers, want to move to the same (free) tile? 
 The moment a server receives an update for the move, it sends a request to the other servers, however, the other server where this action is about to happen, will reject the action and vice versa. 
-This means that in the case of concurrent updates, the update will not be performed at all.
+This means that in the case of concurrent updates, the update will not be performed at all. The client will notice that their action has not been performed and it can try to execute the action again.
 
 \begin{figure}[h!]
   \centering
@@ -80,11 +81,11 @@ When this server comes back online, it will send a message to all other servers 
 Then one of the servers will send the current game state to the `new' server so it can start participating in the system again.
 We do not make a distinction between a networking problem between servers and a server crash. 
 In both cases, the server appears to be offline for the other servers. 
-Note that a server that cannot communicate with one of the other servers, will still accept requests from clients.
+Note that a server that cannot communicate with one of the other servers, will still accept requests from clients. These client request will probably not be executed since the server cannot get an acknowledgment for this action from all the other servers.
 
 Besides the heartbeat messages sent to other servers, the servers also send heartbeat messages to their clients to check if they are still connected (and vice versa). 
 When a client misses two consecutive messages, it will be considered offline and will be removed from the game.
-When this client comes back online it can try to connect to one of the server as described above.
+When this client comes back online it can try to connect to one of the server as described above. The client will not return to its former position but a new random position on the board will be assigned to this client.
 
 Finally, when two consecutive heartbeat messages to a server fail, the client assumes the server has crashed. 
 Then this client will pick another server from its lists of servers and try to connect to it so it can resume the game. 
